@@ -278,9 +278,7 @@ export default function AdminDashboard({ email }: { email: string }) {
                     )}
                   </span>
 
-                  <span>
-                    <b>{lead.service}</b>
-                  </span>
+                  <span>{lead.service} </span>
 
                   <span className="messageCell">
                     {lead.message || '-'}
