@@ -265,75 +265,108 @@ export default function AdminDashboard({ email }: { email: string }) {
           </div>
         )}
 
-      {/* DESKTOP TABLE */}
-                    {lead.email ? (
-                      <a
-                        className="actionLink"
-                        href={`mailto:${lead.email}`}
-                      >
-                        ✉️ {lead.email}
-                      </a>
-                    ) : (
-                      '-'
-                    )}
-                  </span>
+     {/* DESKTOP TABLE */}
+{!loading && filteredLeads.length > 0 && (
+  <div className="leadTableWrap">
+    <div className="leadTable">
 
-                  <span>{lead.service} </span>
+      <div className="lead leadHead">
+        <span>Name</span>
+        <span>Phone</span>
+        <span>Email</span>
+        <span>Service</span>
+        <span>Message</span>
+        <span>Status</span>
+        <span>Date</span>
+        <span>Actions</span>
+      </div>
 
-                  <span className="messageCell">
-                    {lead.message || '-'}
-                  </span>
+      {filteredLeads.map((lead) => (
+        <div className="lead" key={lead.id}>
 
-                  <span>
-                    <span className={statusClass(lead.status)}>
-                      {lead.status}
-                    </span>
-                  </span>
+          <span>
+            <b>{lead.name}</b>
+          </span>
 
-                  <span>
-                    {new Date(
-                      lead.created_at
-                    ).toLocaleString()}
-                  </span>
+          <span>
+            <a
+              className="actionLink"
+              href={`tel:${lead.phone}`}
+            >
+              📞 {lead.phone}
+            </a>
+          </span>
 
-                  <span className="crmActions">
+          <span>
+            {lead.email ? (
+              <a
+                className="actionLink"
+                href={`mailto:${lead.email}`}
+              >
+                ✉️ {lead.email}
+              </a>
+            ) : (
+              '-'
+            )}
+          </span>
 
-                    <a
-                      className="smallBtn callBtn"
-                      href={`tel:${lead.phone}`}
-                    >
-                      📞 Call
-                    </a>
+          <span>
+            {lead.service}
+          </span>
 
-                    <a
-                      className="smallBtn whatsappBtn"
-                      href={`https://wa.me/${lead.phone.replace(
-                        /[^0-9]/g,
-                        ''
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      💬 WhatsApp
-                    </a>
+          <span className="messageCell">
+            {lead.message || '-'}
+          </span>
 
-                    {lead.email && (
-                      <a
-                        className="smallBtn emailBtn"
-                        href={`mailto:${lead.email}`}
-                      >
-                        ✉️ Email
-                      </a>
-                    )}
+          <span>
+            <span className={statusClass(lead.status)}>
+              {lead.status}
+            </span>
+          </span>
 
-                  </span>
+          <span>
+            {new Date(lead.created_at).toLocaleString()}
+          </span>
 
-                </div>
-              ))}
+          <span className="crmActions">
 
-            </div>
-          </div>
-        )}
+            <a
+              className="smallBtn callBtn"
+              href={`tel:${lead.phone}`}
+            >
+              📞 Call
+            </a>
+
+            <a
+              className="smallBtn whatsappBtn"
+              href={`https://wa.me/${lead.phone.replace(
+                /[^0-9]/g,
+                ''
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              💬 WhatsApp
+            </a>
+
+            {lead.email && (
+              <a
+                className="smallBtn emailBtn"
+                href={`mailto:${lead.email}`}
+              >
+                ✉️ Email
+              </a>
+            )}
+
+          </span>
+
+        </div>
+      ))}
+
+    </div>
+  </div>
+)}
+
 
       {/* MOBILE CARDS */}
       {!loading &&
