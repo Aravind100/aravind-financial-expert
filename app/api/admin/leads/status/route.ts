@@ -8,9 +8,10 @@ const ADMIN_EMAIL = (
 
 export async function PATCH(request: Request) {
   try {
-    // Verify logged-in user
     const supabase = await createClient()
-    const { data, error: authError } = await supabase.auth.getUser()
+
+    const { data, error: authError } =
+      await supabase.auth.getUser()
 
     if (authError || !data.user?.email) {
       return NextResponse.json(
@@ -19,8 +20,10 @@ export async function PATCH(request: Request) {
       )
     }
 
-    // Verify admin email
-    if (data.user.email.trim().toLowerCase() !== ADMIN_EMAIL) {
+    if (
+      data.user.email.trim().toLowerCase() !==
+      ADMIN_EMAIL
+    ) {
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }
@@ -31,6 +34,16 @@ export async function PATCH(request: Request) {
 
     const id = Number(body.id)
     const status = String(body.status || '').trim()
+
+    const follow_up_date =
+      body.follow_up_date
+        ? String(body.follow_up_date).trim()
+        : null
+
+    const follow_up_notes =
+      body.follow_up_notes !== undefined
+        ? String(body.follow_up_notes || '').trim() || null
+        : null
 
     if (!Number.isInteger(id) || !status) {
       return NextResponse.json(
@@ -56,18 +69,37 @@ export async function PATCH(request: Request) {
 
     const admin = supabaseAdmin()
 
+    const updateData: {
+      status: string
+      follow_up_date?: string | null
+      follow_up_notes?: string | null
+    } = {
+      status,
+    }
+
+    if (body.follow_up_date !== undefined) {
+      updateData.follow_up_date = follow_up_date
+    }
+
+    if (body.follow_up_notes !== undefined) {
+      updateData.follow_up_notes = follow_up_notes
+    }
+
     const { data: lead, error } = await admin
       .from('leads')
-      .update({ status })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
 
     if (error) {
-      console.error('Lead status update error:', error)
+      console.error(
+        'Lead update error:',
+        error
+      )
 
       return NextResponse.json(
-        { error: 'Unable to update lead status.' },
+        { error: 'Unable to update lead.' },
         { status: 500 }
       )
     }
@@ -77,7 +109,10 @@ export async function PATCH(request: Request) {
       lead,
     })
   } catch (error) {
-    console.error('Status API error:', error)
+    console.error(
+      'Lead status API error:',
+      error
+    )
 
     return NextResponse.json(
       { error: 'Server error.' },
@@ -85,3 +120,4 @@ export async function PATCH(request: Request) {
     )
   }
 }
+
