@@ -118,6 +118,7 @@ export default function EnquiryForm({
       />
 
       <input
+        required
         type="email"
         placeholder="Email"
         value={form.email}
