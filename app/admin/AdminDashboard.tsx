@@ -20,6 +20,7 @@ const STATUSES = [
   'Contacted',
   'Follow-up',
   'Converted',
+  'Closed',
 ]
 
 function whatsappNumber(phone: string) {
@@ -49,30 +50,21 @@ export default function AdminDashboard({
     setError('')
 
     try {
-      const response = await fetch(
-        '/api/admin/leads',
-        {
-          cache: 'no-store',
-        }
-      )
+      const response = await fetch('/api/admin/leads', {
+        cache: 'no-store',
+      })
 
       const data = await response.json()
 
       if (!response.ok) {
-        setError(
-          data.error ||
-          'Unable to load leads.'
-        )
-
+        setError(data.error || 'Unable to load leads.')
         setLoading(false)
         return
       }
 
       setLeads(data.leads || [])
     } catch {
-      setError(
-        'Unable to connect to the server.'
-      )
+      setError('Unable to connect to the server.')
     }
 
     setLoading(false)
@@ -82,10 +74,7 @@ export default function AdminDashboard({
     loadLeads()
   }, [])
 
-  async function updateStatus(
-    id: number,
-    status: string
-  ) {
+  async function updateStatus(id: number, status: string) {
     const previousLeads = leads
 
     setUpdatingId(id)
@@ -100,37 +89,26 @@ export default function AdminDashboard({
     )
 
     try {
-      const response = await fetch(
-        '/api/admin/leads/status',
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
-          body: JSON.stringify({
-            id,
-            status,
-          }),
-        }
-      )
+      const response = await fetch('/api/admin/leads/status', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          status,
+        }),
+      })
 
       const data = await response.json()
 
       if (!response.ok) {
         setLeads(previousLeads)
-
-        setError(
-          data.error ||
-          'Unable to update status.'
-        )
+        setError(data.error || 'Unable to update status.')
       }
     } catch {
       setLeads(previousLeads)
-
-      setError(
-        'Unable to update status.'
-      )
+      setError('Unable to update status.')
     }
 
     setUpdatingId(null)
@@ -161,9 +139,7 @@ export default function AdminDashboard({
       ]
         .filter(Boolean)
         .some((value) =>
-          String(value)
-            .toLowerCase()
-            .includes(q)
+          String(value).toLowerCase().includes(q)
         )
     )
   }, [leads, search])
@@ -189,8 +165,6 @@ export default function AdminDashboard({
   return (
     <main className="admin">
 
-      {/* HEADER */}
-
       <div className="adminTop">
         <div>
           <h1>Lead Dashboard</h1>
@@ -201,7 +175,6 @@ export default function AdminDashboard({
         </div>
 
         <div className="actions">
-
           <button
             className="btn alt"
             onClick={loadLeads}
@@ -216,18 +189,13 @@ export default function AdminDashboard({
           >
             🔐 Sign out
           </button>
-
         </div>
       </div>
-
-      {/* COUNTERS */}
 
       <div className="leadStats">
 
         <div className="statCard">
-          <div className="statIcon">
-            📊
-          </div>
+          <div className="statIcon">📊</div>
 
           <div>
             <strong>{total}</strong>
@@ -236,9 +204,7 @@ export default function AdminDashboard({
         </div>
 
         <div className="statCard">
-          <div className="statIcon">
-            🆕
-          </div>
+          <div className="statIcon">🆕</div>
 
           <div>
             <strong>{newCount}</strong>
@@ -247,9 +213,7 @@ export default function AdminDashboard({
         </div>
 
         <div className="statCard">
-          <div className="statIcon">
-            📞
-          </div>
+          <div className="statIcon">📞</div>
 
           <div>
             <strong>{contactedCount}</strong>
@@ -258,9 +222,7 @@ export default function AdminDashboard({
         </div>
 
         <div className="statCard">
-          <div className="statIcon">
-            🔄
-          </div>
+          <div className="statIcon">🔄</div>
 
           <div>
             <strong>{followUpCount}</strong>
@@ -269,9 +231,7 @@ export default function AdminDashboard({
         </div>
 
         <div className="statCard">
-          <div className="statIcon">
-            ✅
-          </div>
+          <div className="statIcon">✅</div>
 
           <div>
             <strong>{convertedCount}</strong>
@@ -281,17 +241,13 @@ export default function AdminDashboard({
 
       </div>
 
-      {/* SEARCH */}
-
       <div className="adminTools">
 
         <input
           className="searchInput"
           placeholder="🔎 Search name, phone, email, service..."
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => setSearch(e.target.value)}
         />
 
         <div className="leadCount">
@@ -320,11 +276,8 @@ export default function AdminDashboard({
           </div>
         )}
 
-      {/* DESKTOP */}
-
       {!loading &&
         filteredLeads.length > 0 && (
-
           <div className="desktopLeads">
 
             <div className="leadTableWrap">
@@ -332,7 +285,6 @@ export default function AdminDashboard({
               <div className="leadTable">
 
                 <div className="lead leadHead">
-
                   <span>Name</span>
                   <span>Phone</span>
                   <span>Email</span>
@@ -341,128 +293,114 @@ export default function AdminDashboard({
                   <span>Status</span>
                   <span>Date</span>
                   <span>Actions</span>
-
                 </div>
 
-                {filteredLeads.map(
-                  (lead) => (
+                {filteredLeads.map((lead) => (
 
-                    <div
-                      className="lead"
-                      key={lead.id}
-                    >
+                  <div
+                    className="lead"
+                    key={lead.id}
+                  >
 
-                      <span>
-                        <b>
-                          {lead.name}
-                        </b>
-                      </span>
+                    <span>
+                      <b>{lead.name}</b>
+                    </span>
 
-                      <span>
+                    <span>
+                      <a
+                        className="actionLink"
+                        href={`tel:${lead.phone}`}
+                      >
+                        📞 {lead.phone}
+                      </a>
+                    </span>
+
+                    <span>
+                      {lead.email ? (
                         <a
                           className="actionLink"
-                          href={`tel:${lead.phone}`}
+                          href={`mailto:${lead.email}`}
                         >
-                          📞 {lead.phone}
+                          ✉️ {lead.email}
                         </a>
-                      </span>
+                      ) : (
+                        '-'
+                      )}
+                    </span>
 
-                      <span>
-                        {lead.email ? (
-                          <a
-                            className="actionLink"
-                            href={`mailto:${lead.email}`}
+                    <span>
+                      <b>{lead.service}</b>
+                    </span>
+
+                    <span className="messageCell">
+                      {lead.message || '-'}
+                    </span>
+
+                    <span>
+                      <select
+                        className={`statusSelect status-${lead.status
+                          .toLowerCase()
+                          .replace(/\s+/g, '-')}`}
+                        value={lead.status}
+                        disabled={updatingId === lead.id}
+                        onChange={(e) =>
+                          updateStatus(
+                            lead.id,
+                            e.target.value
+                          )
+                        }
+                      >
+                        {STATUSES.map((status) => (
+                          <option
+                            key={status}
+                            value={status}
                           >
-                            ✉️ {lead.email}
-                          </a>
-                        ) : (
-                          '-'
-                        )}
-                      </span>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
 
-                      <span>
-                        <b>
-                          {lead.service}
-                        </b>
-                      </span>
+                    <span>
+                      {new Date(
+                        lead.created_at
+                      ).toLocaleString()}
+                    </span>
 
-                      <span className="messageCell">
-                        {lead.message || '-'}
-                      </span>
+                    <span className="actionButtons">
 
-                      <span>
+                      <a
+                        className="smallBtn callBtn"
+                        href={`tel:${lead.phone}`}
+                      >
+                        📞 Call
+                      </a>
 
-                        <select
-                          className={`statusSelect status-${lead.status
-                            .toLowerCase()
-                            .replace(/\s+/g, '-')}`}
-                          value={lead.status}
-                          disabled={
-                            updatingId === lead.id
-                          }
-                          onChange={(e) =>
-                            updateStatus(
-                              lead.id,
-                              e.target.value
-                            )
-                          }
-                        >
+                      <a
+                        className="smallBtn whatsappBtn"
+                        href={`https://wa.me/${whatsappNumber(
+                          lead.phone
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        💬 WhatsApp
+                      </a>
 
-                          {STATUSES.map(
-                            (status) => (
-                              <option
-                                key={status}
-                                value={status}
-                              >
-                                {status}
-                              </option>
-                            )
-                          )}
-
-                        </select>
-
-                      </span>
-
-                      <span>
-                        {new Date(
-                          lead.created_at
-                        ).toLocaleString()}
-                      </span>
-
-                      <span className="actionButtons">
-
+                      {lead.email && (
                         <a
-                          className="smallBtn callBtn"
-                          href={`tel:${lead.phone}`}
+                          className="smallBtn emailBtn"
+                          href={`mailto:${lead.email}`}
                         >
-                          📞 Call
+                          ✉️ Email
                         </a>
+                      )}
 
-                        <a
-                          className="smallBtn whatsappBtn"
-                          href={`https://wa.me/${whatsappNumber(
-                            lead.phone
-                          )}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          💬 WhatsApp
-                        </a>
+                    </span>
 
-                        {lead.email && (
-                          <a
-                            className="smallBtn emailBtn"
-                            href={`mailto:${lead.email}`}
-                          >
-                            ✉️ Email
-                          </a>
-                        )}
+                  </div>
 
-                      </span>
-
-                    </div>
-                  )
-                )}
+                ))}
 
               </div>
 
@@ -471,156 +409,132 @@ export default function AdminDashboard({
           </div>
         )}
 
-      {/* MOBILE */}
-
       {!loading &&
         filteredLeads.length > 0 && (
-
           <div className="mobileLeads">
 
-            {filteredLeads.map(
-              (lead) => (
+            {filteredLeads.map((lead) => (
 
-                <div
-                  className="mobileLeadCard"
-                  key={lead.id}
-                >
+              <div
+                className="mobileLeadCard"
+                key={lead.id}
+              >
 
-                  <div className="mobileLeadTop">
+                <div className="mobileLeadTop">
 
-                    <div>
-                      <h2>
-                        {lead.name}
-                      </h2>
+                  <div>
+                    <h2>{lead.name}</h2>
 
-                      <div className="mobileService">
-                        {lead.service}
-                      </div>
+                    <div className="mobileService">
+                      {lead.service}
                     </div>
-
                   </div>
 
-                  <div className="mobileInfo">
+                </div>
 
-                    <div>
-                      <strong>
-                        📞 Phone
-                      </strong>
+                <div className="mobileInfo">
 
-                      <a
-                        href={`tel:${lead.phone}`}
-                      >
-                        {lead.phone}
-                      </a>
-                    </div>
+                  <div>
+                    <strong>📞 Phone</strong>
 
-                    {lead.email && (
-                      <div>
-                        <strong>
-                          ✉️ Email
-                        </strong>
-
-                        <a
-                          href={`mailto:${lead.email}`}
-                        >
-                          {lead.email}
-                        </a>
-                      </div>
-                    )}
-
-                    <div>
-                      <strong>
-                        📝 Message
-                      </strong>
-
-                      <p>
-                        {lead.message || '-'}
-                      </p>
-                    </div>
-
-                    <div>
-                      <strong>
-                        📅 Enquiry
-                      </strong>
-
-                      <p>
-                        {new Date(
-                          lead.created_at
-                        ).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="mobileStatus">
-
-                      <strong>
-                        📌 Lead Status
-                      </strong>
-
-                      <select
-                        className="mobileStatusSelect"
-                        value={lead.status}
-                        disabled={
-                          updatingId === lead.id
-                        }
-                        onChange={(e) =>
-                          updateStatus(
-                            lead.id,
-                            e.target.value
-                          )
-                        }
-                      >
-
-                        {STATUSES.map(
-                          (status) => (
-                            <option
-                              key={status}
-                              value={status}
-                            >
-                              {status}
-                            </option>
-                          )
-                        )}
-
-                      </select>
-
-                    </div>
-
+                    <a href={`tel:${lead.phone}`}>
+                      {lead.phone}
+                    </a>
                   </div>
 
-                  <div className="mobileActions">
+                  {lead.email && (
+                    <div>
+                      <strong>✉️ Email</strong>
 
-                    <a
-                      className="mobileAction call"
-                      href={`tel:${lead.phone}`}
-                    >
-                      📞 Call
-                    </a>
-
-                    <a
-                      className="mobileAction whatsapp"
-                      href={`https://wa.me/${whatsappNumber(
-                        lead.phone
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      💬 WhatsApp
-                    </a>
-
-                    {lead.email && (
                       <a
-                        className="mobileAction email"
                         href={`mailto:${lead.email}`}
                       >
-                        ✉️ Email
+                        {lead.email}
                       </a>
-                    )}
+                    </div>
+                  )}
+
+                  <div>
+                    <strong>📝 Message</strong>
+
+                    <p>
+                      {lead.message || '-'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <strong>📅 Enquiry</strong>
+
+                    <p>
+                      {new Date(
+                        lead.created_at
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div className="mobileStatus">
+
+                    <strong>📌 Lead Status</strong>
+
+                    <select
+                      className="mobileStatusSelect"
+                      value={lead.status}
+                      disabled={updatingId === lead.id}
+                      onChange={(e) =>
+                        updateStatus(
+                          lead.id,
+                          e.target.value
+                        )
+                      }
+                    >
+                      {STATUSES.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                        >
+                          {status}
+                        </option>
+                      ))}
+                    </select>
 
                   </div>
 
                 </div>
-              )
-            )}
+
+                <div className="mobileActions">
+
+                  <a
+                    className="mobileAction call"
+                    href={`tel:${lead.phone}`}
+                  >
+                    📞 Call
+                  </a>
+
+                  <a
+                    className="mobileAction whatsapp"
+                    href={`https://wa.me/${whatsappNumber(
+                      lead.phone
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    💬 WhatsApp
+                  </a>
+
+                  {lead.email && (
+                    <a
+                      className="mobileAction email"
+                      href={`mailto:${lead.email}`}
+                    >
+                      ✉️ Email
+                    </a>
+                  )}
+
+                </div>
+
+              </div>
+
+            ))}
 
           </div>
         )}
@@ -629,8 +543,7 @@ export default function AdminDashboard({
 
         .leadStats {
           display: grid;
-          grid-template-columns:
-            repeat(5, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 14px;
           margin: 25px 0;
         }
@@ -643,13 +556,13 @@ export default function AdminDashboard({
           display: flex;
           align-items: center;
           gap: 12px;
-          box-shadow:
-            0 3px 12px
-            rgba(0,0,0,0.05);
+          box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+          min-width: 0;
         }
 
         .statIcon {
           font-size: 25px;
+          flex-shrink: 0;
         }
 
         .statCard strong {
@@ -714,14 +627,11 @@ export default function AdminDashboard({
           border-radius: 16px;
           padding: 18px;
           margin-bottom: 14px;
-          box-shadow:
-            0 4px 16px
-            rgba(0,0,0,0.06);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
 
         .mobileLeadTop {
-          border-bottom:
-            1px solid #eee;
+          border-bottom: 1px solid #eee;
           padding-bottom: 14px;
         }
 
@@ -766,23 +676,25 @@ export default function AdminDashboard({
           box-sizing: border-box;
           margin-top: 5px;
           padding: 11px;
+          min-height: 44px;
         }
 
         .mobileActions {
           display: grid;
-          grid-template-columns:
-            repeat(3, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 8px;
           margin-top: 16px;
         }
 
         .mobileAction {
           text-align: center;
-          padding: 11px 6px;
+          padding: 12px 6px;
           border-radius: 9px;
           text-decoration: none;
           font-weight: 700;
           font-size: 13px;
+          min-height: 44px;
+          box-sizing: border-box;
         }
 
         .mobileAction.call {
@@ -803,8 +715,7 @@ export default function AdminDashboard({
         @media (max-width: 900px) {
 
           .leadStats {
-            grid-template-columns:
-              repeat(3, 1fr);
+            grid-template-columns: repeat(3, 1fr);
           }
 
         }
@@ -820,8 +731,8 @@ export default function AdminDashboard({
           }
 
           .leadStats {
-            grid-template-columns:
-              repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
           }
 
           .adminTop {
@@ -836,6 +747,7 @@ export default function AdminDashboard({
 
           .adminTop .btn {
             flex: 1;
+            min-height: 44px;
           }
 
           .adminTools {
@@ -845,6 +757,7 @@ export default function AdminDashboard({
           .searchInput {
             width: 100%;
             box-sizing: border-box;
+            min-height: 44px;
           }
 
           .leadCount {
@@ -864,8 +777,16 @@ export default function AdminDashboard({
             padding: 13px;
           }
 
+          .statIcon {
+            font-size: 21px;
+          }
+
           .statCard strong {
             font-size: 21px;
+          }
+
+          .statCard span {
+            font-size: 12px;
           }
 
           .mobileLeadCard {
