@@ -31,7 +31,17 @@ export default function RootLayout({
               <Link href="/articles">Articles</Link>
               <Link href="/about">About</Link>
               <Link href="/contact">Contact</Link>
-            </nav>
+                       </nav>
+
+            {/* Desktop WhatsApp Button */}
+            <a
+              className="desktop-whatsapp"
+              href="https://wa.me/919173334069"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp
+            </a>
 
             {/* Mobile Hamburger Menu */}
             <details className="mobile-menu">
