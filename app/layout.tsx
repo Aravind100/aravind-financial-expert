@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import MobileMenu from "../components/MobileMenu";
 
 export const metadata = {
   title: "Aravind Chaudhary | Financial Services",
@@ -43,23 +44,8 @@ export default function RootLayout({
               WhatsApp
             </a>
 
-            {/* Mobile Hamburger Menu */}
-            <details className="mobile-menu">
-              <summary aria-label="Open navigation menu">
-                <span className="hamburger-icon">☰</span>
-              </summary>
-
-              <div className="mobile-menu-panel">
-                <Link href="/investments">Investments</Link>
-                <Link href="/insurance">Insurance</Link>
-                <Link href="/loans">Loans</Link>
-                <Link href="/imp">IMP</Link>
-                <Link href="/swp">SWP</Link>
-                <Link href="/articles">Articles</Link>
-                <Link href="/about">About</Link>
-                <Link href="/contact">Contact</Link>
-              </div>
-            </details>
+           {/* Mobile Hamburger Menu */}
+<MobileMenu />
 
           </div>
         </header>
