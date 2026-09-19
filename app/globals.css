@@ -203,4 +203,29 @@
   }
 
 }
+
+/* =========================================================
+   STEP 12 — DESKTOP WHATSAPP BUTTON
+   ========================================================= */
+
+.desktop-whatsapp {
+  background: #25d366;
+  color: #ffffff;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.desktop-whatsapp:hover {
+  opacity: 0.9;
+}
+
+/* Hide WhatsApp on mobile */
+@media (max-width: 768px) {
+  .desktop-whatsapp {
+    display: none !important;
+  }
+}
    
