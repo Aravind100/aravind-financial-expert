@@ -139,5 +139,30 @@
   }
 
 }
+/* =========================================================
+   MOBILE MENU OPEN / CLOSE ICON
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* When menu is closed */
+  .mobile-menu:not([open]) .hamburger-icon {
+    font-size: 24px;
+  }
+
+  /* When menu is open, hide ☰ */
+  .mobile-menu[open] .hamburger-icon {
+    font-size: 0;
+  }
+
+  /* Show × when menu is open */
+  .mobile-menu[open] .hamburger-icon::after {
+    content: "×";
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+}
    
    
