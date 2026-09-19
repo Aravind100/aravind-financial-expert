@@ -37,3 +37,130 @@
     white-space: nowrap;
   }
 }
+
+/* =====================================================
+   RESPONSIVE MOBILE HAMBURGER MENU
+   ===================================================== */
+
+.mobile-menu {
+  display: none;
+}
+
+.mobile-menu summary {
+  list-style: none;
+}
+
+.mobile-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.hamburger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #0878d1;
+  color: #ffffff;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 80, 160, 0.18);
+}
+
+.mobile-menu-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 245px;
+  background: #ffffff;
+  border: 1px solid #e1e7ef;
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 14px 35px rgba(0, 30, 70, 0.16);
+  z-index: 9999;
+}
+
+.mobile-menu-panel a {
+  display: block;
+  padding: 13px 15px;
+  border-radius: 10px;
+  color: #142b44;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.mobile-menu-panel a:hover {
+  background: #eef6ff;
+  color: #0878d1;
+}
+
+
+/* =====================================================
+   MOBILE HEADER
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  .header {
+    width: 100%;
+  }
+
+  .nav {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 18px;
+    gap: 12px;
+  }
+
+  .brand {
+    font-size: 20px !important;
+    white-space: nowrap;
+  }
+
+  /* Hide desktop navigation */
+  .desktop-nav {
+    display: none !important;
+  }
+
+  /* Show hamburger */
+  .mobile-menu {
+    display: block;
+    position: relative;
+    margin-left: auto;
+  }
+
+  .mobile-menu[open] .hamburger-icon {
+    font-size: 0;
+  }
+
+  .mobile-menu[open] .hamburger-icon::after {
+    content: "×";
+    font-size: 30px;
+  }
+
+  .mobile-menu-panel {
+    right: 0;
+    top: 54px;
+  }
+}
+
+
+/* =====================================================
+   DESKTOP
+   ===================================================== */
+
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: none !important;
+  }
+}
