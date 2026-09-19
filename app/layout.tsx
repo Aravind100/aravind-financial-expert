@@ -13,6 +13,7 @@ export default function RootLayout({children}:{children:React.ReactNode}) {
       <nav>
         <Link href="/investments">Investments</Link><Link href="/insurance">Insurance</Link>
         <Link href="/loans">Loans</Link><Link href="/imp">IMP</Link><Link href="/swp">SWP</Link>
+        <Link href="/articles">Articles</Link>
         <Link href="/about">About</Link><Link href="/contact">Contact</Link>
       </nav>
       <a className="wa" href="https://wa.me/919173334069">WhatsApp</a>
