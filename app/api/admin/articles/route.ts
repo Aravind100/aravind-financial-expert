@@ -10,7 +10,7 @@ const ADMIN_EMAIL = (
   .trim()
   .toLowerCase()
 
-async function checkAdmin() {
+async function isAdmin() {
   const authClient = await createClient()
 
   const { data, error } = await authClient.auth.getUser()
@@ -24,12 +24,13 @@ async function checkAdmin() {
   return true
 }
 
-/* GET — Load all articles */
+/* =========================
+   GET ARTICLES
+========================= */
+
 export async function GET() {
   try {
-    const isAdmin = await checkAdmin()
-
-    if (!isAdmin) {
+    if (!(await isAdmin())) {
       return NextResponse.json(
         { error: 'Unauthorized.' },
         { status: 401 }
@@ -58,7 +59,7 @@ export async function GET() {
       articles: articles || [],
     })
   } catch (error) {
-    console.error('Articles API error:', error)
+    console.error('Articles GET API error:', error)
 
     return NextResponse.json(
       { error: 'Unable to load articles.' },
@@ -67,12 +68,13 @@ export async function GET() {
   }
 }
 
-/* POST — Create new article */
+/* =========================
+   CREATE ARTICLE
+========================= */
+
 export async function POST(request: Request) {
   try {
-    const isAdmin = await checkAdmin()
-
-    if (!isAdmin) {
+    if (!(await isAdmin())) {
       return NextResponse.json(
         { error: 'Unauthorized.' },
         { status: 401 }
@@ -81,67 +83,85 @@ export async function POST(request: Request) {
 
     const body = await request.json()
 
-    const {
-      title,
-      slug,
-      category,
-      excerpt,
-      content,
-      image_url,
-      tags,
-      published,
-      published_at,
-    } = body
+    const title = String(body.title || '').trim()
+    const slug = String(body.slug || '').trim()
+    const category = String(body.category || '').trim()
+    const excerpt = String(body.excerpt || '').trim()
+    const content = String(body.content || '').trim()
+    const image_url = String(body.image_url || '').trim()
 
-    if (!title || !slug || !content) {
+    const tags = Array.isArray(body.tags)
+      ? body.tags
+          .map((tag: unknown) => String(tag).trim())
+          .filter(Boolean)
+      : []
+
+    const published = Boolean(body.published)
+
+    if (!title) {
       return NextResponse.json(
-        {
-          error:
-            'Title, slug and content are required.',
-        },
+        { error: 'Article title is required.' },
+        { status: 400 }
+      )
+    }
+
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Article slug is required.' },
+        { status: 400 }
+      )
+    }
+
+    if (!content) {
+      return NextResponse.json(
+        { error: 'Article content is required.' },
         { status: 400 }
       )
     }
 
     const admin = supabaseAdmin()
 
+    const { data: existing } = await admin
+      .from('articles')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (existing) {
+      return NextResponse.json(
+        {
+          error:
+            'An article with this slug already exists. Please use a different slug.',
+        },
+        { status: 409 }
+      )
+    }
+
+    const now = new Date().toISOString()
+
     const { data: article, error } = await admin
       .from('articles')
       .insert({
-        title: String(title).trim(),
-        slug: String(slug).trim(),
-        category: category
-          ? String(category).trim()
-          : 'General',
-        excerpt: excerpt
-          ? String(excerpt).trim()
-          : null,
-        content: String(content),
-        image_url: image_url
-          ? String(image_url).trim()
-          : null,
-        tags: Array.isArray(tags) ? tags : [],
-        published: Boolean(published),
-        published_at:
-          published && published_at
-            ? published_at
-            : published
-              ? new Date().toISOString()
-              : null,
+        title,
+        slug,
+        category,
+        excerpt: excerpt || null,
+        content,
+        image_url: image_url || null,
+        tags,
+        published,
+        published_at: published ? now : null,
+        created_at: now,
+        updated_at: now,
       })
       .select()
       .single()
 
     if (error) {
-      console.error('Article INSERT error:', error)
+      console.error('Articles POST error:', error)
 
       return NextResponse.json(
-        {
-          error:
-            error.code === '23505'
-              ? 'This slug already exists.'
-              : 'Unable to create article.',
-        },
+        { error: error.message || 'Unable to create article.' },
         { status: 500 }
       )
     }
@@ -154,7 +174,7 @@ export async function POST(request: Request) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Article POST error:', error)
+    console.error('Articles POST API error:', error)
 
     return NextResponse.json(
       { error: 'Unable to create article.' },
@@ -163,12 +183,13 @@ export async function POST(request: Request) {
   }
 }
 
-/* PATCH — Update existing article */
+/* =========================
+   UPDATE ARTICLE
+========================= */
+
 export async function PATCH(request: Request) {
   try {
-    const isAdmin = await checkAdmin()
-
-    if (!isAdmin) {
+    if (!(await isAdmin())) {
       return NextResponse.json(
         { error: 'Unauthorized.' },
         { status: 401 }
@@ -177,12 +198,42 @@ export async function PATCH(request: Request) {
 
     const body = await request.json()
 
-    const { id } = body
+    const id = Number(body.id)
 
-    if (!id) {
+    if (!id || Number.isNaN(id)) {
       return NextResponse.json(
-        { error: 'Article ID is required.' },
+        { error: 'Valid article ID is required.' },
         { status: 400 }
+      )
+    }
+
+    const admin = supabaseAdmin()
+
+    const { data: currentArticle, error: currentError } =
+      await admin
+        .from('articles')
+        .select(
+          'id,title,slug,category,excerpt,content,image_url,tags,published,published_at'
+        )
+        .eq('id', id)
+        .maybeSingle()
+
+    if (currentError) {
+      console.error(
+        'Current article fetch error:',
+        currentError
+      )
+
+      return NextResponse.json(
+        { error: 'Unable to find article.' },
+        { status: 500 }
+      )
+    }
+
+    if (!currentArticle) {
+      return NextResponse.json(
+        { error: 'Article not found.' },
+        { status: 404 }
       )
     }
 
@@ -201,42 +252,64 @@ export async function PATCH(request: Request) {
     }
 
     if (body.excerpt !== undefined) {
-      updates.excerpt = body.excerpt
-        ? String(body.excerpt).trim()
-        : null
+      const value = String(body.excerpt).trim()
+      updates.excerpt = value || null
     }
 
     if (body.content !== undefined) {
-      updates.content = String(body.content)
+      updates.content = String(body.content).trim()
     }
 
     if (body.image_url !== undefined) {
-      updates.image_url = body.image_url
-        ? String(body.image_url).trim()
-        : null
+      const value = String(body.image_url).trim()
+      updates.image_url = value || null
     }
 
     if (body.tags !== undefined) {
       updates.tags = Array.isArray(body.tags)
         ? body.tags
+            .map((tag: unknown) => String(tag).trim())
+            .filter(Boolean)
         : []
     }
 
     if (body.published !== undefined) {
-      updates.published = Boolean(body.published)
+      const published = Boolean(body.published)
 
-      if (body.published) {
-        updates.published_at =
-          body.published_at ||
-          new Date().toISOString()
-      } else {
+      updates.published = published
+
+      if (published && !currentArticle.published_at) {
+        updates.published_at = new Date().toISOString()
+      }
+
+      if (!published) {
         updates.published_at = null
       }
     }
 
-    updates.updated_at = new Date().toISOString()
+    if (
+      updates.slug &&
+      updates.slug !== currentArticle.slug
+    ) {
+      const { data: duplicate } = await admin
+        .from('articles')
+        .select('id')
+        .eq('slug', updates.slug)
+        .neq('id', id)
+        .maybeSingle()
 
-    const admin = supabaseAdmin()
+      if (duplicate) {
+        return NextResponse.json(
+          {
+            error:
+              'Another article already uses this slug.',
+          },
+          { status: 409 }
+        )
+      }
+    }
+
+    updates.updated_at = new Date().toISOString()
 
     const { data: article, error } = await admin
       .from('articles')
@@ -246,10 +319,10 @@ export async function PATCH(request: Request) {
       .single()
 
     if (error) {
-      console.error('Article UPDATE error:', error)
+      console.error('Articles PATCH error:', error)
 
       return NextResponse.json(
-        { error: 'Unable to update article.' },
+        { error: error.message || 'Unable to update article.' },
         { status: 500 }
       )
     }
@@ -259,7 +332,7 @@ export async function PATCH(request: Request) {
       message: 'Article updated successfully.',
     })
   } catch (error) {
-    console.error('Article PATCH error:', error)
+    console.error('Articles PATCH API error:', error)
 
     return NextResponse.json(
       { error: 'Unable to update article.' },
@@ -268,12 +341,13 @@ export async function PATCH(request: Request) {
   }
 }
 
-/* DELETE — Delete article */
+/* =========================
+   DELETE ARTICLE
+========================= */
+
 export async function DELETE(request: Request) {
   try {
-    const isAdmin = await checkAdmin()
-
-    if (!isAdmin) {
+    if (!(await isAdmin())) {
       return NextResponse.json(
         { error: 'Unauthorized.' },
         { status: 401 }
@@ -282,11 +356,11 @@ export async function DELETE(request: Request) {
 
     const body = await request.json()
 
-    const { id } = body
+    const id = Number(body.id)
 
-    if (!id) {
+    if (!id || Number.isNaN(id)) {
       return NextResponse.json(
-        { error: 'Article ID is required.' },
+        { error: 'Valid article ID is required.' },
         { status: 400 }
       )
     }
@@ -299,10 +373,10 @@ export async function DELETE(request: Request) {
       .eq('id', id)
 
     if (error) {
-      console.error('Article DELETE error:', error)
+      console.error('Articles DELETE error:', error)
 
       return NextResponse.json(
-        { error: 'Unable to delete article.' },
+        { error: error.message || 'Unable to delete article.' },
         { status: 500 }
       )
     }
@@ -311,7 +385,7 @@ export async function DELETE(request: Request) {
       message: 'Article deleted successfully.',
     })
   } catch (error) {
-    console.error('Article DELETE error:', error)
+    console.error('Articles DELETE API error:', error)
 
     return NextResponse.json(
       { error: 'Unable to delete article.' },
