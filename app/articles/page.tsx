@@ -136,7 +136,7 @@ export default async function ArticlesPage() {
         </div>
       </section>
 
-      <style jsx>{`
+      <style>{`
 
         .articlesPage {
           min-height: 100vh;
