@@ -4,8 +4,8 @@ import styles from "./Insurance.module.css";
 
 const lifeInsurers = [
   {
-    name: "LIC",
-    logo: "/insurers/lic.svg",
+    name: "Axis Max",
+    logo: "/insurers/axis-max.png",
     category: "Life Insurance",
     product: "Life Insurance & Term Protection",
     description:
@@ -13,23 +13,16 @@ const lifeInsurers = [
   },
   {
     name: "HDFC Life",
-    logo: "/insurers/hdfc-life.svg",
+    logo: "/insurers/hdfc-life.png",
     category: "Life Insurance",
     product: "Click 2 Protect Supreme Plus",
     description:
       "A life insurance product offering protection options subject to eligibility, policy terms and conditions.",
   },
-  {
-    name: "SBI Life",
-    logo: "/insurers/sbi-life.svg",
-    category: "Life Insurance",
-    product: "eShield Next",
-    description:
-      "A pure-risk term insurance product designed for life protection, subject to applicable policy terms.",
-  },
+ 
   {
     name: "ICICI Prudential Life",
-    logo: "/insurers/icici-prudential-life.svg",
+    logo: "/insurers/icici-prudential-life.png",
     category: "Life Insurance",
     product: "Protection & Life Insurance",
     description:
@@ -37,7 +30,7 @@ const lifeInsurers = [
   },
   {
     name: "Tata AIA",
-    logo: "/insurers/tata-aia.svg",
+    logo: "/insurers/tata-aia.png",
     category: "Life Insurance",
     product: "Protection & Life Insurance",
     description:
@@ -45,7 +38,7 @@ const lifeInsurers = [
   },
   {
     name: "Aditya Birla Sun Life",
-    logo: "/insurers/aditya-birla-sun-life.svg",
+    logo: "/insurers/aditya-birla-sun-life.jpeg",
     category: "Life Insurance",
     product: "Life & Protection Solutions",
     description:
@@ -56,7 +49,7 @@ const lifeInsurers = [
 const healthInsurers = [
   {
     name: "Star Health",
-    logo: "/insurers/star-health.svg",
+    logo: "/insurers/star-health.png",
     category: "Health Insurance",
     product: "Family Health Optima",
     description:
@@ -64,7 +57,7 @@ const healthInsurers = [
   },
   {
     name: "HDFC ERGO",
-    logo: "/insurers/hdfc-ergo.svg",
+    logo: "/insurers/hdfc-ergo.jpg",
     category: "Health Insurance",
     product: "my:Optima Secure",
     description:
@@ -80,7 +73,7 @@ const healthInsurers = [
   },
   {
     name: "Aditya Birla Health",
-    logo: "/insurers/aditya-birla-health.svg",
+    logo: "/insurers/aditya-birla-health.png",
     category: "Health Insurance",
     product: "Health Insurance Solutions",
     description:
@@ -88,7 +81,7 @@ const healthInsurers = [
   },
   {
     name: "Care Health",
-    logo: "/insurers/care-health.svg",
+    logo: "/insurers/care-health.jpg",
     category: "Health Insurance",
     product: "Health Insurance Solutions",
     description:
@@ -96,7 +89,7 @@ const healthInsurers = [
   },
   {
     name: "Niva Bupa",
-    logo: "/insurers/niva-bupa.svg",
+    logo: "/insurers/niva-bupa.jpg",
     category: "Health Insurance",
     product: "Health Insurance Solutions",
     description:
@@ -107,7 +100,7 @@ const healthInsurers = [
 const generalInsurers = [
   {
     name: "Tata AIG",
-    logo: "/insurers/tata-aig.svg",
+    logo: "/insurers/tata-aig.png",
     category: "General Insurance",
     product: "Motor, Travel & General Insurance",
     description:
@@ -123,7 +116,7 @@ const generalInsurers = [
   },
   {
     name: "HDFC ERGO",
-    logo: "/insurers/hdfc-ergo.svg",
+    logo: "/insurers/hdfc-ergo.jpg",
     category: "General Insurance",
     product: "Motor & General Insurance",
     description:
@@ -131,20 +124,13 @@ const generalInsurers = [
   },
   {
     name: "Bajaj General",
-    logo: "/insurers/bajaj-general.svg",
+    logo: "/insurers/bajaj-general.jpg",
     category: "General Insurance",
     product: "Motor & General Insurance",
     description:
       "General insurance solutions across motor and other personal/general risk categories.",
   },
-  {
-    name: "SBI General",
-    logo: "/insurers/sbi-general.svg",
-    category: "General Insurance",
-    product: "Motor & General Insurance",
-    description:
-      "General insurance products for vehicle and other protection requirements.",
-  },
+ 
   {
     name: "Go Digit",
     logo: "/insurers/go-digit.svg",
