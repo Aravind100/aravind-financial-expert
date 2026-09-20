@@ -71,35 +71,35 @@ const philosophy = [
 
 const performance = [
   {
-    client: "Client 09",
+    client: "Client 1",
     investment: "₹2,50,000",
     value: "₹2,66,000",
     returnValue: "6.40%",
     date: "9 July 2026",
   },
   {
-    client: "Client 10",
+    client: "Client 2",
     investment: "₹3,50,000",
     value: "₹3,60,000",
     returnValue: "2.86%",
     date: "5 August 2026",
   },
   {
-    client: "Client 11",
+    client: "Client 3",
     investment: "₹5,00,000",
     value: "₹5,40,000",
     returnValue: "8.00%",
     date: "13 July 2026",
   },
   {
-    client: "Client 12",
+    client: "Client 4",
     investment: "₹50,00,000",
     value: "₹60,00,000",
     returnValue: "20.00%",
     date: "12 May 2026",
   },
   {
-    client: "Client 13",
+    client: "Client 5",
     investment: "₹1,80,00,000",
     value: "₹2,10,00,000",
     returnValue: "16.67%",
