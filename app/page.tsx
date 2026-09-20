@@ -142,7 +142,7 @@ export default function Home() {
       <section className="hero homeHero">
         <div className="homeHeroContent">
           <div>
-            <div className="pill">FINANCIAL SERVICES & WEALTH SOLUTIONS</div>
+            <div className="homeHeroEyebrow">FINANCIAL SERVICES & WEALTH SOLUTIONS</div>
 
             <h1>
               Your financial goals.
