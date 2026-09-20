@@ -1,1 +1,711 @@
+.impPage {
+  width: 100%;
+  overflow-x: hidden;
+  color: #071b35;
+  background: #ffffff;
+}
 
+.container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+  padding: 70px 0;
+  background: linear-gradient(
+    135deg,
+    #f5fbff 0%,
+    #ffffff 55%,
+    #eef7ff 100%
+  );
+  border-bottom: 1px solid #e5edf5;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: #2474c6;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin: 0 0 15px;
+}
+
+.heroTitle {
+  margin: 0 0 22px;
+  color: #071b35;
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 1.08;
+  letter-spacing: -2px;
+}
+
+.heroTitle span {
+  color: #2474c6;
+}
+
+.heroText {
+  max-width: 680px;
+  margin: 0 0 28px;
+  color: #50657a;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-block;
+  padding: 13px 23px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.primaryButton {
+  background: #2474c6;
+  color: #ffffff;
+}
+
+.primaryButton:hover {
+  background: #1765b2;
+}
+
+.secondaryButton {
+  background: #ffffff;
+  color: #2474c6;
+  border: 1px solid #2474c6;
+}
+
+.secondaryButton:hover {
+  background: #f3f8fd;
+}
+
+.heroCard {
+  padding: 35px;
+  background: #ffffff;
+  border: 1px solid #dfe9f2;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(20, 70, 110, 0.08);
+}
+
+.cardLabel {
+  margin: 0;
+  color: #2474c6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.heroCard h2 {
+  margin: 15px 0;
+  color: #071b35;
+  font-size: 30px;
+  line-height: 1.25;
+}
+
+.divider {
+  height: 1px;
+  margin: 25px 0;
+  background: #e5edf5;
+}
+
+.miniStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.miniStats strong,
+.miniStats span {
+  display: block;
+}
+
+.miniStats strong {
+  color: #2474c6;
+  font-size: 24px;
+}
+
+.miniStats span {
+  margin-top: 5px;
+  color: #68798a;
+  font-size: 12px;
+}
+
+/* ================= SECTIONS ================= */
+
+.section {
+  padding: 85px 0;
+  background: #ffffff;
+}
+
+.lightSection {
+  padding: 85px 0;
+  background: #f7fbff;
+  border-top: 1px solid #edf2f6;
+  border-bottom: 1px solid #edf2f6;
+}
+
+.sectionIntro {
+  max-width: 800px;
+  margin-bottom: 45px;
+}
+
+.sectionLabel {
+  margin: 0 0 12px;
+  color: #2474c6;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.sectionIntro h2,
+.centerHeading h2 {
+  color: #071b35;
+  font-size: clamp(34px, 5vw, 50px);
+  line-height: 1.15;
+  margin: 12px 0 20px;
+}
+
+.centerHeading {
+  max-width: 800px;
+  margin: 0 auto 50px;
+  text-align: center;
+}
+
+.centerHeading > p:last-child {
+  color: #607487;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ================= INTRO ================= */
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 55px;
+}
+
+.twoColumn p {
+  color: #52677b;
+  font-size: 16px;
+  line-height: 1.85;
+  margin: 0 0 18px;
+}
+
+.highlightBox {
+  margin-top: 25px;
+  padding: 20px;
+  background: #f3f8fd;
+  border-left: 4px solid #2474c6;
+  border-radius: 5px;
+}
+
+.highlightBox strong {
+  color: #071b35;
+}
+
+/* ================= PROCESS ================= */
+
+.processGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+}
+
+.simpleCard {
+  padding: 25px 20px;
+  background: #ffffff;
+  border: 1px solid #e0e9f1;
+  border-radius: 12px;
+}
+
+.number {
+  color: #2474c6;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.simpleCard h3 {
+  margin: 30px 0 10px;
+  color: #071b35;
+  font-size: 20px;
+}
+
+.simpleCard p {
+  margin: 0;
+  color: #66798b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ================= PHILOSOPHY ================= */
+
+.philosophyGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 35px;
+}
+
+.focusItem {
+  min-width: 0;
+}
+
+.focusIcon {
+  margin-bottom: 12px;
+  font-size: 27px;
+}
+
+.focusItem h3 {
+  margin: 0 0 8px;
+  color: #163d65;
+  font-size: 19px;
+}
+
+.focusItem p {
+  margin: 0;
+  color: #718396;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ================= PERFORMANCE ================= */
+
+.performanceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.performanceCard {
+  padding: 25px;
+  background: #ffffff;
+  border: 1px solid #dfe8f0;
+  border-radius: 12px;
+  min-width: 0;
+}
+
+.performanceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.performanceHeader strong {
+  color: #163d65;
+}
+
+.performanceHeader span {
+  color: #2474c6;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.performanceValues {
+  display: grid;
+  grid-template-columns: 1fr 25px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 22px 0;
+}
+
+.performanceValues small {
+  display: block;
+  margin-bottom: 5px;
+  color: #81909d;
+  font-size: 10px;
+}
+
+.performanceValues strong {
+  color: #071b35;
+  font-size: 15px;
+  word-break: break-word;
+}
+
+.arrow {
+  color: #2474c6;
+  font-weight: 700;
+  text-align: center;
+}
+
+.date {
+  color: #81909d;
+  font-size: 11px;
+}
+
+.date strong {
+  color: #516678;
+}
+
+.note {
+  margin-top: 25px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid #e0e8ef;
+  border-radius: 8px;
+  color: #66798b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ================= TESTIMONIALS ================= */
+
+.testimonialGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.testimonialCard {
+  min-width: 0;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #dfe8f0;
+  border-radius: 12px;
+}
+
+.stars {
+  margin-bottom: 15px;
+  color: #2474c6;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.testimonialCard h3 {
+  margin: 0 0 12px;
+  color: #163d65;
+  font-size: 18px;
+}
+
+.testimonialCard p {
+  margin: 0;
+  color: #66798b;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.person {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #edf1f5;
+}
+
+.person strong,
+.person span {
+  display: block;
+}
+
+.person strong {
+  color: #071b35;
+  font-size: 13px;
+}
+
+.person span {
+  margin-top: 3px;
+  color: #81909d;
+  font-size: 10px;
+}
+
+.approvalNote {
+  margin: 22px 0 0;
+  color: #8997a3;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* ================= TOP UP ================= */
+
+.topupSection {
+  padding: 70px 0;
+  background: #f3f8fd;
+  border-top: 1px solid #e2edf6;
+  border-bottom: 1px solid #e2edf6;
+}
+
+/* ================= CTA ================= */
+
+.ctaSection {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #1478d4 0%, #2489df 100%);
+}
+
+.ctaContent {
+  max-width: 900px;
+  margin: 0 auto 30px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.ctaContent p:first-child {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.ctaContent h2 {
+  margin: 0 0 18px;
+  font-size: clamp(34px, 5vw, 52px);
+}
+
+.ctaContent p:last-child {
+  max-width: 700px;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.8;
+}
+
+.formBox {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 25px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 12px;
+  color: #071b35;
+}
+
+/* ================= DISCLAIMER ================= */
+
+.disclaimer {
+  padding: 35px 0;
+  background: #f7f8fa;
+  border-top: 1px solid #e5e9ed;
+}
+
+.disclaimer h3 {
+  margin: 0 0 10px;
+  color: #163d65;
+  font-size: 15px;
+}
+
+.disclaimer p {
+  margin: 0;
+  color: #788692;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* ==================================================
+   MOBILE
+   IMPORTANT:
+   Desktop layout above is unchanged.
+   These rules only apply below 700px.
+   ================================================== */
+
+@media (max-width: 700px) {
+  .container {
+    width: calc(100% - 28px);
+    max-width: 100%;
+  }
+
+  .hero {
+    padding: 55px 0;
+  }
+
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .heroTitle {
+    font-size: 44px;
+    letter-spacing: -1.5px;
+  }
+
+  .heroText {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .heroButtons a {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .heroCard {
+    padding: 25px;
+  }
+
+  .heroCard h2 {
+    font-size: 27px;
+  }
+
+  .miniStats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .section,
+  .lightSection {
+    padding: 65px 0;
+  }
+
+  .sectionIntro {
+    margin-bottom: 30px;
+  }
+
+  .sectionIntro h2,
+  .centerHeading h2 {
+    font-size: 35px;
+  }
+
+  .centerHeading {
+    margin-bottom: 35px;
+  }
+
+  .centerHeading > p:last-child {
+    font-size: 14px;
+  }
+
+  /* INTRODUCTION */
+  .twoColumn {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .twoColumn p {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* PROCESS */
+  .processGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .simpleCard {
+    padding: 23px;
+  }
+
+  .simpleCard h3 {
+    margin-top: 18px;
+  }
+
+  /* PHILOSOPHY */
+  .philosophyGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .focusItem {
+    padding-bottom: 22px;
+    border-bottom: 1px solid #edf1f5;
+  }
+
+  .focusItem:last-child {
+    border-bottom: none;
+  }
+
+  /* PERFORMANCE */
+  .performanceGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .performanceCard {
+    padding: 22px;
+  }
+
+  .performanceValues {
+    grid-template-columns: minmax(0, 1fr) 25px minmax(0, 1fr);
+  }
+
+  .performanceValues strong {
+    font-size: 14px;
+  }
+
+  /* TESTIMONIALS */
+  .testimonialGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .testimonialCard {
+    padding: 24px;
+  }
+
+  /* TOP UP */
+  .topupSection {
+    padding: 60px 0;
+  }
+
+  /* CTA */
+  .ctaSection {
+    padding: 60px 0;
+  }
+
+  .ctaContent h2 {
+    font-size: 36px;
+  }
+
+  .formBox {
+    padding: 18px;
+  }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    padding: 30px 0;
+  }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 420px) {
+  .container {
+    width: calc(100% - 24px);
+  }
+
+  .heroTitle {
+    font-size: 39px;
+  }
+
+  .heroCard {
+    padding: 22px;
+  }
+
+  .miniStats {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .sectionIntro h2,
+  .centerHeading h2 {
+    font-size: 31px;
+  }
+
+  .performanceValues strong {
+    font-size: 13px;
+  }
+
+  .performanceValues small {
+    font-size: 9px;
+  }
+
+  .formBox {
+    padding: 14px;
+  }
+}
