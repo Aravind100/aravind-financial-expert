@@ -1,6 +1,7 @@
 import Link from "next/link"
 import styles from "./Investments.module.css"
 
+
 const products = [
   {
     icon: "📈",
