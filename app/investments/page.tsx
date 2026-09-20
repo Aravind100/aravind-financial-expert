@@ -1,7 +1,7 @@
 export default function Investments() {
   return (
     <>
-      {/* EXISTING HERO — DESIGN PRESERVED */}
+      {/* HERO - EXISTING DESIGN PRESERVED */}
       <section className="pageHero">
         <div>
           <h1>Investments</h1>
@@ -11,239 +11,262 @@ export default function Investments() {
         </div>
       </section>
 
-      {/* EXISTING INVESTMENT CARDS — DESIGN PRESERVED */}
+      {/* MAIN INVESTMENT CARDS */}
       <section className="grid">
 
+        {/* MUTUAL FUNDS & SIP */}
         <div className="card">
           <h3>Mutual Funds & SIP</h3>
 
           <p className="muted">
-            Mutual Funds pool money from multiple investors and invest it across
-            securities according to a defined investment objective.
+            Mutual Funds pool money from multiple investors and invest it
+            according to a defined investment objective and strategy.
           </p>
 
           <p>
-            <strong>Minimum Investment:</strong> Scheme-specific. SIPs can be
-            started with relatively small amounts depending on the scheme.
+            <strong>Minimum Investment:</strong> Depends on the scheme.
+            SIP minimums vary between schemes.
           </p>
 
           <p>
-            <strong>Advantages:</strong>
+            <strong>Advantages</strong>
           </p>
 
           <ul>
             <li>Professional fund management</li>
             <li>Diversification across securities</li>
-            <li>SIP option for disciplined investing</li>
+            <li>SIP facility for regular investing</li>
             <li>Suitable for different financial goals</li>
+            <li>Options across different risk categories</li>
           </ul>
 
           <p>
             <strong>Suitable for:</strong> Investors looking for diversified
-            market-linked investing with a defined investment strategy.
+            market-linked investments and disciplined long-term investing.
           </p>
 
           <p>
-            <strong>How it works:</strong> You invest either through a lump sum
-            or SIP. The fund invests the money according to its mandate and the
-            value of your investment changes with the underlying securities.
+            <strong>How it works:</strong> You invest through a lump sum or
+            SIP. The fund invests the money according to its stated strategy.
+            The value of your investment changes with the market value of the
+            underlying investments.
           </p>
         </div>
 
+
+        {/* EQUITY / DEMAT */}
         <div className="card">
           <h3>Equity / Demat</h3>
 
           <p className="muted">
-            A Demat account allows securities such as shares to be held
-            electronically. It can be linked with a trading account for buying
-            and selling securities.
+            A Demat account allows securities to be held electronically.
+            A trading account can be linked with the Demat account to buy and
+            sell securities.
           </p>
 
           <p>
-            <strong>Minimum Investment:</strong> No universal minimum investment
-            requirement for opening a Demat account. Brokerage and other charges
-            depend on the provider and transaction.
+            <strong>Minimum Investment:</strong> There is no universal
+            minimum investment requirement for opening a Demat account.
           </p>
 
           <p>
-            <strong>Advantages:</strong>
+            <strong>Advantages</strong>
           </p>
 
           <ul>
             <li>Electronic holding of securities</li>
-            <li>Easy access to portfolio information</li>
-            <li>Convenient buying, selling and transfers</li>
+            <li>Convenient portfolio tracking</li>
+            <li>Easy buying and selling of securities</li>
             <li>Reduced paperwork</li>
-            <li>Portfolio tracking through digital platforms</li>
+            <li>Digital access to holdings</li>
+            <li>Easy transfer of eligible securities</li>
           </ul>
 
           <p>
             <strong>Suitable for:</strong> Investors interested in direct
-            equity and other securities available through the relevant platform.
+            equity and other securities available through the chosen platform.
           </p>
 
           <p>
             <strong>How it works:</strong> Securities purchased through the
-            trading account are credited electronically to the Demat account.
-            When securities are sold, the relevant holdings are debited.
+            trading account are credited to the Demat account. When securities
+            are sold or transferred, the corresponding holdings are debited.
           </p>
         </div>
 
+
+        {/* PMS */}
         <div className="card">
           <h3>PMS</h3>
 
           <p className="muted">
             Portfolio Management Services provide a structured portfolio
-            management approach where an eligible portfolio manager manages
-            securities according to an agreed investment strategy.
+            management arrangement where a registered portfolio manager manages
+            securities according to an agreed strategy.
           </p>
 
           <p>
-            <strong>Minimum Investment:</strong> ₹50 lakh under the current PMS
-            regulatory framework. :contentReference[oaicite:0]{index=0}
+            <strong>Minimum Investment:</strong> ₹50 lakh under the current
+            PMS framework.
           </p>
 
           <p>
-            <strong>Advantages:</strong>
+            <strong>Advantages</strong>
           </p>
 
           <ul>
-            <li>Portfolio management based on a defined strategy</li>
-            <li>Direct ownership of securities in the investor's account</li>
+            <li>Defined investment strategy</li>
+            <li>Professional portfolio management</li>
+            <li>Direct ownership of securities</li>
             <li>Focused portfolio construction</li>
-            <li>Regular portfolio monitoring</li>
+            <li>Portfolio monitoring and review</li>
           </ul>
 
           <p>
-            <strong>Suitable for:</strong> Investors who meet the applicable
-            investment threshold and are comfortable with equity-market and
+            <strong>Suitable for:</strong> Investors meeting the applicable
+            investment threshold who understand equity-market and
             strategy-specific risks.
           </p>
 
           <p>
-            <strong>How it works:</strong> The investor selects a suitable
-            portfolio management strategy, completes the required documentation
-            and invests according to the applicable terms. The portfolio is then
-            managed according to that strategy.
+            <strong>How it works:</strong> The investor selects an applicable
+            PMS strategy and completes the required documentation. The
+            portfolio manager manages the portfolio according to the agreed
+            strategy and applicable regulations.
+          </p>
+
+          <p className="muted">
+            PMS minimum investment threshold is based on SEBI's applicable
+            framework.
           </p>
         </div>
 
+
+        {/* AIF */}
         <div className="card">
           <h3>AIF</h3>
 
           <p className="muted">
             Alternative Investment Funds are privately pooled investment
-            vehicles that invest according to their specific category,
-            strategy and placement memorandum.
+            vehicles that invest according to their category, strategy and
+            fund documents.
           </p>
 
           <p>
-            <strong>Minimum Investment:</strong> Generally ₹1 crore for an AIF,
-            subject to applicable regulatory provisions and exceptions such as
-            those applicable to certain accredited investors. :contentReference[oaicite:1]{index=1}
+            <strong>Minimum Investment:</strong> Generally ₹1 crore, subject
+            to applicable regulatory provisions and exceptions.
           </p>
 
           <p>
-            <strong>Advantages:</strong>
+            <strong>Advantages</strong>
           </p>
 
           <ul>
             <li>Access to alternative investment strategies</li>
             <li>Potential diversification beyond traditional products</li>
-            <li>Strategies can include private-market opportunities</li>
-            <li>Different risk-return structures depending on the fund</li>
+            <li>Access to selected private-market opportunities</li>
+            <li>Different strategies for different investment objectives</li>
           </ul>
 
           <p>
-            <strong>Suitable for:</strong> Eligible investors with higher
-            investment capacity who understand the liquidity, risk and
-            complexity associated with alternative investments.
+            <strong>Suitable for:</strong> Eligible investors with sufficient
+            investment capacity who understand the risks, liquidity conditions
+            and complexity associated with alternative investments.
           </p>
 
           <p>
-            <strong>How it works:</strong> Investors commit capital to an AIF
-            according to its fund documents. The fund deploys capital according
-            to its stated strategy and applicable regulations.
+            <strong>How it works:</strong> Investors commit capital to a fund
+            according to its documents. The fund manager deploys capital
+            according to the stated strategy and applicable regulations.
           </p>
         </div>
 
+
+        {/* SIF */}
         <div className="card">
-          <h3>SIF — Specialized Investment Fund</h3>
+          <h3>SIF - Specialized Investment Fund</h3>
 
           <p className="muted">
-            Specialized Investment Funds provide investment strategies within
-            the mutual-fund regulatory framework with strategies that can be
-            more specialized than conventional mutual-fund offerings.
+            Specialized Investment Funds offer specialized investment
+            strategies within the mutual-fund regulatory framework.
           </p>
 
           <p>
-            <strong>Minimum Investment:</strong> The regulatory minimum threshold
-            is generally ₹10 lakh across SIF investment strategies, subject to
-            applicable provisions and exceptions. :contentReference[oaicite:2]{index=2}
+            <strong>Minimum Investment:</strong> The current minimum investment
+            threshold is ₹10 lakh at the PAN level, subject to applicable rules.
           </p>
 
           <p>
-            <strong>Advantages:</strong>
+            <strong>Advantages</strong>
           </p>
 
           <ul>
             <li>Specialized investment strategies</li>
-            <li>Strategies may use equity and other permitted instruments</li>
-            <li>Potentially suitable for sophisticated investors</li>
             <li>Structured investment approach</li>
+            <li>Exposure to permitted asset classes and strategies</li>
+            <li>Potential diversification for suitable investors</li>
           </ul>
 
           <p>
             <strong>Suitable for:</strong> Investors who understand specialized
-            strategies, market risk and the characteristics of the particular
-            SIF.
+            strategies, market risks, liquidity and the characteristics of the
+            particular SIF.
           </p>
 
           <p>
             <strong>How it works:</strong> Investors purchase units of a
-            registered SIF strategy and the fund manager manages the portfolio
-            according to the strategy's stated mandate.
+            registered SIF investment strategy. The fund manager manages the
+            portfolio according to the strategy's stated mandate.
           </p>
         </div>
 
       </section>
 
 
-      {/* QUICK COMPARISON */}
+      {/* INVESTMENT COMPARISON */}
       <section className="grid">
 
         <div className="card">
-          <h3>Which Investment Solution May Fit?</h3>
+          <h3>Investment Options at a Glance</h3>
 
           <p className="muted">
-            The right product depends on investment amount, financial goals,
-            liquidity requirements, risk tolerance and investment horizon.
+            Different investment products serve different objectives,
+            investment amounts, risk levels and time horizons.
           </p>
 
           <ul>
             <li>
-              <strong>Starting / Regular Investing:</strong> Mutual Funds & SIP
+              <strong>Mutual Funds & SIP:</strong> Regular and diversified
+              market-linked investing
             </li>
+
             <li>
-              <strong>Direct Stock Investing:</strong> Equity / Demat
+              <strong>Equity / Demat:</strong> Direct participation in listed
+              securities
             </li>
+
             <li>
-              <strong>₹50 Lakh+:</strong> PMS may be considered
+              <strong>PMS:</strong> Structured portfolio management for
+              eligible investors
             </li>
+
             <li>
-              <strong>₹1 Crore+:</strong> AIF may be considered
+              <strong>AIF:</strong> Alternative investment strategies for
+              eligible investors
             </li>
+
             <li>
-              <strong>₹10 Lakh+:</strong> SIF may be considered, subject to
-              applicable rules
+              <strong>SIF:</strong> Specialized investment strategies with
+              applicable minimum investment requirements
             </li>
           </ul>
 
           <p className="muted">
-            These are broad categories, not recommendations. Suitability should
-            be assessed before investing.
+            Product suitability depends on the investor's financial goals,
+            risk profile, liquidity requirement and investment horizon.
           </p>
         </div>
+
 
         <div className="card">
           <h3>How We Approach Investments</h3>
@@ -251,22 +274,21 @@ export default function Investments() {
           <p>
             <strong>1. Understand</strong>
             <br />
-            Understand your financial objective, time horizon and liquidity
-            requirement.
+            Understand your financial goals, income, existing investments and
+            time horizon.
           </p>
 
           <p>
             <strong>2. Assess</strong>
             <br />
-            Consider your risk profile, investment capacity and existing
-            portfolio.
+            Consider risk profile, liquidity requirements and investment
+            capacity.
           </p>
 
           <p>
             <strong>3. Compare</strong>
             <br />
-            Compare products based on strategy, risk, liquidity, cost and
-            historical performance.
+            Compare strategy, risk, liquidity, cost and historical performance.
           </p>
 
           <p>
@@ -279,8 +301,8 @@ export default function Investments() {
           <p>
             <strong>5. Review</strong>
             <br />
-            Monitor the portfolio and review it when your financial situation
-            or goals change.
+            Review the portfolio periodically as goals and market conditions
+            change.
           </p>
         </div>
 
@@ -291,26 +313,30 @@ export default function Investments() {
       <section className="grid">
 
         <div className="card">
-          <h3>Benefits of a Motilal Oswal Demat & Trading Account</h3>
+          <h3>Motilal Oswal Demat & Trading Account</h3>
 
           <p className="muted">
-            Motilal Oswal describes its platform as providing access to multiple
-            investment and trading products through a single ecosystem.
-            :contentReference[oaicite:3]{index=3}
+            A Demat account allows securities to be held electronically.
+            Motilal Oswal provides Demat and trading services along with access
+            to multiple investment and market segments.
+          </p>
+
+          <p>
+            <strong>Key Features</strong>
           </p>
 
           <ul>
-            <li>Access to equity and other market segments</li>
-            <li>Digital portfolio and transaction access</li>
+            <li>Access to equity and supported market segments</li>
             <li>Trading across supported devices</li>
             <li>Research and market information</li>
             <li>Advisory and call-and-trade support</li>
-            <li>Online account and portfolio management</li>
+            <li>Digital portfolio access</li>
+            <li>Multiple investment products through the platform</li>
           </ul>
 
           <p className="muted">
-            Features, charges, eligibility and services may change. Please
-            verify the latest terms before opening an account.
+            Features, charges, eligibility and offers can change. Please check
+            the latest official terms before opening an account.
           </p>
 
           <p>
@@ -336,27 +362,28 @@ export default function Investments() {
           </a>
         </div>
 
+
         <div className="card">
-          <h3>Why Have a Demat Account?</h3>
+          <h3>Benefits of a Demat Account</h3>
 
           <p className="muted">
-            A Demat account holds securities electronically instead of physical
-            certificates.
+            A Demat account works as an electronic holding account for
+            securities and removes the need to maintain physical certificates.
           </p>
 
           <ul>
             <li>Electronic holding of securities</li>
             <li>Convenient portfolio tracking</li>
-            <li>Easy transfer of securities</li>
+            <li>Easy transfer of eligible securities</li>
             <li>Reduced paperwork</li>
-            <li>Digital access to holdings and transactions</li>
-            <li>Can support a diversified investment portfolio</li>
+            <li>Online access to holdings</li>
+            <li>Convenient transaction records</li>
           </ul>
 
-          <p className="muted">
-            A Demat account itself does not generate returns. Investment returns
-            depend on the securities and investment decisions made through the
-            account.
+          <p>
+            <strong>Important:</strong> A Demat account itself does not generate
+            investment returns. Returns depend on the securities purchased and
+            their market performance.
           </p>
         </div>
 
@@ -369,9 +396,9 @@ export default function Investments() {
           <h2>Past-Performance Examples</h2>
 
           <p className="muted">
-            Historical performance can help investors understand how a strategy
-            has behaved in the past. It should not be treated as a forecast or
-            guarantee of future returns.
+            Historical performance can help investors understand how different
+            strategies have performed in the past. It should not be considered
+            a prediction or guarantee of future returns.
           </p>
         </div>
       </section>
@@ -380,103 +407,41 @@ export default function Investments() {
       <section className="grid">
 
         <div className="card">
-          <h3>PMS — Aequitas India Opportunities</h3>
+          <h3>PMS - Historical Performance</h3>
 
           <p className="muted">
-            A published Aequitas PMS presentation reported performance as of
-            28 February 2026. The presentation states that one-year and longer
-            period returns were presented on a compounded annual basis and that
-            individual client portfolios can differ because of timing of
-            inflows/outflows and portfolio constraints. :contentReference[oaicite:4]{index=4}
+            PMS strategies can have significantly different investment
+            objectives, portfolios, risk levels and performance periods.
           </p>
 
           <p>
-            <strong>Reported historical examples:</strong>
+            When evaluating PMS performance, consider:
           </p>
 
           <ul>
-            <li>1 Year: approximately 34%</li>
-            <li>3 Years: approximately 34%</li>
-            <li>5 Years: approximately 35%</li>
-            <li>10 Years: approximately 15%</li>
+            <li>1-year, 3-year and 5-year performance</li>
+            <li>Performance across different market cycles</li>
+            <li>Benchmark comparison</li>
+            <li>Risk and volatility</li>
+            <li>Portfolio concentration</li>
+            <li>Investment strategy</li>
+            <li>Fees and other applicable charges</li>
           </ul>
 
           <p className="muted">
-            Source date: 28 February 2026. Historical performance only.
+            Always refer to the latest official PMS performance disclosure
+            before making an investment decision.
           </p>
         </div>
 
 
         <div className="card">
-          <h3>SIF — Recent Performance Data</h3>
+          <h3>AIF - Historical Performance</h3>
 
           <p className="muted">
-            SIF performance is still based on relatively short track records
-            for many strategies. For example, the SIF India performance dashboard
-            reports strategy-level returns as of 18 September 2026. :contentReference[oaicite:5]{index=5}
-          </p>
-
-          <p>
-            <strong>Examples from the dashboard:</strong>
-          </p>
-
-          <ul>
-            <li>
-              qSIF Hybrid Long-Short: 30.67% since inception
-            </li>
-            <li>
-              qSIF Active Asset Allocator Long-Short: 31.89% since inception
-            </li>
-            <li>
-              qSIF Equity Ex-Top 100 Long-Short: 14.59% since inception
-            </li>
-          </ul>
-
-          <p className="muted">
-            Since-inception periods differ between strategies, so these figures
-            should not be treated as directly comparable annual returns.
-          </p>
-        </div>
-
-
-        <div className="card">
-          <h3>Mutual Funds — Historical Performance</h3>
-
-          <p className="muted">
-            Mutual-fund performance should be compared using the appropriate
-            period, benchmark, category and return methodology.
-          </p>
-
-          <p>
-            Recent market reporting, for example, has highlighted long-term
-            performance data for several Flexi Cap funds, but historical returns
-            vary by period and should not be treated as future-return estimates.
-            :contentReference[oaicite:6]{index=6}
-          </p>
-
-          <p>
-            <strong>Before selecting a fund, consider:</strong>
-          </p>
-
-          <ul>
-            <li>Investment objective</li>
-            <li>Risk level</li>
-            <li>Benchmark</li>
-            <li>Expense ratio</li>
-            <li>Portfolio composition</li>
-            <li>Fund-manager and strategy consistency</li>
-            <li>Long-term performance across different market cycles</li>
-          </ul>
-        </div>
-
-
-        <div className="card">
-          <h3>AIF — Strategy-Specific Evaluation</h3>
-
-          <p className="muted">
-            AIFs can follow very different strategies, structures and liquidity
-            terms. Therefore, a single return number is not sufficient for
-            comparing AIF opportunities.
+            AIF strategies can be very different from one another. Therefore,
+            AIF performance should be evaluated strategy-by-strategy rather
+            than using one return number for all AIFs.
           </p>
 
           <p>
@@ -494,23 +459,81 @@ export default function Investments() {
           </ul>
 
           <p className="muted">
-            AIF performance should be reviewed from the latest fund documents
-            and disclosures before making an investment decision.
+            Latest fund documents and disclosures should be reviewed before
+            investing.
+          </p>
+        </div>
+
+
+        <div className="card">
+          <h3>SIF - Historical Performance</h3>
+
+          <p className="muted">
+            SIF is a relatively newer investment category, and different
+            strategies may have different inception dates.
+          </p>
+
+          <p>
+            Performance should therefore be reviewed along with:
+          </p>
+
+          <ul>
+            <li>Since-inception period</li>
+            <li>Benchmark</li>
+            <li>Strategy objective</li>
+            <li>Portfolio composition</li>
+            <li>Risk level</li>
+            <li>Market-cycle performance</li>
+          </ul>
+
+          <p className="muted">
+            Since-inception returns from different strategies may cover
+            different time periods and should not automatically be compared
+            as equivalent annual returns.
+          </p>
+        </div>
+
+
+        <div className="card">
+          <h3>Mutual Funds - Historical Performance</h3>
+
+          <p className="muted">
+            Mutual funds should be evaluated using the appropriate category,
+            benchmark and time period rather than looking at a single recent
+            return.
+          </p>
+
+          <p>
+            <strong>Before selecting a fund, consider:</strong>
+          </p>
+
+          <ul>
+            <li>Investment objective</li>
+            <li>Risk level</li>
+            <li>Benchmark</li>
+            <li>Expense ratio</li>
+            <li>Portfolio composition</li>
+            <li>Fund-management approach</li>
+            <li>Performance across market cycles</li>
+          </ul>
+
+          <p className="muted">
+            Past performance does not guarantee future performance.
           </p>
         </div>
 
       </section>
 
 
-      {/* SIMPLE DECISION CARD */}
+      {/* GOAL BASED INVESTING */}
       <section className="grid">
 
         <div className="card">
-          <h3>Investment Selection Starts With Your Goal</h3>
+          <h3>Start With Your Financial Goal</h3>
 
           <p className="muted">
-            Instead of starting with a product, start with the financial
-            objective.
+            Investment selection should start with the objective rather than
+            simply choosing a product.
           </p>
 
           <ul>
@@ -524,7 +547,7 @@ export default function Investments() {
           </ul>
 
           <p>
-            Once the objective, time horizon, liquidity requirement and risk
+            Once your objective, time horizon, liquidity requirement and risk
             profile are understood, suitable investment categories can be
             evaluated.
           </p>
@@ -535,8 +558,8 @@ export default function Investments() {
           <h3>Need Help Understanding Your Options?</h3>
 
           <p className="muted">
-            Share your investment requirement and we can help you understand
-            the available investment categories, their features, risks and
+            Share your investment requirement and get help understanding
+            available investment categories, their features, risks and
             suitability.
           </p>
 
@@ -562,10 +585,10 @@ export default function Investments() {
       <section className="pageHero">
         <div>
           <p className="muted">
-            <strong>Important:</strong> Investments are subject to market risks.
-            Past performance does not indicate future results. Minimum
+            <strong>Important:</strong> Investments are subject to market
+            risks. Past performance does not indicate future results. Minimum
             investment amounts, product features, charges, eligibility and
-            regulatory requirements can change. Investors should review the
+            regulatory requirements may change. Investors should review the
             latest official product documents and assess suitability before
             investing.
           </p>
