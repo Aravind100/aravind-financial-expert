@@ -5,7 +5,7 @@ import styles from "./Insurance.module.css";
 const lifeInsurers = [
   {
     name: "Axis Max",
-    logo: "/insurers/axis-max.png",
+    logo: "/insurers/axis-max-life.png",
     category: "Life Insurance",
     product: "Life Insurance & Term Protection",
     description:
@@ -65,7 +65,7 @@ const healthInsurers = [
   },
   {
     name: "ICICI Lombard",
-    logo: "/insurers/icici-lombard.svg",
+    logo: "/insurers/icici-lombard.webp",
     category: "Health Insurance",
     product: "Complete Health Insurance",
     description:
@@ -108,7 +108,7 @@ const generalInsurers = [
   },
   {
     name: "ICICI Lombard",
-    logo: "/insurers/icici-lombard.svg",
+    logo: "/insurers/icici-lombard.webp",
     category: "General Insurance",
     product: "Motor & General Insurance",
     description:
@@ -133,7 +133,7 @@ const generalInsurers = [
  
   {
     name: "Go Digit",
-    logo: "/insurers/go-digit.svg",
+    logo: "/insurers/go-digit.png",
     category: "General Insurance",
     product: "Motor & General Insurance",
     description:
