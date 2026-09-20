@@ -1,599 +1,617 @@
+import Link from "next/link"
+import styles from "./Investments.module.css"
+
+const products = [
+  {
+    icon: "📈",
+    title: "Mutual Funds & SIP",
+    tag: "START & GROW",
+    ticket: "Scheme Specific",
+    description:
+      "Diversified market-linked investing through professionally managed mutual fund schemes.",
+    suitable:
+      "Investors looking for disciplined, diversified and goal-oriented investing.",
+    points: [
+      "Professional fund management",
+      "Diversification",
+      "SIP for regular investing",
+      "Multiple categories and strategies",
+    ],
+  },
+  {
+    icon: "💹",
+    title: "Equity / Demat",
+    tag: "DIRECT INVESTING",
+    ticket: "No Universal Minimum",
+    description:
+      "Invest directly in listed securities through a Demat and trading account.",
+    suitable:
+      "Investors who want direct participation in listed companies and securities.",
+    points: [
+      "Electronic holding of securities",
+      "Direct equity participation",
+      "Digital portfolio tracking",
+      "Convenient buying and selling",
+    ],
+  },
+  {
+    icon: "🎯",
+    title: "PMS",
+    tag: "₹50 LAKH+",
+    ticket: "₹50 Lakh",
+    description:
+      "A structured portfolio management approach based on a defined investment strategy.",
+    suitable:
+      "Eligible investors who understand portfolio and strategy-specific risks.",
+    points: [
+      "Defined investment strategy",
+      "Professional portfolio management",
+      "Focused portfolio construction",
+      "Portfolio monitoring",
+    ],
+  },
+  {
+    icon: "🏛️",
+    title: "AIF",
+    tag: "ALTERNATIVE",
+    ticket: "Generally ₹1 Crore",
+    description:
+      "Alternative investment structures offering strategy-specific opportunities beyond conventional products.",
+    suitable:
+      "Eligible investors with higher investment capacity and understanding of alternative investments.",
+    points: [
+      "Alternative strategies",
+      "Potential diversification",
+      "Private-market opportunities",
+      "Strategy-specific portfolios",
+    ],
+  },
+  {
+    icon: "🔷",
+    title: "SIF",
+    tag: "SPECIALIZED",
+    ticket: "₹10 Lakh",
+    description:
+      "Specialized investment strategies within the mutual-fund regulatory framework.",
+    suitable:
+      "Investors who understand specialized strategies, risks and liquidity.",
+    points: [
+      "Specialized strategies",
+      "Structured approach",
+      "Permitted investment opportunities",
+      "Strategy-focused investing",
+    ],
+  },
+]
+
+const process = [
+  {
+    number: "01",
+    title: "Understand",
+    text: "Understand your financial goal, investment horizon and liquidity requirement.",
+  },
+  {
+    number: "02",
+    title: "Assess",
+    text: "Consider your risk profile, investment capacity and existing portfolio.",
+  },
+  {
+    number: "03",
+    title: "Compare",
+    text: "Compare strategy, risk, liquidity, cost and historical performance.",
+  },
+  {
+    number: "04",
+    title: "Implement",
+    text: "Complete the appropriate investment and account-opening process.",
+  },
+  {
+    number: "05",
+    title: "Review",
+    text: "Review your portfolio periodically as your goals and circumstances change.",
+  },
+]
+
 export default function Investments() {
   return (
-    <>
-      {/* HERO - EXISTING DESIGN PRESERVED */}
-      <section className="pageHero">
+    <main className={styles.page}>
+
+      {/* HERO */}
+      <section className={styles.hero}>
+        <div className={styles.heroOverlay} />
+
+        <div className={styles.heroContent}>
+          <span className={styles.eyebrow}>
+            INVESTMENT SOLUTIONS
+          </span>
+
+          <h1>
+            Invest With
+            <span> Knowledge. Strategy. Discipline.</span>
+          </h1>
+
+          <p>
+            Explore Mutual Funds, SIP, Equity, Demat, PMS, AIF and SIF
+            solutions based on your goals, risk profile and investment
+            horizon.
+          </p>
+
+          <div className={styles.heroButtons}>
+            <a
+              href="https://wa.me/919173334069?text=Hello%20Aravind%2C%20I%20want%20to%20discuss%20investment%20options."
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.primaryButton}
+            >
+              Discuss Your Investment
+            </a>
+
+            <a
+              href="#investment-options"
+              className={styles.secondaryButton}
+            >
+              Explore Options ↓
+            </a>
+          </div>
+        </div>
+      </section>
+
+
+      {/* INTRO */}
+      <section className={styles.intro}>
         <div>
-          <h1>Investments</h1>
-          <p className="muted">
-            Explore investment solutions based on goals, risk and time horizon.
+          <span className={styles.sectionLabel}>
+            EXPLORE
+          </span>
+
+          <h2>
+            Different Goals.
+            <br />
+            Different Investment Solutions.
+          </h2>
+        </div>
+
+        <p>
+          There is no single investment product that is suitable for every
+          investor. The right approach depends on your financial objective,
+          investment amount, risk tolerance, liquidity needs and time horizon.
+        </p>
+      </section>
+
+
+      {/* PRODUCT CARDS */}
+      <section
+        id="investment-options"
+        className={styles.productsSection}
+      >
+        <div className={styles.sectionHeading}>
+          <span className={styles.sectionLabel}>
+            INVESTMENT OPTIONS
+          </span>
+
+          <h2>
+            Explore Your Investment Universe
+          </h2>
+
+          <p>
+            Understand what each investment category does before making an
+            investment decision.
           </p>
+        </div>
+
+
+        <div className={styles.productGrid}>
+
+          {products.map((product) => (
+            <article
+              className={styles.productCard}
+              key={product.title}
+            >
+              <div className={styles.cardTop}>
+                <div className={styles.productIcon}>
+                  {product.icon}
+                </div>
+
+                <span className={styles.productTag}>
+                  {product.tag}
+                </span>
+              </div>
+
+              <h3>{product.title}</h3>
+
+              <p className={styles.description}>
+                {product.description}
+              </p>
+
+              <div className={styles.ticketBox}>
+                <span>MINIMUM / TYPICAL TICKET</span>
+                <strong>{product.ticket}</strong>
+              </div>
+
+              <div className={styles.cardBlock}>
+                <h4>Key Benefits</h4>
+
+                <ul>
+                  {product.points.map((point) => (
+                    <li key={point}>
+                      <span>✓</span>
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className={styles.suitableBox}>
+                <strong>Suitable for</strong>
+                <p>{product.suitable}</p>
+              </div>
+
+              <div className={styles.howItWorks}>
+                <span>HOW IT WORKS</span>
+                <p>
+                  Select a suitable strategy, complete the required
+                  documentation and invest according to the applicable
+                  product terms.
+                </p>
+              </div>
+            </article>
+          ))}
+
         </div>
       </section>
 
-      {/* MAIN INVESTMENT CARDS */}
-      <section className="grid">
 
-        {/* MUTUAL FUNDS & SIP */}
-        <div className="card">
-          <h3>Mutual Funds & SIP</h3>
+      {/* QUICK COMPARISON */}
+      <section className={styles.compareSection}>
 
-          <p className="muted">
-            Mutual Funds pool money from multiple investors and invest it
-            according to a defined investment objective and strategy.
-          </p>
+        <div className={styles.sectionHeading}>
+          <span className={styles.sectionLabel}>
+            QUICK VIEW
+          </span>
+
+          <h2>Investment Options At A Glance</h2>
+        </div>
+
+        <div className={styles.compareGrid}>
+
+          <div className={styles.compareCard}>
+            <span>01</span>
+            <strong>Mutual Funds & SIP</strong>
+            <p>Regular & diversified investing</p>
+          </div>
+
+          <div className={styles.compareCard}>
+            <span>02</span>
+            <strong>Equity / Demat</strong>
+            <p>Direct market participation</p>
+          </div>
+
+          <div className={styles.compareCard}>
+            <span>03</span>
+            <strong>PMS</strong>
+            <p>₹50 lakh+ portfolio approach</p>
+          </div>
+
+          <div className={styles.compareCard}>
+            <span>04</span>
+            <strong>AIF</strong>
+            <p>Alternative investment strategies</p>
+          </div>
+
+          <div className={styles.compareCard}>
+            <span>05</span>
+            <strong>SIF</strong>
+            <p>Specialized investment strategies</p>
+          </div>
+
+        </div>
+      </section>
+
+
+      {/* PROCESS */}
+      <section className={styles.processSection}>
+
+        <div className={styles.sectionHeading}>
+          <span className={styles.sectionLabel}>
+            OUR APPROACH
+          </span>
+
+          <h2>
+            From Goal To Investment
+          </h2>
 
           <p>
-            <strong>Minimum Investment:</strong> Depends on the scheme.
-            SIP minimums vary between schemes.
-          </p>
-
-          <p>
-            <strong>Advantages</strong>
-          </p>
-
-          <ul>
-            <li>Professional fund management</li>
-            <li>Diversification across securities</li>
-            <li>SIP facility for regular investing</li>
-            <li>Suitable for different financial goals</li>
-            <li>Options across different risk categories</li>
-          </ul>
-
-          <p>
-            <strong>Suitable for:</strong> Investors looking for diversified
-            market-linked investments and disciplined long-term investing.
-          </p>
-
-          <p>
-            <strong>How it works:</strong> You invest through a lump sum or
-            SIP. The fund invests the money according to its stated strategy.
-            The value of your investment changes with the market value of the
-            underlying investments.
+            A simple process designed to make investment decisions easier to
+            understand.
           </p>
         </div>
 
+        <div className={styles.processGrid}>
+          {process.map((item) => (
+            <div
+              className={styles.processCard}
+              key={item.number}
+            >
+              <span>{item.number}</span>
 
-        {/* EQUITY / DEMAT */}
-        <div className="card">
-          <h3>Equity / Demat</h3>
+              <h3>{item.title}</h3>
 
-          <p className="muted">
-            A Demat account allows securities to be held electronically.
-            A trading account can be linked with the Demat account to buy and
-            sell securities.
-          </p>
-
-          <p>
-            <strong>Minimum Investment:</strong> There is no universal
-            minimum investment requirement for opening a Demat account.
-          </p>
-
-          <p>
-            <strong>Advantages</strong>
-          </p>
-
-          <ul>
-            <li>Electronic holding of securities</li>
-            <li>Convenient portfolio tracking</li>
-            <li>Easy buying and selling of securities</li>
-            <li>Reduced paperwork</li>
-            <li>Digital access to holdings</li>
-            <li>Easy transfer of eligible securities</li>
-          </ul>
-
-          <p>
-            <strong>Suitable for:</strong> Investors interested in direct
-            equity and other securities available through the chosen platform.
-          </p>
-
-          <p>
-            <strong>How it works:</strong> Securities purchased through the
-            trading account are credited to the Demat account. When securities
-            are sold or transferred, the corresponding holdings are debited.
-          </p>
-        </div>
-
-
-        {/* PMS */}
-        <div className="card">
-          <h3>PMS</h3>
-
-          <p className="muted">
-            Portfolio Management Services provide a structured portfolio
-            management arrangement where a registered portfolio manager manages
-            securities according to an agreed strategy.
-          </p>
-
-          <p>
-            <strong>Minimum Investment:</strong> ₹50 lakh under the current
-            PMS framework.
-          </p>
-
-          <p>
-            <strong>Advantages</strong>
-          </p>
-
-          <ul>
-            <li>Defined investment strategy</li>
-            <li>Professional portfolio management</li>
-            <li>Direct ownership of securities</li>
-            <li>Focused portfolio construction</li>
-            <li>Portfolio monitoring and review</li>
-          </ul>
-
-          <p>
-            <strong>Suitable for:</strong> Investors meeting the applicable
-            investment threshold who understand equity-market and
-            strategy-specific risks.
-          </p>
-
-          <p>
-            <strong>How it works:</strong> The investor selects an applicable
-            PMS strategy and completes the required documentation. The
-            portfolio manager manages the portfolio according to the agreed
-            strategy and applicable regulations.
-          </p>
-
-          <p className="muted">
-            PMS minimum investment threshold is based on SEBI's applicable
-            framework.
-          </p>
-        </div>
-
-
-        {/* AIF */}
-        <div className="card">
-          <h3>AIF</h3>
-
-          <p className="muted">
-            Alternative Investment Funds are privately pooled investment
-            vehicles that invest according to their category, strategy and
-            fund documents.
-          </p>
-
-          <p>
-            <strong>Minimum Investment:</strong> Generally ₹1 crore, subject
-            to applicable regulatory provisions and exceptions.
-          </p>
-
-          <p>
-            <strong>Advantages</strong>
-          </p>
-
-          <ul>
-            <li>Access to alternative investment strategies</li>
-            <li>Potential diversification beyond traditional products</li>
-            <li>Access to selected private-market opportunities</li>
-            <li>Different strategies for different investment objectives</li>
-          </ul>
-
-          <p>
-            <strong>Suitable for:</strong> Eligible investors with sufficient
-            investment capacity who understand the risks, liquidity conditions
-            and complexity associated with alternative investments.
-          </p>
-
-          <p>
-            <strong>How it works:</strong> Investors commit capital to a fund
-            according to its documents. The fund manager deploys capital
-            according to the stated strategy and applicable regulations.
-          </p>
-        </div>
-
-
-        {/* SIF */}
-        <div className="card">
-          <h3>SIF - Specialized Investment Fund</h3>
-
-          <p className="muted">
-            Specialized Investment Funds offer specialized investment
-            strategies within the mutual-fund regulatory framework.
-          </p>
-
-          <p>
-            <strong>Minimum Investment:</strong> The current minimum investment
-            threshold is ₹10 lakh at the PAN level, subject to applicable rules.
-          </p>
-
-          <p>
-            <strong>Advantages</strong>
-          </p>
-
-          <ul>
-            <li>Specialized investment strategies</li>
-            <li>Structured investment approach</li>
-            <li>Exposure to permitted asset classes and strategies</li>
-            <li>Potential diversification for suitable investors</li>
-          </ul>
-
-          <p>
-            <strong>Suitable for:</strong> Investors who understand specialized
-            strategies, market risks, liquidity and the characteristics of the
-            particular SIF.
-          </p>
-
-          <p>
-            <strong>How it works:</strong> Investors purchase units of a
-            registered SIF investment strategy. The fund manager manages the
-            portfolio according to the strategy's stated mandate.
-          </p>
+              <p>{item.text}</p>
+            </div>
+          ))}
         </div>
 
       </section>
 
 
-      {/* INVESTMENT COMPARISON */}
-      <section className="grid">
+      {/* DEMAT */}
+      <section className={styles.dematSection}>
 
-        <div className="card">
-          <h3>Investment Options at a Glance</h3>
+        <div className={styles.dematContent}>
 
-          <p className="muted">
-            Different investment products serve different objectives,
-            investment amounts, risk levels and time horizons.
-          </p>
+          <span className={styles.sectionLabel}>
+            EQUITY & DEMAT
+          </span>
 
-          <ul>
-            <li>
-              <strong>Mutual Funds & SIP:</strong> Regular and diversified
-              market-linked investing
-            </li>
-
-            <li>
-              <strong>Equity / Demat:</strong> Direct participation in listed
-              securities
-            </li>
-
-            <li>
-              <strong>PMS:</strong> Structured portfolio management for
-              eligible investors
-            </li>
-
-            <li>
-              <strong>AIF:</strong> Alternative investment strategies for
-              eligible investors
-            </li>
-
-            <li>
-              <strong>SIF:</strong> Specialized investment strategies with
-              applicable minimum investment requirements
-            </li>
-          </ul>
-
-          <p className="muted">
-            Product suitability depends on the investor's financial goals,
-            risk profile, liquidity requirement and investment horizon.
-          </p>
-        </div>
-
-
-        <div className="card">
-          <h3>How We Approach Investments</h3>
-
-          <p>
-            <strong>1. Understand</strong>
+          <h2>
+            Want To Start Your Direct
             <br />
-            Understand your financial goals, income, existing investments and
-            time horizon.
-          </p>
+            Equity Journey?
+          </h2>
 
           <p>
-            <strong>2. Assess</strong>
-            <br />
-            Consider risk profile, liquidity requirements and investment
-            capacity.
+            A Demat account enables you to hold eligible securities
+            electronically. A trading account can be used to buy and sell
+            securities through the applicable platform.
           </p>
 
-          <p>
-            <strong>3. Compare</strong>
-            <br />
-            Compare strategy, risk, liquidity, cost and historical performance.
-          </p>
+          <div className={styles.dematFeatures}>
 
-          <p>
-            <strong>4. Implement</strong>
-            <br />
-            Select the appropriate investment route and complete the required
-            documentation.
-          </p>
+            <div>
+              <strong>✓</strong>
+              <span>Electronic holding</span>
+            </div>
 
-          <p>
-            <strong>5. Review</strong>
-            <br />
-            Review the portfolio periodically as goals and market conditions
-            change.
-          </p>
-        </div>
+            <div>
+              <strong>✓</strong>
+              <span>Portfolio tracking</span>
+            </div>
 
-      </section>
+            <div>
+              <strong>✓</strong>
+              <span>Digital transactions</span>
+            </div>
 
+            <div>
+              <strong>✓</strong>
+              <span>Research & market access</span>
+            </div>
 
-      {/* DEMAT SECTION */}
-      <section className="grid">
+          </div>
 
-        <div className="card">
-          <h3>Motilal Oswal Demat & Trading Account</h3>
-
-          <p className="muted">
-            A Demat account allows securities to be held electronically.
-            Motilal Oswal provides Demat and trading services along with access
-            to multiple investment and market segments.
-          </p>
-
-          <p>
-            <strong>Key Features</strong>
-          </p>
-
-          <ul>
-            <li>Access to equity and supported market segments</li>
-            <li>Trading across supported devices</li>
-            <li>Research and market information</li>
-            <li>Advisory and call-and-trade support</li>
-            <li>Digital portfolio access</li>
-            <li>Multiple investment products through the platform</li>
-          </ul>
-
-          <p className="muted">
-            Features, charges, eligibility and offers can change. Please check
-            the latest official terms before opening an account.
-          </p>
-
-          <p>
-            <strong>Want to open a Demat account?</strong>
-          </p>
-
-          <p>
-            Contact us for assistance with the account-opening process.
-          </p>
-
-          <p>
-            📞 <strong>+91 91733 34069</strong>
-            <br />
-            ✉️ <strong>aravindchaudhary90@gmail.com</strong>
+          <p className={styles.smallNote}>
+            Features, charges, eligibility and services depend on the
+            selected provider and applicable terms.
           </p>
 
           <a
             href="https://wa.me/919173334069?text=Hello%20Aravind%2C%20I%20want%20to%20open%20a%20Demat%20account."
             target="_blank"
             rel="noopener noreferrer"
+            className={styles.primaryButton}
           >
             Open Demat Account
           </a>
+
         </div>
 
+        <div className={styles.dematVisual}>
+          <div className={styles.visualCircle}>
+            <span>₹</span>
+          </div>
 
-        <div className="card">
-          <h3>Benefits of a Demat Account</h3>
-
-          <p className="muted">
-            A Demat account works as an electronic holding account for
-            securities and removes the need to maintain physical certificates.
-          </p>
-
-          <ul>
-            <li>Electronic holding of securities</li>
-            <li>Convenient portfolio tracking</li>
-            <li>Easy transfer of eligible securities</li>
-            <li>Reduced paperwork</li>
-            <li>Online access to holdings</li>
-            <li>Convenient transaction records</li>
-          </ul>
-
-          <p>
-            <strong>Important:</strong> A Demat account itself does not generate
-            investment returns. Returns depend on the securities purchased and
-            their market performance.
-          </p>
+          <div className={styles.floatingCard}>
+            <small>INVESTMENT</small>
+            <strong>Knowledge → Strategy → Action</strong>
+          </div>
         </div>
 
       </section>
 
 
       {/* PAST PERFORMANCE */}
-      <section className="pageHero">
-        <div>
-          <h2>Past-Performance Examples</h2>
+      <section className={styles.performanceSection}>
 
-          <p className="muted">
-            Historical performance can help investors understand how different
-            strategies have performed in the past. It should not be considered
-            a prediction or guarantee of future returns.
-          </p>
-        </div>
-      </section>
+        <div className={styles.sectionHeading}>
+          <span className={styles.sectionLabel}>
+            RESEARCH & COMPARISON
+          </span>
 
-
-      <section className="grid">
-
-        <div className="card">
-          <h3>PMS - Historical Performance</h3>
-
-          <p className="muted">
-            PMS strategies can have significantly different investment
-            objectives, portfolios, risk levels and performance periods.
-          </p>
-
-          <p>
-            When evaluating PMS performance, consider:
-          </p>
-
-          <ul>
-            <li>1-year, 3-year and 5-year performance</li>
-            <li>Performance across different market cycles</li>
-            <li>Benchmark comparison</li>
-            <li>Risk and volatility</li>
-            <li>Portfolio concentration</li>
-            <li>Investment strategy</li>
-            <li>Fees and other applicable charges</li>
-          </ul>
-
-          <p className="muted">
-            Always refer to the latest official PMS performance disclosure
-            before making an investment decision.
-          </p>
-        </div>
-
-
-        <div className="card">
-          <h3>AIF - Historical Performance</h3>
-
-          <p className="muted">
-            AIF strategies can be very different from one another. Therefore,
-            AIF performance should be evaluated strategy-by-strategy rather
-            than using one return number for all AIFs.
-          </p>
-
-          <p>
-            <strong>Important factors:</strong>
-          </p>
-
-          <ul>
-            <li>Category and investment strategy</li>
-            <li>Fund vintage and track record</li>
-            <li>Portfolio construction</li>
-            <li>Liquidity and lock-in provisions</li>
-            <li>Fees and carried interest</li>
-            <li>Risk and concentration</li>
-            <li>Exit strategy</li>
-          </ul>
-
-          <p className="muted">
-            Latest fund documents and disclosures should be reviewed before
-            investing.
-          </p>
-        </div>
-
-
-        <div className="card">
-          <h3>SIF - Historical Performance</h3>
-
-          <p className="muted">
-            SIF is a relatively newer investment category, and different
-            strategies may have different inception dates.
-          </p>
-
-          <p>
-            Performance should therefore be reviewed along with:
-          </p>
-
-          <ul>
-            <li>Since-inception period</li>
-            <li>Benchmark</li>
-            <li>Strategy objective</li>
-            <li>Portfolio composition</li>
-            <li>Risk level</li>
-            <li>Market-cycle performance</li>
-          </ul>
-
-          <p className="muted">
-            Since-inception returns from different strategies may cover
-            different time periods and should not automatically be compared
-            as equivalent annual returns.
-          </p>
-        </div>
-
-
-        <div className="card">
-          <h3>Mutual Funds - Historical Performance</h3>
-
-          <p className="muted">
-            Mutual funds should be evaluated using the appropriate category,
-            benchmark and time period rather than looking at a single recent
-            return.
-          </p>
-
-          <p>
-            <strong>Before selecting a fund, consider:</strong>
-          </p>
-
-          <ul>
-            <li>Investment objective</li>
-            <li>Risk level</li>
-            <li>Benchmark</li>
-            <li>Expense ratio</li>
-            <li>Portfolio composition</li>
-            <li>Fund-management approach</li>
-            <li>Performance across market cycles</li>
-          </ul>
-
-          <p className="muted">
-            Past performance does not guarantee future performance.
-          </p>
-        </div>
-
-      </section>
-
-
-      {/* GOAL BASED INVESTING */}
-      <section className="grid">
-
-        <div className="card">
-          <h3>Start With Your Financial Goal</h3>
-
-          <p className="muted">
-            Investment selection should start with the objective rather than
-            simply choosing a product.
-          </p>
-
-          <ul>
-            <li>Wealth creation</li>
-            <li>Retirement planning</li>
-            <li>Children's education</li>
-            <li>Long-term capital growth</li>
-            <li>Regular income</li>
-            <li>Portfolio diversification</li>
-            <li>Direct equity participation</li>
-          </ul>
-
-          <p>
-            Once your objective, time horizon, liquidity requirement and risk
-            profile are understood, suitable investment categories can be
-            evaluated.
-          </p>
-        </div>
-
-
-        <div className="card">
-          <h3>Need Help Understanding Your Options?</h3>
-
-          <p className="muted">
-            Share your investment requirement and get help understanding
-            available investment categories, their features, risks and
-            suitability.
-          </p>
-
-          <p>
-            📞 <strong>+91 91733 34069</strong>
+          <h2>
+            Past Performance Matters —
             <br />
-            ✉️ <strong>aravindchaudhary90@gmail.com</strong>
+            But Context Matters More.
+          </h2>
+
+          <p>
+            Historical performance can provide context, but different products
+            have different strategies, risk levels, benchmarks and time periods.
           </p>
+        </div>
+
+
+        <div className={styles.performanceGrid}>
+
+          <div className={styles.performanceCard}>
+            <div className={styles.performanceIcon}>📊</div>
+
+            <h3>PMS</h3>
+
+            <p>
+              Review performance across multiple periods and compare it with
+              the relevant benchmark and strategy.
+            </p>
+
+            <ul>
+              <li>1-year performance</li>
+              <li>3-year performance</li>
+              <li>5-year performance</li>
+              <li>Risk & volatility</li>
+            </ul>
+          </div>
+
+
+          <div className={styles.performanceCard}>
+            <div className={styles.performanceIcon}>🏛️</div>
+
+            <h3>AIF</h3>
+
+            <p>
+              AIF strategies can differ significantly, so evaluation should be
+              strategy-specific.
+            </p>
+
+            <ul>
+              <li>Fund strategy</li>
+              <li>Track record</li>
+              <li>Liquidity</li>
+              <li>Fees & risk</li>
+            </ul>
+          </div>
+
+
+          <div className={styles.performanceCard}>
+            <div className={styles.performanceIcon}>🔷</div>
+
+            <h3>SIF</h3>
+
+            <p>
+              Consider the strategy, benchmark, inception period and market
+              conditions when reviewing historical returns.
+            </p>
+
+            <ul>
+              <li>Strategy objective</li>
+              <li>Benchmark</li>
+              <li>Since inception</li>
+              <li>Risk profile</li>
+            </ul>
+          </div>
+
+
+          <div className={styles.performanceCard}>
+            <div className={styles.performanceIcon}>📈</div>
+
+            <h3>Mutual Funds</h3>
+
+            <p>
+              Evaluate funds using category, benchmark, costs, portfolio and
+              performance across market cycles.
+            </p>
+
+            <ul>
+              <li>Category</li>
+              <li>Benchmark</li>
+              <li>Expense ratio</li>
+              <li>Market-cycle performance</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* GOAL SECTION */}
+      <section className={styles.goalSection}>
+
+        <div>
+          <span className={styles.sectionLabel}>
+            START WITH WHY
+          </span>
+
+          <h2>
+            Your Investment Should
+            <br />
+            Have A Purpose.
+          </h2>
+
+          <p>
+            Whether the goal is wealth creation, retirement, children's
+            education, regular income or portfolio diversification, the
+            investment strategy should begin with the objective.
+          </p>
+        </div>
+
+
+        <div className={styles.goalGrid}>
+
+          <span>Wealth Creation</span>
+          <span>Retirement</span>
+          <span>Education</span>
+          <span>Regular Income</span>
+          <span>Portfolio Diversification</span>
+          <span>Direct Equity</span>
+
+        </div>
+
+      </section>
+
+
+      {/* CTA */}
+      <section className={styles.ctaSection}>
+
+        <span className={styles.sectionLabel}>
+          LET'S TALK
+        </span>
+
+        <h2>
+          Not Sure Which Investment
+          <br />
+          Option Is Right For You?
+        </h2>
+
+        <p>
+          Share your investment requirement and understand the available
+          investment categories, their features, risks and suitability.
+        </p>
+
+        <div className={styles.ctaButtons}>
 
           <a
             href="https://wa.me/919173334069?text=Hello%20Aravind%2C%20I%20want%20to%20discuss%20investment%20options."
             target="_blank"
             rel="noopener noreferrer"
+            className={styles.primaryButton}
           >
-            Discuss Investment Options
+            WhatsApp Us
           </a>
+
+          <a
+            href="tel:+919173334069"
+            className={styles.secondaryButtonDark}
+          >
+            Call +91 91733 34069
+          </a>
+
         </div>
 
       </section>
 
 
       {/* DISCLAIMER */}
-      <section className="pageHero">
-        <div>
-          <p className="muted">
-            <strong>Important:</strong> Investments are subject to market
-            risks. Past performance does not indicate future results. Minimum
-            investment amounts, product features, charges, eligibility and
-            regulatory requirements may change. Investors should review the
-            latest official product documents and assess suitability before
-            investing.
-          </p>
-        </div>
+      <section className={styles.disclaimer}>
+
+        <strong>Important:</strong>{" "}
+
+        Investments are subject to market risks. Past performance does not
+        indicate future results. Minimum investment amounts, product features,
+        charges, eligibility and regulatory requirements may change. Investors
+        should review the latest official product documents and assess
+        suitability before investing.
+
       </section>
-    </>
+
+    </main>
   )
 }
