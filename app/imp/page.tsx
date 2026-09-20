@@ -355,7 +355,7 @@ export default function IMPPage() {
 
           <div className={styles.philosophyGrid}>
             {philosophy.map((item) => (
-              <div className={styles.philosophyCard} key={item.number}>
+              <div className={styles.philosophyCard} key={item.icon}>
                 <div className={styles.philosophyNumber}>{item.icon}</div>
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
