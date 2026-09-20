@@ -1,46 +1,106 @@
 import Link from "next/link";
 import EnquiryForm from "../../components/EnquiryForm";
-import styles from "./IMP.module.css";
 
 export const metadata = {
   title: "IMP | Intelligent Model Portfolio | Aravind Chaudhary",
   description:
-    "Explore IMP — Intelligent Model Portfolio, a research-driven and disciplined approach to long-term investing.",
+    "Explore IMP - Intelligent Model Portfolio, a structured and research-driven approach to long-term investing.",
 };
+
+const process = [
+  {
+    number: "01",
+    title: "Understand",
+    text: "Understand the investor's goals, investment horizon, requirements and risk considerations.",
+  },
+  {
+    number: "02",
+    title: "Research",
+    text: "Study businesses, sectors, market conditions, valuations and relevant investment opportunities.",
+  },
+  {
+    number: "03",
+    title: "Build",
+    text: "Build a structured portfolio based on the selected investment approach and available opportunities.",
+  },
+  {
+    number: "04",
+    title: "Monitor",
+    text: "Review portfolio developments and reassess investments as market and business conditions change.",
+  },
+  {
+    number: "05",
+    title: "Review",
+    text: "Regularly review the portfolio and discuss changes as investment goals and market conditions evolve.",
+  },
+];
+
+const philosophy = [
+  {
+    icon: "📊",
+    title: "Research Driven",
+    text: "Investment decisions are supported by research rather than short-term market noise.",
+  },
+  {
+    icon: "🎯",
+    title: "Focused Approach",
+    text: "The portfolio approach focuses on identifying and understanding selected investment opportunities.",
+  },
+  {
+    icon: "🧭",
+    title: "Discipline",
+    text: "A structured process can help investors avoid reacting emotionally to short-term market movements.",
+  },
+  {
+    icon: "🛡️",
+    title: "Risk Awareness",
+    text: "Market-linked investments carry risk. Risk considerations remain an important part of the investment process.",
+  },
+  {
+    icon: "📈",
+    title: "Long-Term Thinking",
+    text: "IMP is designed around a long-term perspective rather than short-term market predictions.",
+  },
+  {
+    icon: "🔄",
+    title: "Continuous Review",
+    text: "Markets and businesses change, so investments need to be reviewed as circumstances evolve.",
+  },
+];
 
 const performance = [
   {
     client: "Client 09",
-    investment: "₹2.50 Lakh",
-    value: "₹2.66 Lakh",
+    investment: "₹2,50,000",
+    value: "₹2,66,000",
     returnValue: "6.40%",
     date: "9 July 2026",
   },
   {
     client: "Client 10",
-    investment: "₹3.50 Lakh",
-    value: "₹3.60 Lakh",
+    investment: "₹3,50,000",
+    value: "₹3,60,000",
     returnValue: "2.86%",
     date: "5 August 2026",
   },
   {
     client: "Client 11",
-    investment: "₹5.00 Lakh",
-    value: "₹5.40 Lakh",
+    investment: "₹5,00,000",
+    value: "₹5,40,000",
     returnValue: "8.00%",
     date: "13 July 2026",
   },
   {
     client: "Client 12",
-    investment: "₹50.00 Lakh",
-    value: "₹60.00 Lakh",
+    investment: "₹50,00,000",
+    value: "₹60,00,000",
     returnValue: "20.00%",
     date: "12 May 2026",
   },
   {
     client: "Client 13",
-    investment: "₹1.80 Crore",
-    value: "₹2.10 Crore",
+    investment: "₹1,80,00,000",
+    value: "₹2,10,00,000",
     returnValue: "16.67%",
     date: "1 May 2026",
   },
@@ -49,22 +109,22 @@ const performance = [
 const testimonials = [
   {
     name: "Bhavesh Patel",
-    title: "Confidence to Continue & Top Up",
+    title: "Confidence to Continue",
     text: "The structured approach and regular monitoring have given me confidence in continuing with IMP. I am also considering increasing my investment through a top-up.",
   },
   {
     name: "Mukesh Thakkar",
-    title: "A Disciplined Investment Approach",
+    title: "A Disciplined Approach",
     text: "I appreciate the research-driven approach and disciplined investment process. It gives me better clarity about how my investment is being approached.",
   },
   {
     name: "Nikita Patel",
-    title: "Simple, Clear & Structured",
-    text: "IMP has made my investment journey easier to understand. The structured approach and regular updates help me remain focused on my long-term financial goals.",
+    title: "Simple & Structured",
+    text: "IMP has made my investment journey easier to understand. The structured approach and regular updates help me remain focused on my long-term goals.",
   },
   {
     name: "Vishnubhai Thakkar",
-    title: "Positive Investment Experience",
+    title: "Positive Experience",
     text: "My experience with IMP has been positive. I value the research and disciplined approach and am comfortable continuing my investment journey.",
   },
   {
@@ -79,234 +139,283 @@ const testimonials = [
   },
 ];
 
-const process = [
-  {
-    number: "01",
-    title: "Understand",
-    text: "Understand the investor's goals, time horizon, expectations and risk considerations.",
-  },
-  {
-    number: "02",
-    title: "Research",
-    text: "Study businesses, sectors, valuations, market conditions and relevant investment opportunities.",
-  },
-  {
-    number: "03",
-    title: "Build",
-    text: "Create a structured portfolio based on the selected investment approach and available opportunities.",
-  },
-  {
-    number: "04",
-    title: "Monitor",
-    text: "Review portfolio developments and reassess investments as market and business conditions change.",
-  },
-  {
-    number: "05",
-    title: "Review & Evolve",
-    text: "Investments can be reviewed over time as goals, portfolio conditions and investor requirements evolve.",
-  },
-];
-
-const philosophy = [
-  {
-    icon: "01",
-    title: "Research First",
-    text: "Investment decisions should be supported by research rather than short-term market noise.",
-  },
-  {
-    icon: "02",
-    title: "Quality Matters",
-    text: "Focus on understanding the underlying business, opportunity and long-term potential.",
-  },
-  {
-    icon: "03",
-    title: "Discipline",
-    text: "A structured process can help investors avoid making decisions purely because of emotions or market headlines.",
-  },
-  {
-    icon: "04",
-    title: "Risk Awareness",
-    text: "Every market-linked investment carries risk. Risk needs to be understood and managed within the overall strategy.",
-  },
-  {
-    icon: "05",
-    title: "Long-Term Thinking",
-    text: "The objective is to build an approach that can support long-term wealth-creation goals.",
-  },
-  {
-    icon: "06",
-    title: "Continuous Review",
-    text: "Markets and businesses change, so portfolios should be reviewed rather than treated as permanently fixed.",
-  },
-];
-
 export default function IMPPage() {
   return (
-    <main className={styles.page}>
+    <main>
+
       {/* HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroGlowOne}></div>
-        <div className={styles.heroGlowTwo}></div>
-
-        <div className={styles.container}>
-          <div className={styles.heroGrid}>
-            <div className={styles.heroContent}>
-              <div className={styles.eyebrow}>
-                INTELLIGENT MODEL PORTFOLIO
-              </div>
-
-              <h1>
-                Let Your Money
-                <span> Work Smarter.</span>
-              </h1>
-
-              <p className={styles.heroLead}>
-                A structured, research-driven investment approach designed to
-                help investors participate in the equity market with greater
-                discipline, clarity and long-term perspective.
-              </p>
-
-              <div className={styles.heroButtons}>
-                <Link href="#enquire" className={styles.primaryButton}>
-                  Explore IMP
-                  <span>→</span>
-                </Link>
-
-                <Link href="#performance" className={styles.secondaryButton}>
-                  View Performance
-                </Link>
-              </div>
-
-              <div className={styles.heroNote}>
-                <span>✓</span>
-                Research-driven &nbsp;•&nbsp; Disciplined &nbsp;•&nbsp;
-                Long-term focused
-              </div>
-            </div>
-
-            <div className={styles.heroCard}>
-              <div className={styles.heroCardTop}>
-                <span>IMP</span>
-                <span className={styles.liveDot}>●</span>
-              </div>
-
-              <div className={styles.heroCardTitle}>
-                Intelligent
-                <br />
-                Model Portfolio
-              </div>
-
-              <div className={styles.heroCardLine}></div>
-
-              <div className={styles.heroMiniStats}>
-                <div>
-                  <strong>50+</strong>
-                  <span>Investor Relationships*</span>
-                </div>
-
-                <div>
-                  <strong>Research</strong>
-                  <span>Driven Approach</span>
-                </div>
-              </div>
-
-              <div className={styles.heroQuote}>
-                “Disciplined investing starts with informed decisions.”
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* TRUST STRIP */}
-      <section className={styles.trustStrip}>
-        <div className={styles.container}>
-          <div className={styles.trustGrid}>
-            <div>
-              <strong>50+</strong>
-              <span>Investor Relationships*</span>
-            </div>
-
-            <div>
-              <strong>Research</strong>
-              <span>Driven Approach</span>
-            </div>
-
-            <div>
-              <strong>Long-Term</strong>
-              <span>Wealth Focus</span>
-            </div>
-
-            <div>
-              <strong>Disciplined</strong>
-              <span>Investment Process</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* WHAT IS IMP */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionLabel}>UNDERSTANDING IMP</span>
-            <h2>
-              What is <span>IMP?</span>
-            </h2>
-            <p>
-              IMP stands for Intelligent Model Portfolio — a structured
-              approach to investing that combines research, portfolio
-              construction, monitoring and long-term thinking.
+      <section
+        style={{
+          padding: "70px 20px",
+          background:
+            "linear-gradient(135deg, #f5fbff 0%, #ffffff 55%, #eef7ff 100%)",
+          borderBottom: "1px solid #e5edf5",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1180px",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "1.2fr 0.8fr",
+            gap: "50px",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                color: "#2474c6",
+                fontWeight: 700,
+                letterSpacing: "1.5px",
+                fontSize: "13px",
+                marginBottom: "15px",
+              }}
+            >
+              IMP | INTELLIGENT MODEL PORTFOLIO
             </p>
+
+            <h1
+              style={{
+                fontSize: "clamp(42px, 6vw, 68px)",
+                lineHeight: 1.08,
+                color: "#071b35",
+                margin: "0 0 22px",
+                letterSpacing: "-2px",
+              }}
+            >
+              Let your money
+              <br />
+              <span style={{ color: "#2474c6" }}>work smarter.</span>
+            </h1>
+
+            <p
+              style={{
+                maxWidth: "680px",
+                color: "#50657a",
+                fontSize: "18px",
+                lineHeight: 1.8,
+                marginBottom: "28px",
+              }}
+            >
+              IMP is a structured, research-driven investment approach designed
+              to help investors participate in the equity market with
+              discipline, clarity and a long-term perspective.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
+            >
+              <Link
+                href="#enquire"
+                style={{
+                  display: "inline-block",
+                  background: "#2474c6",
+                  color: "#ffffff",
+                  padding: "13px 23px",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                Explore IMP
+              </Link>
+
+              <Link
+                href="#performance"
+                style={{
+                  display: "inline-block",
+                  background: "#ffffff",
+                  color: "#2474c6",
+                  padding: "12px 23px",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                  border: "1px solid #2474c6",
+                }}
+              >
+                View Performance
+              </Link>
+            </div>
           </div>
 
-          <div className={styles.introGrid}>
-            <div className={styles.introMain}>
-              <h3>
-                Investing is not just about finding a stock.
-                <br />
-                It is about building a process.
-              </h3>
+          <div
+            style={{
+              background: "#ffffff",
+              border: "1px solid #dfe9f2",
+              borderRadius: "18px",
+              padding: "35px",
+              boxShadow: "0 12px 35px rgba(20,70,110,0.08)",
+            }}
+          >
+            <p
+              style={{
+                color: "#2474c6",
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                margin: 0,
+              }}
+            >
+              INTELLIGENT INVESTING
+            </p>
 
-              <p>
-                Markets constantly move. Businesses evolve. Investor emotions
-                change. IMP is designed around a disciplined process that
-                focuses on understanding opportunities rather than simply
-                reacting to market movements.
-              </p>
+            <h2
+              style={{
+                color: "#071b35",
+                fontSize: "30px",
+                lineHeight: 1.25,
+                margin: "15px 0",
+              }}
+            >
+              Research.
+              <br />
+              Discipline.
+              <br />
+              Long-term thinking.
+            </h2>
 
-              <p>
-                The approach aims to bring together research, portfolio
-                discipline and continuous review so investors can make more
-                informed long-term decisions.
-              </p>
+            <div
+              style={{
+                height: "1px",
+                background: "#e5edf5",
+                margin: "25px 0",
+              }}
+            />
 
-              <div className={styles.highlightBox}>
-                <span>IMP Philosophy</span>
-                <strong>
-                  Research → Discipline → Strategy → Review → Long-Term
-                  Perspective
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "20px",
+              }}
+            >
+              <div>
+                <strong
+                  style={{
+                    display: "block",
+                    color: "#2474c6",
+                    fontSize: "25px",
+                  }}
+                >
+                  50+
                 </strong>
+                <span style={{ color: "#68798a", fontSize: "12px" }}>
+                  Client relationships*
+                </span>
+              </div>
+
+              <div>
+                <strong
+                  style={{
+                    display: "block",
+                    color: "#2474c6",
+                    fontSize: "20px",
+                  }}
+                >
+                  Research
+                </strong>
+                <span style={{ color: "#68798a", fontSize: "12px" }}>
+                  Driven approach
+                </span>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className={styles.introSide}>
-              <div className={styles.infoCard}>
-                <div className={styles.infoIcon}>01</div>
-                <h4>Not Market Noise</h4>
-                <p>
-                  The focus is on research and a structured investment
-                  approach rather than reacting to every market headline.
-                </p>
-              </div>
+      {/* INTRODUCTION */}
+      <section style={{ padding: "85px 20px" }}>
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <div style={{ maxWidth: "800px", marginBottom: "45px" }}>
+            <p
+              style={{
+                color: "#2474c6",
+                fontWeight: 700,
+                fontSize: "13px",
+                letterSpacing: "1.5px",
+              }}
+            >
+              UNDERSTANDING IMP
+            </p>
 
-              <div className={styles.infoCard}>
-                <div className={styles.infoIcon}>02</div>
-                <h4>Not a Return Promise</h4>
-                <p>
-                  Market-linked investments carry risk. IMP does not guarantee
-                  returns or eliminate investment risk.
-                </p>
+            <h2
+              style={{
+                color: "#071b35",
+                fontSize: "clamp(34px, 5vw, 52px)",
+                lineHeight: 1.15,
+                margin: "12px 0 20px",
+              }}
+            >
+              Investing is not just about
+              <br />
+              finding a stock.
+            </h2>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "55px",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  color: "#52677b",
+                  lineHeight: 1.85,
+                  fontSize: "16px",
+                }}
+              >
+                IMP stands for Intelligent Model Portfolio. It is a structured
+                approach that combines research, portfolio construction,
+                monitoring and long-term thinking.
+              </p>
+
+              <p
+                style={{
+                  color: "#52677b",
+                  lineHeight: 1.85,
+                  fontSize: "16px",
+                }}
+              >
+                The objective is to bring more structure to the investment
+                journey and help investors understand what they own, why they
+                own it and how the portfolio is being reviewed.
+              </p>
+            </div>
+
+            <div>
+              <p
+                style={{
+                  color: "#52677b",
+                  lineHeight: 1.85,
+                  fontSize: "16px",
+                }}
+              >
+                Markets continuously change. Businesses evolve. Investor
+                emotions also change. A disciplined process can help investors
+                focus on research and long-term objectives rather than reacting
+                to every market movement.
+              </p>
+
+              <div
+                style={{
+                  marginTop: "25px",
+                  padding: "20px",
+                  background: "#f3f8fd",
+                  borderLeft: "4px solid #2474c6",
+                  borderRadius: "5px",
+                }}
+              >
+                <strong style={{ color: "#071b35" }}>
+                  Research → Strategy → Discipline → Review
+                </strong>
               </div>
             </div>
           </div>
@@ -314,51 +423,155 @@ export default function IMPPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className={`${styles.section} ${styles.darkSection}`}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionLabel}>THE PROCESS</span>
-            <h2>
-              How <span>IMP Works</span>
+      <section
+        style={{
+          padding: "85px 20px",
+          background: "#f7fbff",
+          borderTop: "1px solid #edf2f6",
+          borderBottom: "1px solid #edf2f6",
+        }}
+      >
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "50px" }}>
+            <p
+              style={{
+                color: "#2474c6",
+                fontWeight: 700,
+                fontSize: "13px",
+                letterSpacing: "1.5px",
+              }}
+            >
+              HOW IT WORKS
+            </p>
+
+            <h2
+              style={{
+                color: "#071b35",
+                fontSize: "clamp(34px, 5vw, 50px)",
+                margin: "12px 0",
+              }}
+            >
+              A structured investment process.
             </h2>
-            <p>
-              A simple framework designed to bring structure and discipline to
-              the investment journey.
+
+            <p style={{ color: "#607487", fontSize: "16px" }}>
+              Five simple stages designed to bring discipline to the investment
+              journey.
             </p>
           </div>
 
-          <div className={styles.processGrid}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5, 1fr)",
+              gap: "18px",
+            }}
+          >
             {process.map((item) => (
-              <div className={styles.processCard} key={item.number}>
-                <div className={styles.processNumber}>{item.number}</div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+              <div
+                key={item.number}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #e0e9f1",
+                  borderRadius: "12px",
+                  padding: "25px 20px",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#2474c6",
+                    fontWeight: 800,
+                    fontSize: "12px",
+                  }}
+                >
+                  {item.number}
+                </span>
+
+                <h3
+                  style={{
+                    color: "#071b35",
+                    fontSize: "20px",
+                    margin: "30px 0 10px",
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#66798b",
+                    fontSize: "13px",
+                    lineHeight: 1.7,
+                    margin: 0,
+                  }}
+                >
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* WHY IMP */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionLabel}>WHY A STRUCTURED APPROACH</span>
-            <h2>
-              Built Around <span>Intelligent Investing</span>
-            </h2>
-            <p>
-              IMP focuses on the process behind an investment decision — not
-              simply the investment itself.
+      {/* PHILOSOPHY */}
+      <section style={{ padding: "85px 20px" }}>
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "50px" }}>
+            <p
+              style={{
+                color: "#2474c6",
+                fontWeight: 700,
+                fontSize: "13px",
+                letterSpacing: "1.5px",
+              }}
+            >
+              IMP PHILOSOPHY
             </p>
+
+            <h2
+              style={{
+                color: "#071b35",
+                fontSize: "clamp(34px, 5vw, 50px)",
+                margin: "12px 0",
+              }}
+            >
+              Intelligent investing starts with a process.
+            </h2>
           </div>
 
-          <div className={styles.philosophyGrid}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "35px",
+            }}
+          >
             {philosophy.map((item) => (
-              <div className={styles.philosophyCard} key={item.icon}>
-                <div className={styles.philosophyNumber}>{item.icon}</div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+              <div key={item.title}>
+                <div style={{ fontSize: "27px", marginBottom: "12px" }}>
+                  {item.icon}
+                </div>
+
+                <h3
+                  style={{
+                    color: "#163d65",
+                    fontSize: "19px",
+                    margin: "0 0 8px",
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#718396",
+                    fontSize: "14px",
+                    lineHeight: 1.7,
+                    margin: 0,
+                  }}
+                >
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
@@ -368,256 +581,449 @@ export default function IMPPage() {
       {/* PERFORMANCE */}
       <section
         id="performance"
-        className={`${styles.section} ${styles.performanceSection}`}
+        style={{
+          padding: "85px 20px",
+          background: "#f7fbff",
+          borderTop: "1px solid #edf2f6",
+          borderBottom: "1px solid #edf2f6",
+        }}
       >
-        <div className={styles.container}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionLabel}>CLIENT PERFORMANCE SNAPSHOTS</span>
-            <h2>
-              Real Client <span>Performance</span>
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "50px" }}>
+            <p
+              style={{
+                color: "#2474c6",
+                fontWeight: 700,
+                fontSize: "13px",
+                letterSpacing: "1.5px",
+              }}
+            >
+              CLIENT PERFORMANCE
+            </p>
+
+            <h2
+              style={{
+                color: "#071b35",
+                fontSize: "clamp(34px, 5vw, 50px)",
+                margin: "12px 0",
+              }}
+            >
+              Selected client performance snapshots.
             </h2>
-            <p>
-              Selected client investment snapshots supplied for this page.
+
+            <p style={{ color: "#68798a" }}>
+              Figures supplied for the IMP page.
             </p>
           </div>
 
-          <div className={styles.performanceGrid}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "18px",
+            }}
+          >
             {performance.map((item) => (
-              <div className={styles.performanceCard} key={item.client}>
-                <div className={styles.performanceTop}>
-                  <span>{item.client}</span>
-                  <span className={styles.returnBadge}>
+              <div
+                key={item.client}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #dfe8f0",
+                  borderRadius: "12px",
+                  padding: "25px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderBottom: "1px solid #edf1f5",
+                    paddingBottom: "15px",
+                  }}
+                >
+                  <strong style={{ color: "#163d65" }}>
+                    {item.client}
+                  </strong>
+
+                  <span
+                    style={{
+                      color: "#2474c6",
+                      fontWeight: 800,
+                      fontSize: "14px",
+                    }}
+                  >
                     {item.returnValue}
                   </span>
                 </div>
 
-                <div className={styles.performanceValues}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 25px 1fr",
+                    gap: "8px",
+                    alignItems: "center",
+                    padding: "22px 0",
+                  }}
+                >
                   <div>
-                    <span>Investment</span>
-                    <strong>{item.investment}</strong>
+                    <small
+                      style={{
+                        display: "block",
+                        color: "#81909d",
+                        fontSize: "10px",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      INVESTMENT
+                    </small>
+
+                    <strong style={{ color: "#071b35" }}>
+                      {item.investment}
+                    </strong>
                   </div>
 
-                  <div className={styles.arrow}>→</div>
+                  <div
+                    style={{
+                      color: "#2474c6",
+                      fontWeight: 700,
+                      textAlign: "center",
+                    }}
+                  >
+                    →
+                  </div>
 
                   <div>
-                    <span>Value Shown</span>
-                    <strong>{item.value}</strong>
+                    <small
+                      style={{
+                        display: "block",
+                        color: "#81909d",
+                        fontSize: "10px",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      VALUE SHOWN
+                    </small>
+
+                    <strong style={{ color: "#071b35" }}>
+                      {item.value}
+                    </strong>
                   </div>
                 </div>
 
-                <div className={styles.performanceDate}>
-                  Investment date: <strong>{item.date}</strong>
+                <small style={{ color: "#81909d" }}>
+                  Investment date:{" "}
+                  <strong style={{ color: "#516678" }}>
+                    {item.date}
+                  </strong>
+                </small>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              marginTop: "25px",
+              padding: "18px 20px",
+              background: "#ffffff",
+              border: "1px solid #e0e8ef",
+              borderRadius: "8px",
+              color: "#66798b",
+              fontSize: "12px",
+              lineHeight: 1.7,
+            }}
+          >
+            <strong style={{ color: "#163d65" }}>Important:</strong>{" "}
+            Performance figures displayed here are based on information
+            supplied for this page. The valuation date and benchmark were not
+            supplied with the figures. Past performance is not indicative of
+            future results. Market-linked investments are subject to market
+            risks.
+          </div>
+        </div>
+      </section>
+
+      {/* INVESTOR EXPERIENCE */}
+      <section style={{ padding: "85px 20px" }}>
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "50px" }}>
+            <p
+              style={{
+                color: "#2474c6",
+                fontWeight: 700,
+                fontSize: "13px",
+                letterSpacing: "1.5px",
+              }}
+            >
+              INVESTOR EXPERIENCE
+            </p>
+
+            <h2
+              style={{
+                color: "#071b35",
+                fontSize: "clamp(34px, 5vw, 50px)",
+                margin: "12px 0",
+              }}
+            >
+              What IMP investors value.
+            </h2>
+
+            <p style={{ color: "#68798a" }}>
+              Investor experience and feedback from the IMP community.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "20px",
+            }}
+          >
+            {testimonials.map((item) => (
+              <div
+                key={item.name}
+                style={{
+                  border: "1px solid #dfe8f0",
+                  borderRadius: "12px",
+                  padding: "28px",
+                  background: "#ffffff",
+                }}
+              >
+                <div
+                  style={{
+                    color: "#2474c6",
+                    fontSize: "22px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  ★★★★★
+                </div>
+
+                <h3
+                  style={{
+                    color: "#163d65",
+                    fontSize: "18px",
+                    margin: "0 0 12px",
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    color: "#66798b",
+                    fontSize: "14px",
+                    lineHeight: 1.75,
+                    margin: 0,
+                  }}
+                >
+                  “{item.text}”
+                </p>
+
+                <div
+                  style={{
+                    borderTop: "1px solid #edf1f5",
+                    marginTop: "20px",
+                    paddingTop: "15px",
+                  }}
+                >
+                  <strong
+                    style={{
+                      display: "block",
+                      color: "#071b35",
+                      fontSize: "13px",
+                    }}
+                  >
+                    {item.name}
+                  </strong>
+
+                  <small style={{ color: "#81909d" }}>
+                    IMP Investor
+                  </small>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className={styles.performanceNote}>
-            <strong>Important:</strong> These figures are based on client
-            information supplied for this website page. The valuation date and
-            benchmark were not supplied with the figures. Past performance is
-            not indicative of future results. Market-linked investments are
-            subject to market risks.
-          </div>
+          <p
+            style={{
+              textAlign: "center",
+              color: "#8997a3",
+              fontSize: "11px",
+              marginTop: "22px",
+            }}
+          >
+            Testimonial wording should be reviewed and approved by the
+            respective client before publication.
+          </p>
         </div>
       </section>
 
       {/* TOP UP */}
-      <section className={styles.topupSection}>
-        <div className={styles.container}>
-          <div className={styles.topupGrid}>
-            <div>
-              <span className={styles.sectionLabel}>CONTINUE YOUR JOURNEY</span>
-              <h2>
-                Happy With Your IMP Experience?
-                <span> Explore a Top-Up.</span>
-              </h2>
+      <section
+        style={{
+          padding: "70px 20px",
+          background: "#f3f8fd",
+          borderTop: "1px solid #e2edf6",
+          borderBottom: "1px solid #e2edf6",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1000px",
+            margin: "0 auto",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              color: "#2474c6",
+              fontWeight: 700,
+              fontSize: "13px",
+              letterSpacing: "1.5px",
+            }}
+          >
+            CONTINUE YOUR INVESTMENT JOURNEY
+          </p>
 
-              <p>
-                As your financial goals and investment capacity evolve, you may
-                wish to review whether additional investment is appropriate for
-                your overall financial plan.
-              </p>
-            </div>
+          <h2
+            style={{
+              color: "#071b35",
+              fontSize: "clamp(32px, 5vw, 48px)",
+              margin: "12px 0 18px",
+            }}
+          >
+            Happy with your IMP experience?
+          </h2>
 
-            <div className={styles.topupAction}>
-              <Link href="#enquire" className={styles.primaryButton}>
-                Discuss Top-Up
-                <span>→</span>
-              </Link>
+          <p
+            style={{
+              maxWidth: "700px",
+              margin: "0 auto 25px",
+              color: "#66798b",
+              lineHeight: 1.8,
+            }}
+          >
+            If your financial goals and investment capacity have changed, you
+            can discuss whether an additional investment or top-up is
+            appropriate for your overall financial plan.
+          </p>
 
-              <small>
-                Top-up decisions should be based on your financial goals,
-                suitability and risk considerations.
-              </small>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionLabel}>INVESTOR EXPERIENCE</span>
-            <h2>
-              What IMP Investors <span>Value</span>
-            </h2>
-
-            <p>
-              Feedback themes from IMP investors, presented as draft summaries
-              for client approval before publication.
-            </p>
-          </div>
-
-          <div className={styles.testimonialGrid}>
-            {testimonials.map((item) => (
-              <article className={styles.testimonialCard} key={item.name}>
-                <div className={styles.quoteMark}>“</div>
-
-                <div className={styles.stars}>★★★★★</div>
-
-                <h3>{item.title}</h3>
-
-                <p>{item.text}</p>
-
-                <div className={styles.testimonialPerson}>
-                  <div className={styles.avatar}>
-                    {item.name.charAt(0)}
-                  </div>
-
-                  <div>
-                    <strong>{item.name}</strong>
-                    <span>IMP Investor</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className={styles.testimonialNote}>
-            <strong>Client approval:</strong> Testimonial wording should be
-            reviewed and approved by the respective client before publication.
-          </div>
-        </div>
-      </section>
-
-      {/* WHO IS IT FOR */}
-      <section className={`${styles.section} ${styles.softSection}`}>
-        <div className={styles.container}>
-          <div className={styles.sectionHeading}>
-            <span className={styles.sectionLabel}>IS IMP RIGHT FOR YOU?</span>
-            <h2>
-              IMP May Be Relevant For <span>Investors Who...</span>
-            </h2>
-          </div>
-
-          <div className={styles.suitabilityGrid}>
-            <div>
-              <span>✓</span>
-              Want a structured approach to equity investing
-            </div>
-
-            <div>
-              <span>✓</span>
-              Prefer research over short-term market noise
-            </div>
-
-            <div>
-              <span>✓</span>
-              Have a long-term investment perspective
-            </div>
-
-            <div>
-              <span>✓</span>
-              Want regular portfolio review and monitoring
-            </div>
-
-            <div>
-              <span>✓</span>
-              Understand that equity investments carry market risk
-            </div>
-
-            <div>
-              <span>✓</span>
-              Want to discuss portfolio allocation before investing
-            </div>
-          </div>
+          <Link
+            href="#enquire"
+            style={{
+              display: "inline-block",
+              background: "#2474c6",
+              color: "#ffffff",
+              padding: "13px 25px",
+              borderRadius: "8px",
+              textDecoration: "none",
+              fontWeight: 700,
+            }}
+          >
+            Discuss IMP Top-Up
+          </Link>
         </div>
       </section>
 
       {/* FINAL CTA */}
-      <section id="enquire" className={styles.ctaSection}>
-        <div className={styles.container}>
-          <div className={styles.ctaBox}>
-            <div>
-              <span className={styles.sectionLabel}>READY TO EXPLORE IMP?</span>
+      <section
+        id="enquire"
+        style={{
+          padding: "80px 20px",
+          background:
+            "linear-gradient(135deg, #1478d4 0%, #2489df 100%)",
+          color: "#ffffff",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <p
+            style={{
+              fontWeight: 700,
+              letterSpacing: "1.5px",
+              fontSize: "13px",
+              marginBottom: "10px",
+            }}
+          >
+            LET&apos;S CONNECT
+          </p>
 
-              <h2>
-                Your Money Deserves
-                <br />
-                <span>an Intelligent Approach.</span>
-              </h2>
+          <h2
+            style={{
+              fontSize: "clamp(34px, 5vw, 52px)",
+              margin: "0 0 18px",
+            }}
+          >
+            Want to explore IMP?
+          </h2>
 
-              <p>
-                Share your investment requirements and let&apos;s understand
-                whether the IMP approach is suitable for your financial goals.
-              </p>
+          <p
+            style={{
+              maxWidth: "700px",
+              margin: "0 auto 30px",
+              lineHeight: 1.8,
+              color: "rgba(255,255,255,0.88)",
+            }}
+          >
+            Share your investment requirements and let&apos;s understand
+            whether the IMP approach is suitable for your financial goals.
+          </p>
 
-              <div className={styles.ctaPoints}>
-                <span>✓ Understand</span>
-                <span>✓ Analyse</span>
-                <span>✓ Plan</span>
-                <span>✓ Invest</span>
-                <span>✓ Review</span>
-              </div>
-            </div>
-
-            <div className={styles.ctaMiniCard}>
-              <strong>IMP</strong>
-              <span>Intelligent Model Portfolio</span>
-              <small>Research • Discipline • Long-Term Perspective</small>
-            </div>
-          </div>
-
-          <div className={styles.formWrapper}>
+          <div
+            style={{
+              maxWidth: "850px",
+              margin: "0 auto",
+              background: "#ffffff",
+              borderRadius: "12px",
+              padding: "25px",
+              textAlign: "left",
+              color: "#071b35",
+            }}
+          >
             <EnquiryForm />
           </div>
         </div>
       </section>
 
       {/* DISCLAIMER */}
-      <section className={styles.disclaimer}>
-        <div className={styles.container}>
-          <h3>Important Information</h3>
+      <section
+        style={{
+          padding: "35px 20px",
+          background: "#f7f8fa",
+          borderTop: "1px solid #e5e9ed",
+        }}
+      >
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <h3
+            style={{
+              color: "#163d65",
+              fontSize: "15px",
+              marginBottom: "10px",
+            }}
+          >
+            Important Information
+          </h3>
 
-          <p>
-            IMP is a market-linked investment approach. Investments are
-            subject to market risks and there is no assurance that any
-            investment objective will be achieved. Past performance is not
-            indicative of future results. Investors should consider their
-            financial goals, risk profile, investment horizon and suitability
-            before making any investment decision.
-          </p>
-
-          <p>
-            Performance figures displayed on this page are based on information
-            supplied for the website and should not be interpreted as a promise,
-            guarantee or projection of future returns.
+          <p
+            style={{
+              color: "#788692",
+              fontSize: "11px",
+              lineHeight: 1.7,
+              margin: 0,
+            }}
+          >
+            IMP is a market-linked investment approach. Investments are subject
+            to market risks and there is no assurance that any investment
+            objective will be achieved. Past performance is not indicative of
+            future results. Investors should consider their financial goals,
+            risk profile, investment horizon and suitability before making any
+            investment decision.
           </p>
         </div>
       </section>
 
-      {/* FOOTER CTA */}
-      <section className={styles.bottomBar}>
-        <div className={styles.container}>
-          <span>
-            Want to know whether IMP fits your investment requirements?
-          </span>
-
-          <Link href="#enquire">Start a Conversation →</Link>
-        </div>
-      </section>
     </main>
   );
 }
