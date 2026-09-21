@@ -140,11 +140,7 @@ function calculateSIP(
   };
 }
 
-export const metadata = {
-  title: "SIP Calculator | Calculate SIP Investment Growth",
-  description:
-    "Use the SIP Calculator to estimate investment value, total investment and potential returns based on SIP amount, time period, expected return and annual step-up.",
-};
+
 
 export default function SIPCalculatorPage() {
   const [monthlySIP, setMonthlySIP] = useState(10000);
