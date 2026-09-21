@@ -4,7 +4,8 @@ import MobileMenu from "../components/MobileMenu";
 
 export const metadata = {
   title: "Aravind Chaudhary | Financial Services",
-  description: "Investment, insurance, loan and wealth solutions.",
+  description:
+    "Investment, insurance, loan, wealth solutions and financial calculators.",
 };
 
 export default function RootLayout({
@@ -29,10 +30,11 @@ export default function RootLayout({
               <Link href="/loans">Loans</Link>
               <Link href="/imp">IMP</Link>
               <Link href="/swp">SWP</Link>
+              <Link href="/calculators">Calculators</Link>
               <Link href="/articles">Articles</Link>
               <Link href="/about">About</Link>
               <Link href="/contact">Contact</Link>
-                       </nav>
+            </nav>
 
             {/* Desktop WhatsApp Button */}
             <a
@@ -44,8 +46,8 @@ export default function RootLayout({
               WhatsApp
             </a>
 
-           {/* Mobile Hamburger Menu */}
-<MobileMenu />
+            {/* Mobile Hamburger Menu */}
+            <MobileMenu />
 
           </div>
         </header>
@@ -56,9 +58,13 @@ export default function RootLayout({
           <div>
             <b>Aravind Chaudhary</b>
             <p>Financial Services & Wealth Solutions</p>
+
             <p>
-              <a href="tel:+919173334069">+91 91733 34069</a>
+              <a href="tel:+919173334069">
+                +91 91733 34069
+              </a>
             </p>
+
             <p>
               <a href="mailto:aravindchaudhary90@gmail.com">
                 aravindchaudhary90@gmail.com
