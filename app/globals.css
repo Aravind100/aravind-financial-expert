@@ -1697,3 +1697,785 @@
     text-align: center;
   }
 }
+
+
+/* =========================================================
+   SIP CALCULATOR
+   ========================================================= */
+
+.sipHero {
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(20, 99, 216, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #f7faff 0%,
+      #ffffff 58%,
+      #eef5ff 100%
+    );
+  border-bottom: 1px solid #e4eaf2;
+}
+
+.sipEyebrow {
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.6px;
+  margin-bottom: 12px;
+}
+
+.sipHero h1 {
+  font-size: 48px;
+  line-height: 1.1;
+  margin: 0 0 15px;
+}
+
+.sipHero > div > p:first-of-type {
+  font-size: 22px;
+  font-weight: 700;
+  color: #10233f;
+  margin: 0 0 12px;
+}
+
+.sipHeroText {
+  max-width: 780px;
+  color: #63748a;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.sipCalculatorSection {
+  padding-top: 55px;
+}
+
+.sipCalculatorGrid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.sipInputCard,
+.sipResultCard {
+  padding: 30px;
+}
+
+.sipCardEyebrow {
+  color: #1463d8;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  margin-bottom: 10px;
+}
+
+.sipInputCard h2,
+.sipResultCard h2 {
+  margin: 0 0 25px;
+  font-size: 27px;
+}
+
+.sipInputGroup {
+  margin-bottom: 25px;
+}
+
+.sipInputGroup label {
+  display: block;
+  margin-bottom: 9px;
+  color: #263e5c;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sipInputGroup input[type="number"] {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #cdd8e6;
+  border-radius: 10px;
+  font: inherit;
+  color: #10233f;
+  background: #ffffff;
+}
+
+.sipInputGroup input[type="number"]:focus {
+  outline: none;
+  border-color: #1463d8;
+  box-shadow: 0 0 0 3px rgba(20, 99, 216, 0.08);
+}
+
+.sipInputWords {
+  margin-top: 8px;
+  color: #63748a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.sipRangeValue {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.sipRangeValue strong {
+  color: #1463d8;
+  font-size: 23px;
+}
+
+.sipRangeValue span {
+  color: #63748a;
+  font-size: 12px;
+}
+
+.sipInputGroup input[type="range"] {
+  width: 100%;
+  accent-color: #1463d8;
+  cursor: pointer;
+}
+
+.sipRangeLabels {
+  display: flex;
+  justify-content: space-between;
+  color: #7a8999;
+  font-size: 11px;
+}
+
+.sipExampleButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 5px;
+}
+
+.sipExampleButtons span {
+  width: 100%;
+  color: #63748a;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.sipExampleButtons button {
+  border: 1px solid #d7e1ec;
+  background: #f7faff;
+  color: #1463d8;
+  padding: 8px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.sipExampleButtons button:hover {
+  background: #eaf2ff;
+}
+
+.sipFutureValue {
+  padding: 24px;
+  background: linear-gradient(135deg, #eef5ff, #f8fbff);
+  border: 1px solid #dce8f6;
+  border-radius: 15px;
+  margin-bottom: 18px;
+}
+
+.sipFutureValue span {
+  display: block;
+  color: #63748a;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.sipFutureValue strong {
+  display: block;
+  color: #10233f;
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.sipFutureValue small {
+  display: block;
+  color: #63748a;
+  margin-top: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.sipResultGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.sipResultGrid div {
+  padding: 16px;
+  border: 1px solid #e4eaf2;
+  border-radius: 12px;
+}
+
+.sipResultGrid span,
+.sipSummary span {
+  display: block;
+  color: #63748a;
+  font-size: 11px;
+  margin-bottom: 7px;
+}
+
+.sipResultGrid strong {
+  color: #10233f;
+  font-size: 17px;
+}
+
+.sipResultBar {
+  width: 100%;
+  height: 13px;
+  overflow: hidden;
+  background: #e7edf4;
+  border-radius: 999px;
+}
+
+.sipInvestedBar {
+  height: 100%;
+  background: #1463d8;
+  border-radius: 999px;
+}
+
+.sipBarLegend {
+  display: flex;
+  gap: 18px;
+  margin-top: 9px;
+  color: #63748a;
+  font-size: 11px;
+}
+
+.sipBarLegend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sipBarLegend i {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.sipLegendInvested {
+  background: #1463d8;
+}
+
+.sipLegendReturns {
+  background: #b8cbe5;
+}
+
+.sipSummary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.sipSummary div {
+  padding: 13px;
+  background: #f7faff;
+  border-radius: 10px;
+}
+
+.sipSummary strong {
+  color: #10233f;
+  font-size: 14px;
+}
+
+.sipChartSection {
+  padding-top: 35px;
+}
+
+.sipSectionHeading {
+  margin-bottom: 25px;
+}
+
+.sipSectionHeading h2 {
+  margin: 0 0 10px;
+  font-size: 32px;
+}
+
+.sipSectionHeading p {
+  margin: 0;
+}
+
+.sipChartCard {
+  padding: 25px;
+  overflow-x: auto;
+}
+
+.sipChart {
+  min-width: 700px;
+  height: 390px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 25px 10px 0;
+}
+
+.sipChartColumn {
+  flex: 1;
+  min-width: 28px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.sipChartValue {
+  width: 100%;
+  min-height: 34px;
+  color: #63748a;
+  font-size: 9px;
+  text-align: center;
+  transform: rotate(-45deg);
+  margin-bottom: 7px;
+}
+
+.sipChartBarArea {
+  width: 100%;
+  height: 270px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sipChartBar {
+  width: min(34px, 80%);
+  min-height: 2px;
+  background: linear-gradient(180deg, #1463d8, #75a9e8);
+  border-radius: 7px 7px 0 0;
+  transition: height 0.3s ease;
+}
+
+.sipChartColumn > span {
+  margin-top: 9px;
+  color: #63748a;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.sipTableSection {
+  padding-top: 25px;
+}
+
+.sipTableWrap {
+  overflow-x: auto;
+  border: 1px solid #e4eaf2;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.sipTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.sipTable th,
+.sipTable td {
+  padding: 13px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e8edf3;
+  font-size: 13px;
+}
+
+.sipTable th {
+  background: #eef5ff;
+  color: #10233f;
+  font-weight: 800;
+}
+
+.sipTable td {
+  color: #53657c;
+}
+
+.sipTable tr:last-child td {
+  border-bottom: 0;
+}
+
+.sipInfoSection {
+  background: #f7faff;
+  border-top: 1px solid #e4eaf2;
+  border-bottom: 1px solid #e4eaf2;
+}
+
+.sipInfoGrid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 70px;
+}
+
+.sipInfoGrid h2 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.sipInfoGrid p {
+  margin-top: 0;
+  color: #53657c;
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.sipCenteredHeading {
+  max-width: 780px;
+  margin: 0 auto 38px;
+  text-align: center;
+}
+
+.sipCenteredHeading h2 {
+  margin: 0 0 12px;
+  font-size: 34px;
+}
+
+.sipCenteredHeading p {
+  margin: 0;
+}
+
+.sipWorkflow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.sipWorkflowCard {
+  padding: 23px;
+  border: 1px solid #e4eaf2;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(18, 49, 90, 0.05);
+}
+
+.sipWorkflowCard > span {
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sipWorkflowCard h3 {
+  margin: 14px 0 9px;
+  font-size: 18px;
+}
+
+.sipWorkflowCard p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.sipBlueSection {
+  background: linear-gradient(135deg, #0e2038, #123b70);
+  color: #ffffff;
+}
+
+.sipBlueGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 45px;
+  align-items: center;
+}
+
+.sipBlueGrid h2 {
+  margin: 0 0 15px;
+  font-size: 36px;
+  line-height: 1.2;
+}
+
+.sipBlueGrid p {
+  color: #d5e4f8;
+  line-height: 1.75;
+  font-size: 16px;
+}
+
+.sipLightEyebrow {
+  color: #8fc5ff;
+}
+
+.sipBlueExample {
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.sipBlueExample span {
+  color: #8fc5ff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sipBlueExample strong {
+  display: block;
+  margin: 10px 0;
+  font-size: 30px;
+}
+
+.sipBlueExample button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 15px;
+  background: #ffffff;
+  color: #1463d8;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sipExampleSection {
+  padding-bottom: 55px;
+}
+
+.sipExampleGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.sipExampleGrid .card {
+  padding: 22px;
+}
+
+.sipExampleGrid span {
+  display: block;
+  color: #63748a;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.sipExampleGrid strong {
+  color: #10233f;
+  font-size: 20px;
+}
+
+.sipExampleNote {
+  max-width: 850px;
+  margin: 25px auto 0;
+  text-align: center;
+}
+
+.sipExampleNote p {
+  color: #63748a;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.sipExampleNote button {
+  border: 0;
+  background: transparent;
+  color: #1463d8;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sipLightSection {
+  background: #f7faff;
+  border-top: 1px solid #e4eaf2;
+  border-bottom: 1px solid #e4eaf2;
+}
+
+.sipBenefitGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.sipBenefitGrid .card {
+  padding: 24px;
+}
+
+.sipBenefitIcon {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.sipBenefitGrid h3 {
+  margin: 0 0 9px;
+}
+
+.sipBenefitGrid p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.sipRelatedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.sipRelatedGrid .card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.sipRelatedGrid strong {
+  color: #10233f;
+}
+
+.sipRelatedGrid span {
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sipCTA {
+  padding: 75px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #eef5ff, #ffffff);
+}
+
+.sipCTA > div {
+  max-width: 780px;
+  margin: auto;
+}
+
+.sipCTA h2 {
+  margin: 0 0 15px;
+  font-size: 38px;
+}
+
+.sipCTA p {
+  color: #63748a;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.sipCTA .actions {
+  justify-content: center;
+}
+
+.sipDisclaimer {
+  max-width: 950px;
+  margin: auto;
+  padding: 25px 20px 45px;
+}
+
+.sipDisclaimer p {
+  color: #7a8999;
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+
+/* =========================================================
+   SIP — MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .sipCalculatorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sipInfoGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .sipWorkflow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sipBlueGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sipExampleGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sipBenefitGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sipRelatedGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .sipHero {
+    padding-top: 45px;
+    padding-bottom: 45px;
+  }
+
+  .sipHero h1 {
+    font-size: 38px;
+  }
+
+  .sipHero > div > p:first-of-type {
+    font-size: 19px;
+  }
+
+  .sipHeroText {
+    font-size: 15px;
+  }
+
+  .sipInputCard,
+  .sipResultCard {
+    padding: 23px;
+  }
+
+  .sipFutureValue strong {
+    font-size: 29px;
+  }
+
+  .sipResultGrid,
+  .sipSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .sipChart {
+    min-width: 650px;
+  }
+
+  .sipSectionHeading h2,
+  .sipCenteredHeading h2 {
+    font-size: 29px;
+  }
+
+  .sipWorkflow {
+    grid-template-columns: 1fr;
+  }
+
+  .sipBlueGrid h2 {
+    font-size: 29px;
+  }
+
+  .sipExampleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sipBenefitGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sipCTA {
+    padding: 60px 20px;
+  }
+
+  .sipCTA h2 {
+    font-size: 30px;
+  }
+
+  .sipCTA .actions {
+    flex-direction: column;
+  }
+
+  .sipCTA .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
