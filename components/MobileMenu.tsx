@@ -38,6 +38,10 @@ export default function MobileMenu() {
           SWP
         </Link>
 
+        <Link href="/calculators" onClick={closeMenu}>
+          🧮 Calculators
+        </Link>
+
         <Link href="/articles" onClick={closeMenu}>
           Articles
         </Link>
