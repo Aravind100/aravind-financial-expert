@@ -10,7 +10,6 @@ type YearData = {
   gains: number;
 };
 
-
 function formatINR(value: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -20,7 +19,9 @@ function formatINR(value: number) {
 }
 
 function numberToIndianWords(num: number): string {
-  if (!Number.isFinite(num) || num <= 0) return "Zero Rupees";
+  if (!Number.isFinite(num) || num <= 0) {
+    return "Zero Rupees";
+  }
 
   const ones = [
     "",
@@ -90,10 +91,21 @@ function numberToIndianWords(num: number): string {
   const thousand = Math.floor(n / 1000);
   n %= 1000;
 
-  if (crore > 0) result += belowThousand(crore) + " Crore ";
-  if (lakh > 0) result += belowThousand(lakh) + " Lakh ";
-  if (thousand > 0) result += belowThousand(thousand) + " Thousand ";
-  if (n > 0) result += belowThousand(n);
+  if (crore > 0) {
+    result += belowThousand(crore) + " Crore ";
+  }
+
+  if (lakh > 0) {
+    result += belowThousand(lakh) + " Lakh ";
+  }
+
+  if (thousand > 0) {
+    result += belowThousand(thousand) + " Thousand ";
+  }
+
+  if (n > 0) {
+    result += belowThousand(n);
+  }
 
   return result.trim() + " Rupees";
 }
@@ -103,13 +115,17 @@ function calculateLumpsum(
   years: number,
   annualReturn: number
 ) {
-  const monthlyRate = annualReturn / 100 / 12;
+  const investment = Math.max(0, initialInvestment);
+  const period = Math.max(1, years);
+  const returnRate = Math.max(0, annualReturn);
 
-  let corpus = initialInvestment;
+  const monthlyRate = returnRate / 100 / 12;
+
+  let corpus = investment;
 
   const yearlyData: YearData[] = [];
 
-  for (let month = 1; month <= years * 12; month++) {
+  for (let month = 1; month <= period * 12; month++) {
     corpus = corpus * (1 + monthlyRate);
 
     if (month % 12 === 0) {
@@ -117,54 +133,65 @@ function calculateLumpsum(
 
       yearlyData.push({
         year,
-        invested: initialInvestment,
+        invested: investment,
         value: corpus,
-        gains: corpus - initialInvestment,
+        gains: corpus - investment,
       });
     }
   }
 
   return {
     futureValue: corpus,
-    totalInvested: initialInvestment,
-    estimatedGains: corpus - initialInvestment,
+    totalInvested: investment,
+    estimatedGains: corpus - investment,
     yearlyData,
   };
 }
-
-
 
 export default function LumpsumCalculatorPage() {
   const [initialInvestment, setInitialInvestment] = useState(100000);
   const [years, setYears] = useState(10);
   const [expectedReturn, setExpectedReturn] = useState(12);
 
-  const result = useMemo(
-    () =>
-      calculateLumpsum(
-        initialInvestment,
-        years,
-        expectedReturn
-      ),
-    [initialInvestment, years, expectedReturn]
+  const result = useMemo(() => {
+    return calculateLumpsum(
+      initialInvestment,
+      years,
+      expectedReturn
+    );
+  }, [initialInvestment, years, expectedReturn]);
+
+  const maxChartValue = Math.max(
+    ...result.yearlyData.map((item) => item.value),
+    1
   );
 
-  const maxChartValue =
-    Math.max(...result.yearlyData.map((item) => item.value), 1);
+  const investmentPercentage =
+    result.futureValue > 0
+      ? (result.totalInvested / result.futureValue) * 100
+      : 0;
+
+  const growthPercentage =
+    result.futureValue > 0
+      ? (result.estimatedGains / result.futureValue) * 100
+      : 0;
 
   return (
-    <div className="calculator-page">
+    <div className="lumpsum-page">
       {/* HERO */}
       <section className="calculatorHero">
         <div className="calculatorEyebrow">
           LUMPSUM INVESTMENT CALCULATOR
         </div>
 
-        <h1>See How Your Lumpsum Investment Could Grow</h1>
+        <h1>
+          See How Your Lumpsum Investment Could Grow
+        </h1>
 
         <p>
-          Estimate the future value of a one-time investment based on your
-          investment amount, time period and expected annual return.
+          Estimate the future value of a one-time investment based
+          on your investment amount, time period and expected annual
+          return.
         </p>
       </section>
 
@@ -173,27 +200,45 @@ export default function LumpsumCalculatorPage() {
         <div className="calculatorBox">
           <div className="calculatorBoxHeader">
             <h2>Lumpsum Calculator</h2>
+
             <p>
-              Enter your investment details to see an illustrative growth
-              projection.
+              Enter your investment details to see an illustrative
+              growth projection.
             </p>
           </div>
 
-          <div className="calculatorInputGrid">
+          <div className="lumpsumInputGrid">
+            {/* INITIAL INVESTMENT */}
             <div className="calculatorInputCard">
-              <label>Initial Investment</label>
+              <label htmlFor="lumpsum-investment">
+                Initial Investment
+              </label>
 
               <div className="calculatorInputWrap">
                 <span>₹</span>
+
                 <input
+                  id="lumpsum-investment"
                   type="number"
-                  min="1000"
-                  value={initialInvestment}
-                  onChange={(e) =>
-                    setInitialInvestment(
-                      Math.max(1000, Number(e.target.value) || 0)
-                    )
+                  min="0"
+                  step="1000"
+                  value={
+                    initialInvestment === 0
+                      ? ""
+                      : initialInvestment
                   }
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setInitialInvestment(
+                      value === "" ? 0 : Number(value)
+                    );
+                  }}
+                  onBlur={() => {
+                    if (initialInvestment < 1000) {
+                      setInitialInvestment(1000);
+                    }
+                  }}
                 />
               </div>
 
@@ -202,24 +247,30 @@ export default function LumpsumCalculatorPage() {
               </p>
             </div>
 
+            {/* INVESTMENT PERIOD */}
             <div className="calculatorInputCard">
-              <label>Investment Period</label>
+              <label htmlFor="lumpsum-years">
+                Investment Period
+              </label>
 
               <div className="calculatorInputWrap">
                 <input
+                  id="lumpsum-years"
                   type="number"
                   min="1"
                   max="50"
                   value={years}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+
                     setYears(
-                      Math.min(
-                        50,
-                        Math.max(1, Number(e.target.value) || 1)
-                      )
-                    )
-                  }
+                      Number.isFinite(value)
+                        ? Math.min(50, Math.max(1, value))
+                        : 1
+                    );
+                  }}
                 />
+
                 <span>Years</span>
               </div>
 
@@ -229,7 +280,9 @@ export default function LumpsumCalculatorPage() {
                 min="1"
                 max="50"
                 value={years}
-                onChange={(e) => setYears(Number(e.target.value))}
+                onChange={(e) =>
+                  setYears(Number(e.target.value))
+                }
               />
 
               <p className="calculatorInputHint">
@@ -237,25 +290,31 @@ export default function LumpsumCalculatorPage() {
               </p>
             </div>
 
+            {/* EXPECTED RETURN */}
             <div className="calculatorInputCard">
-              <label>Expected Return p.a.</label>
+              <label htmlFor="lumpsum-return">
+                Expected Return p.a.
+              </label>
 
               <div className="calculatorInputWrap">
                 <input
+                  id="lumpsum-return"
                   type="number"
                   min="0"
                   max="30"
                   step="0.1"
                   value={expectedReturn}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+
                     setExpectedReturn(
-                      Math.min(
-                        30,
-                        Math.max(0, Number(e.target.value) || 0)
-                      )
-                    )
-                  }
+                      Number.isFinite(value)
+                        ? Math.min(30, Math.max(0, value))
+                        : 0
+                    );
+                  }}
                 />
+
                 <span>%</span>
               </div>
 
@@ -281,22 +340,35 @@ export default function LumpsumCalculatorPage() {
           <div className="calculatorResults">
             <div className="calculatorResultCard">
               <span>Total Invested</span>
-              <strong>{formatINR(result.totalInvested)}</strong>
+
+              <strong>
+                {formatINR(result.totalInvested)}
+              </strong>
             </div>
 
             <div className="calculatorResultCard">
               <span>Estimated Gains</span>
-              <strong>{formatINR(result.estimatedGains)}</strong>
+
+              <strong>
+                {formatINR(result.estimatedGains)}
+              </strong>
             </div>
 
             <div className="calculatorResultCard calculatorResultHighlight">
               <span>Estimated Future Value</span>
-              <strong>{formatINR(result.futureValue)}</strong>
+
+              <strong>
+                {formatINR(result.futureValue)}
+              </strong>
             </div>
           </div>
 
+          {/* AMOUNT IN WORDS */}
           <div className="calculatorAmountWords">
-            <span>Estimated Future Value in words</span>
+            <span>
+              Estimated Future Value in words
+            </span>
+
             <strong>
               {numberToIndianWords(result.futureValue)}
             </strong>
@@ -305,10 +377,13 @@ export default function LumpsumCalculatorPage() {
           {/* INVESTMENT VS GROWTH */}
           <div className="calculatorBreakdown">
             <div className="calculatorBreakdownHeader">
-              <h3>Investment vs Estimated Growth</h3>
+              <h3>
+                Investment vs Estimated Growth
+              </h3>
+
               <p>
-                This illustration shows how your one-time investment may
-                grow over the selected period.
+                This illustration shows how your one-time
+                investment may grow over the selected period.
               </p>
             </div>
 
@@ -316,17 +391,14 @@ export default function LumpsumCalculatorPage() {
               <div
                 className="calculatorBarInvested"
                 style={{
-                  width: `${
-                    (result.totalInvested / result.futureValue) * 100
-                  }%`,
+                  width: `${investmentPercentage}%`,
                 }}
               />
+
               <div
                 className="calculatorBarGrowth"
                 style={{
-                  width: `${
-                    (result.estimatedGains / result.futureValue) * 100
-                  }%`,
+                  width: `${growthPercentage}%`,
                 }}
               />
             </div>
@@ -334,12 +406,14 @@ export default function LumpsumCalculatorPage() {
             <div className="calculatorLegend">
               <span>
                 <i className="legendInvested" />
-                Invested: {formatINR(result.totalInvested)}
+                Invested:{" "}
+                {formatINR(result.totalInvested)}
               </span>
 
               <span>
                 <i className="legendGrowth" />
-                Estimated Growth: {formatINR(result.estimatedGains)}
+                Estimated Growth:{" "}
+                {formatINR(result.estimatedGains)}
               </span>
             </div>
           </div>
@@ -354,20 +428,26 @@ export default function LumpsumCalculatorPage() {
               <span className="calculatorSmallLabel">
                 YEAR-BY-YEAR VIEW
               </span>
-              <h2>How Your Investment Could Grow</h2>
+
+              <h2>
+                How Your Investment Could Grow
+              </h2>
             </div>
           </div>
 
-          <div className="calculatorChart">
+          <div className="lumpsumChart">
             {result.yearlyData.map((item) => (
-              <div className="calculatorChartItem" key={item.year}>
-                <div className="calculatorChartValue">
+              <div
+                className="lumpsumChartItem"
+                key={item.year}
+              >
+                <div className="lumpsumChartValue">
                   {formatINR(item.value)}
                 </div>
 
-                <div className="calculatorChartBar">
+                <div className="lumpsumChartBar">
                   <div
-                    className="calculatorChartFill"
+                    className="lumpsumChartFill"
                     style={{
                       height: `${
                         (item.value / maxChartValue) * 100
@@ -391,7 +471,10 @@ export default function LumpsumCalculatorPage() {
               <span className="calculatorSmallLabel">
                 YEAR-WISE BREAKDOWN
               </span>
-              <h2>Investment Growth Table</h2>
+
+              <h2>
+                Investment Growth Table
+              </h2>
             </div>
           </div>
 
@@ -410,9 +493,18 @@ export default function LumpsumCalculatorPage() {
                 {result.yearlyData.map((item) => (
                   <tr key={item.year}>
                     <td>{item.year}</td>
-                    <td>{formatINR(item.invested)}</td>
-                    <td>{formatINR(item.value)}</td>
-                    <td>{formatINR(item.gains)}</td>
+
+                    <td>
+                      {formatINR(item.invested)}
+                    </td>
+
+                    <td>
+                      {formatINR(item.value)}
+                    </td>
+
+                    <td>
+                      {formatINR(item.gains)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -423,30 +515,32 @@ export default function LumpsumCalculatorPage() {
 
       {/* WHAT IS LUMPSUM */}
       <section className="calculatorSection">
-        <div className="calculatorInfoGrid">
+        <div className="lumpsumInfoGrid">
           <div className="calculatorInfoCard">
             <span className="calculatorSmallLabel">
               UNDERSTANDING LUMPSUM
             </span>
 
-            <h2>What is a Lumpsum Investment?</h2>
+            <h2>
+              What is a Lumpsum Investment?
+            </h2>
 
             <p>
-              A lumpsum investment means investing a larger amount of
-              money at one time instead of investing a fixed amount
-              periodically.
+              A lumpsum investment means investing a larger amount
+              of money at one time instead of investing a fixed
+              amount periodically.
             </p>
 
             <p>
-              For example, an investor may invest ₹1 lakh, ₹5 lakh or
-              ₹10 lakh as a one-time investment and keep the investment
-              invested for several years.
+              For example, an investor may invest ₹1 lakh, ₹5 lakh
+              or ₹10 lakh as a one-time investment and keep the
+              investment invested for several years.
             </p>
 
             <p>
-              The potential value can increase over time as returns are
-              generated on the investment and subsequent returns can
-              compound.
+              The potential value can increase over time as returns
+              are generated on the investment and subsequent
+              returns can compound.
             </p>
           </div>
 
@@ -455,25 +549,28 @@ export default function LumpsumCalculatorPage() {
               THE POWER OF COMPOUNDING
             </span>
 
-            <h2>Time Can Make a Difference</h2>
+            <h2>
+              Time Can Make a Difference
+            </h2>
 
             <p>
-              Compounding means that returns generated by an investment
-              can themselves become part of the amount on which future
-              returns are calculated.
+              Compounding means that returns generated by an
+              investment can themselves become part of the amount
+              on which future returns are calculated.
             </p>
 
             <p>
-              The longer an investment remains invested, the more time
-              there may be for this compounding effect to work.
+              The longer an investment remains invested, the more
+              time there may be for this compounding effect to work.
             </p>
 
             <div className="calculatorHighlightNote">
               <strong>Illustration:</strong>
               <br />
-              A one-time investment that remains invested for a longer
-              period can potentially experience significant compounding,
-              depending on the actual investment returns.
+              A one-time investment that remains invested for a
+              longer period can potentially experience significant
+              compounding, depending on the actual investment
+              returns.
             </div>
           </div>
         </div>
@@ -487,14 +584,21 @@ export default function LumpsumCalculatorPage() {
               <span className="calculatorSmallLabel">
                 HOW IT WORKS
               </span>
-              <h2>How a Lumpsum Investment Works</h2>
+
+              <h2>
+                How a Lumpsum Investment Works
+              </h2>
             </div>
           </div>
 
-          <div className="calculatorSteps">
+          <div className="lumpsumSteps">
             <div className="calculatorStep">
               <span>01</span>
-              <h3>Choose Your Amount</h3>
+
+              <h3>
+                Choose Your Amount
+              </h3>
+
               <p>
                 Decide how much you want to invest as a one-time
                 investment.
@@ -503,7 +607,11 @@ export default function LumpsumCalculatorPage() {
 
             <div className="calculatorStep">
               <span>02</span>
-              <h3>Choose Your Time Horizon</h3>
+
+              <h3>
+                Choose Your Time Horizon
+              </h3>
+
               <p>
                 Define how long you intend to remain invested.
               </p>
@@ -511,19 +619,27 @@ export default function LumpsumCalculatorPage() {
 
             <div className="calculatorStep">
               <span>03</span>
-              <h3>Investment Growth</h3>
+
+              <h3>
+                Investment Growth
+              </h3>
+
               <p>
-                The investment value can change based on the performance
-                of the underlying investment.
+                The investment value can change based on the
+                performance of the underlying investment.
               </p>
             </div>
 
             <div className="calculatorStep">
               <span>04</span>
-              <h3>Review Your Goal</h3>
+
+              <h3>
+                Review Your Goal
+              </h3>
+
               <p>
-                Periodically review the investment against your financial
-                objective and risk profile.
+                Periodically review the investment against your
+                financial objective and risk profile.
               </p>
             </div>
           </div>
@@ -538,33 +654,53 @@ export default function LumpsumCalculatorPage() {
               <span className="calculatorSmallLabel">
                 LUMPSUM VS SIP
               </span>
-              <h2>Two Different Ways to Invest</h2>
+
+              <h2>
+                Two Different Ways to Invest
+              </h2>
             </div>
           </div>
 
-          <div className="calculatorComparison">
+          <div className="lumpsumComparison">
             <div>
               <h3>Lumpsum</h3>
+
               <ul>
-                <li>One-time investment</li>
-                <li>Useful when a larger amount is already available</li>
+                <li>
+                  One-time investment
+                </li>
+
+                <li>
+                  Useful when a larger amount is already available
+                </li>
+
                 <li>
                   Market exposure begins with the invested amount
                 </li>
+
                 <li>
-                  Investment value can fluctuate with market conditions
+                  Investment value can fluctuate with market
+                  conditions
                 </li>
               </ul>
             </div>
 
             <div>
               <h3>SIP</h3>
+
               <ul>
-                <li>Regular periodic investment</li>
-                <li>Can help build an investing discipline</li>
+                <li>
+                  Regular periodic investment
+                </li>
+
+                <li>
+                  Can help build an investing discipline
+                </li>
+
                 <li>
                   Money is invested gradually over time
                 </li>
+
                 <li>
                   Each instalment gets its own period of market
                   participation
@@ -574,9 +710,9 @@ export default function LumpsumCalculatorPage() {
           </div>
 
           <p className="calculatorNote">
-            The choice between lumpsum and SIP depends on factors such
-            as available capital, financial goals, time horizon, risk
-            tolerance and market conditions.
+            The choice between lumpsum and SIP depends on factors
+            such as available capital, financial goals, time horizon,
+            risk tolerance and market conditions.
           </p>
         </div>
       </section>
@@ -589,38 +725,53 @@ export default function LumpsumCalculatorPage() {
               <span className="calculatorSmallLabel">
                 QUICK EXAMPLES
               </span>
-              <h2>Try Different Investment Amounts</h2>
+
+              <h2>
+                Try Different Investment Amounts
+              </h2>
             </div>
           </div>
 
-          <div className="calculatorQuickGrid">
-            {[100000, 500000, 1000000, 2500000].map((amount) => {
-              const example = calculateLumpsum(
-                amount,
-                10,
-                12
-              );
+          <div className="lumpsumQuickGrid">
+            {[100000, 500000, 1000000, 2500000].map(
+              (amount) => {
+                const example = calculateLumpsum(
+                  amount,
+                  10,
+                  12
+                );
 
-              return (
-                <button
-                  key={amount}
-                  className="calculatorQuickCard"
-                  onClick={() => {
-                    setInitialInvestment(amount);
-                    setYears(10);
-                    setExpectedReturn(12);
-                  }}
-                >
-                  <span>{formatINR(amount)}</span>
-                  <strong>
-                    {formatINR(example.futureValue)}
-                  </strong>
-                  <small>
-                    10 years @ 12% illustrative return
-                  </small>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={amount}
+                    type="button"
+                    className="calculatorQuickCard"
+                    onClick={() => {
+                      setInitialInvestment(amount);
+                      setYears(10);
+                      setExpectedReturn(12);
+
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }}
+                  >
+                    <span>
+                      {formatINR(amount)}
+                    </span>
+
+                    <strong>
+                      {formatINR(example.futureValue)}
+                    </strong>
+
+                    <small>
+                      10 years @ 12% illustrative return
+                    </small>
+                  </button>
+                );
+              }
+            )}
           </div>
         </div>
       </section>
@@ -633,17 +784,24 @@ export default function LumpsumCalculatorPage() {
               <span className="calculatorSmallLabel">
                 EXPLORE MORE
               </span>
-              <h2>Related Financial Calculators</h2>
+
+              <h2>
+                Related Financial Calculators
+              </h2>
             </div>
           </div>
 
-          <div className="calculatorRelatedGrid">
+          <div className="lumpsumRelatedGrid">
             <Link
               href="/calculators/sip"
               className="calculatorRelatedCard"
             >
               <span>📈</span>
-              <h3>SIP Calculator</h3>
+
+              <h3>
+                SIP Calculator
+              </h3>
+
               <p>
                 Estimate the potential growth of regular monthly
                 investments.
@@ -655,9 +813,14 @@ export default function LumpsumCalculatorPage() {
               className="calculatorRelatedCard"
             >
               <span>💰</span>
-              <h3>SWP Calculator</h3>
+
+              <h3>
+                SWP Calculator
+              </h3>
+
               <p>
-                Explore systematic withdrawals from an invested corpus.
+                Explore systematic withdrawals from an invested
+                corpus.
               </p>
             </Link>
 
@@ -666,7 +829,11 @@ export default function LumpsumCalculatorPage() {
               className="calculatorRelatedCard"
             >
               <span>🧮</span>
-              <h3>All Calculators</h3>
+
+              <h3>
+                All Calculators
+              </h3>
+
               <p>
                 Explore the complete collection of financial
                 calculators.
@@ -683,7 +850,9 @@ export default function LumpsumCalculatorPage() {
             PLAN WITH CLARITY
           </span>
 
-          <h2>Have a Financial Goal in Mind?</h2>
+          <h2>
+            Have a Financial Goal in Mind?
+          </h2>
 
           <p>
             Use calculators to understand the numbers, then consider
@@ -691,7 +860,10 @@ export default function LumpsumCalculatorPage() {
             before making an investment decision.
           </p>
 
-          <Link href="/contact" className="primaryButton">
+          <Link
+            href="/contact"
+            className="primaryButton"
+          >
             Discuss Your Financial Needs
           </Link>
         </div>
@@ -699,13 +871,14 @@ export default function LumpsumCalculatorPage() {
 
       {/* DISCLAIMER */}
       <section className="calculatorDisclaimer">
-        <strong>Disclaimer:</strong> This calculator provides an
-        illustrative estimate based on the inputs entered by the user.
-        It assumes a constant rate of return for calculation purposes.
-        Actual investment returns may vary and are subject to market
-        conditions, fees, taxes and other factors. Market-linked
-        investments are subject to market risks. Past performance does
-        not guarantee future results.
+        <strong>Disclaimer:</strong>{" "}
+        This calculator provides an illustrative estimate based on
+        the inputs entered by the user. It assumes a constant rate
+        of return for calculation purposes. Actual investment
+        returns may vary and are subject to market conditions,
+        fees, taxes and other factors. Market-linked investments
+        are subject to market risks. Past performance does not
+        guarantee future results.
       </section>
     </div>
   );
