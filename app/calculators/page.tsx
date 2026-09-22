@@ -31,7 +31,7 @@ const investmentCalculators = [
     description:
       "Calculate the annualized growth rate between an initial investment and its final value.",
     href: "/calculators/cagr",
-    status: "Coming Soon",
+    status: "Available",
   },
   {
     icon: "🧮",
