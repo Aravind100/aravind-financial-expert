@@ -15,7 +15,7 @@ const investmentCalculators = [
     description:
       "Estimate the potential value of a one-time investment over a selected investment period.",
     href: "/calculators/lumpsum",
-    status: "Coming Soon",
+    status: "Available",
   },
   {
     icon: "🚀",
