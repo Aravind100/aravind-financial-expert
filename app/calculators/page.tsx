@@ -49,7 +49,8 @@ const planningCalculators = [
     title: "Goal Planning Calculator",
     description:
       "Estimate the investment required to work toward a future financial goal.",
-    href: "#",
+     href: "/calculators/goal-planning",
+    status: "Available",
   },
   {
     icon: "🏖️",
