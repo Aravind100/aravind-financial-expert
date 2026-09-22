@@ -2482,18 +2482,33 @@
 
 
 /* =========================================================
-   LUMPSUM CALCULATOR
+   LUMPSUM CALCULATOR - COMPLETE
    ========================================================= */
 
-.calculatorSection {
+.lumpsum-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Main sections */
+
+.lumpsum-page .calculatorSection {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
   padding: 32px 20px;
+  box-sizing: border-box;
 }
 
-.calculatorBox,
-.calculatorContentCard {
+/* Calculator box */
+
+.lumpsum-page .calculatorBox,
+.lumpsum-page .calculatorContentCard {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: #fff;
   border: 1px solid #e5ebf3;
   border-radius: 20px;
@@ -2501,40 +2516,51 @@
   box-shadow: 0 10px 30px rgba(16, 35, 63, 0.06);
 }
 
-.calculatorBoxHeader {
+/* Header */
+
+.lumpsum-page .calculatorBoxHeader {
   margin-bottom: 28px;
 }
 
-.calculatorBoxHeader h2,
-.calculatorSectionHeading h2,
-.calculatorInfoCard h2,
-.calculatorCTA h2 {
+.lumpsum-page .calculatorBoxHeader h2,
+.lumpsum-page .calculatorSectionHeading h2,
+.lumpsum-page .calculatorInfoCard h2,
+.lumpsum-page .calculatorCTA h2 {
   margin: 0 0 10px;
   color: #10233f;
 }
 
-.calculatorBoxHeader p,
-.calculatorInfoCard p,
-.calculatorCTA p {
+.lumpsum-page .calculatorBoxHeader p,
+.lumpsum-page .calculatorInfoCard p,
+.lumpsum-page .calculatorCTA p {
   margin: 0;
   color: #607086;
   line-height: 1.7;
 }
 
-.calculatorInputGrid {
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.lumpsumInputGrid {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  box-sizing: border-box;
 }
 
-.calculatorInputCard {
+.lumpsum-page .calculatorInputCard {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: #f7faff;
   border: 1px solid #e4ebf5;
   border-radius: 16px;
   padding: 20px;
 }
 
-.calculatorInputCard label {
+.lumpsum-page .calculatorInputCard label {
   display: block;
   margin-bottom: 12px;
   color: #10233f;
@@ -2542,9 +2568,12 @@
   font-weight: 800;
 }
 
-.calculatorInputWrap {
+.lumpsum-page .calculatorInputWrap {
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   gap: 8px;
   background: #fff;
   border: 1px solid #d9e2ef;
@@ -2552,13 +2581,16 @@
   padding: 0 12px;
 }
 
-.calculatorInputWrap span {
+.lumpsum-page .calculatorInputWrap span {
+  flex: 0 0 auto;
   color: #1463d8;
   font-weight: 800;
 }
 
-.calculatorInputWrap input {
+.lumpsum-page .calculatorInputWrap input {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   border: 0;
   outline: 0;
   background: transparent;
@@ -2568,33 +2600,45 @@
   color: #10233f;
 }
 
-.calculatorInputHint {
+.lumpsum-page .calculatorInputWrap input::-webkit-inner-spin-button,
+.lumpsum-page .calculatorInputWrap input::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.lumpsum-page .calculatorInputHint {
   margin: 9px 0 0;
   color: #78879a;
   font-size: 12px;
 }
 
-.calculatorRange {
+.lumpsum-page .calculatorRange {
   width: 100%;
   margin-top: 15px;
   accent-color: #1463d8;
 }
 
-.calculatorResults {
+/* =========================================================
+   RESULTS
+   ========================================================= */
+
+.lumpsum-page .calculatorResults {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-top: 24px;
 }
 
-.calculatorResultCard {
+.lumpsum-page .calculatorResultCard {
+  min-width: 0;
+  box-sizing: border-box;
   padding: 22px;
   border-radius: 15px;
   background: #f7faff;
   border: 1px solid #e4ebf5;
 }
 
-.calculatorResultCard span {
+.lumpsum-page .calculatorResultCard span {
   display: block;
   color: #66768b;
   font-size: 13px;
@@ -2602,56 +2646,67 @@
   margin-bottom: 8px;
 }
 
-.calculatorResultCard strong {
+.lumpsum-page .calculatorResultCard strong {
   display: block;
   color: #10233f;
   font-size: 22px;
+  overflow-wrap: anywhere;
 }
 
-.calculatorResultHighlight {
+.lumpsum-page .calculatorResultHighlight {
   background: #1463d8;
   border-color: #1463d8;
 }
 
-.calculatorResultHighlight span,
-.calculatorResultHighlight strong {
+.lumpsum-page .calculatorResultHighlight span,
+.lumpsum-page .calculatorResultHighlight strong {
   color: #fff;
 }
 
-.calculatorAmountWords {
+/* =========================================================
+   AMOUNT IN WORDS
+   ========================================================= */
+
+.lumpsum-page .calculatorAmountWords {
   margin-top: 18px;
   padding: 17px 20px;
   border-radius: 12px;
   background: #eef5ff;
+  box-sizing: border-box;
 }
 
-.calculatorAmountWords span {
+.lumpsum-page .calculatorAmountWords span {
   display: block;
   color: #607086;
   font-size: 12px;
   margin-bottom: 5px;
 }
 
-.calculatorAmountWords strong {
+.lumpsum-page .calculatorAmountWords strong {
   color: #10233f;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
-.calculatorBreakdown {
+/* =========================================================
+   INVESTMENT VS GROWTH
+   ========================================================= */
+
+.lumpsum-page .calculatorBreakdown {
   margin-top: 26px;
 }
 
-.calculatorBreakdownHeader h3 {
+.lumpsum-page .calculatorBreakdownHeader h3 {
   margin: 0 0 7px;
   color: #10233f;
 }
 
-.calculatorBreakdownHeader p {
+.lumpsum-page .calculatorBreakdownHeader p {
   margin: 0 0 18px;
   color: #66768b;
 }
 
-.calculatorBar {
+.lumpsum-page .calculatorBar {
   display: flex;
   width: 100%;
   height: 18px;
@@ -2660,15 +2715,15 @@
   background: #edf1f6;
 }
 
-.calculatorBarInvested {
+.lumpsum-page .calculatorBarInvested {
   background: #1463d8;
 }
 
-.calculatorBarGrowth {
+.lumpsum-page .calculatorBarGrowth {
   background: #61b5ff;
 }
 
-.calculatorLegend {
+.lumpsum-page .calculatorLegend {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -2677,35 +2732,39 @@
   font-size: 13px;
 }
 
-.calculatorLegend span {
+.lumpsum-page .calculatorLegend span {
   display: inline-flex;
   align-items: center;
   gap: 7px;
 }
 
-.legendInvested,
-.legendGrowth {
+.lumpsum-page .legendInvested,
+.lumpsum-page .legendGrowth {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   display: inline-block;
 }
 
-.legendInvested {
+.lumpsum-page .legendInvested {
   background: #1463d8;
 }
 
-.legendGrowth {
+.lumpsum-page .legendGrowth {
   background: #61b5ff;
 }
 
-.calculatorSectionHeading {
+/* =========================================================
+   SECTION HEADINGS
+   ========================================================= */
+
+.lumpsum-page .calculatorSectionHeading {
   display: flex;
   justify-content: space-between;
   margin-bottom: 24px;
 }
 
-.calculatorSmallLabel {
+.lumpsum-page .calculatorSmallLabel {
   display: inline-block;
   margin-bottom: 8px;
   color: #1463d8;
@@ -2714,18 +2773,25 @@
   letter-spacing: 2px;
 }
 
-.calculatorChart {
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.lumpsumChart {
+  width: 100%;
+  height: 310px;
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  height: 310px;
   padding: 25px 10px 0;
   overflow-x: auto;
+  overflow-y: hidden;
+  box-sizing: border-box;
   border-bottom: 1px solid #e5ebf3;
 }
 
-.calculatorChartItem {
-  min-width: 54px;
+.lumpsumChartItem {
+  flex: 0 0 54px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -2733,7 +2799,7 @@
   justify-content: flex-end;
 }
 
-.calculatorChartValue {
+.lumpsumChartValue {
   margin-bottom: 7px;
   color: #607086;
   font-size: 9px;
@@ -2741,7 +2807,7 @@
   transform: rotate(-45deg);
 }
 
-.calculatorChartBar {
+.lumpsumChartBar {
   width: 28px;
   height: 220px;
   display: flex;
@@ -2751,62 +2817,72 @@
   overflow: hidden;
 }
 
-.calculatorChartFill {
+.lumpsumChartFill {
   width: 100%;
   min-height: 4px;
   background: #1463d8;
   border-radius: 8px 8px 0 0;
 }
 
-.calculatorChartItem > span {
+.lumpsumChartItem > span {
   margin-top: 9px;
   color: #718096;
   font-size: 10px;
   white-space: nowrap;
 }
 
-.calculatorTableWrap {
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.lumpsum-page .calculatorTableWrap {
   width: 100%;
   overflow-x: auto;
 }
 
-.calculatorTable {
+.lumpsum-page .calculatorTable {
   width: 100%;
   border-collapse: collapse;
   min-width: 650px;
 }
 
-.calculatorTable th,
-.calculatorTable td {
+.lumpsum-page .calculatorTable th,
+.lumpsum-page .calculatorTable td {
   padding: 13px 14px;
   border-bottom: 1px solid #edf1f5;
   text-align: right;
   white-space: nowrap;
 }
 
-.calculatorTable th:first-child,
-.calculatorTable td:first-child {
+.lumpsum-page .calculatorTable th:first-child,
+.lumpsum-page .calculatorTable td:first-child {
   text-align: left;
 }
 
-.calculatorTable th {
+.lumpsum-page .calculatorTable th {
   background: #f7faff;
   color: #53647a;
   font-size: 12px;
 }
 
-.calculatorTable td {
+.lumpsum-page .calculatorTable td {
   color: #243a58;
   font-size: 13px;
 }
 
-.calculatorInfoGrid {
+/* =========================================================
+   INFORMATION
+   ========================================================= */
+
+.lumpsumInfoGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
-.calculatorInfoCard {
+.lumpsum-page .calculatorInfoCard {
+  min-width: 0;
+  box-sizing: border-box;
   background: #fff;
   border: 1px solid #e5ebf3;
   border-radius: 20px;
@@ -2814,11 +2890,11 @@
   box-shadow: 0 10px 30px rgba(16, 35, 63, 0.05);
 }
 
-.calculatorInfoCard p + p {
+.lumpsum-page .calculatorInfoCard p + p {
   margin-top: 15px;
 }
 
-.calculatorHighlightNote {
+.lumpsum-page .calculatorHighlightNote {
   margin-top: 20px;
   padding: 17px;
   border-left: 4px solid #1463d8;
@@ -2828,20 +2904,26 @@
   line-height: 1.7;
 }
 
-.calculatorSteps {
+/* =========================================================
+   STEPS
+   ========================================================= */
+
+.lumpsumSteps {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
-.calculatorStep {
+.lumpsum-page .calculatorStep {
+  min-width: 0;
+  box-sizing: border-box;
   padding: 22px;
   background: #f7faff;
   border: 1px solid #e4ebf5;
   border-radius: 15px;
 }
 
-.calculatorStep > span {
+.lumpsum-page .calculatorStep > span {
   display: inline-flex;
   margin-bottom: 18px;
   color: #1463d8;
@@ -2849,133 +2931,161 @@
   font-weight: 900;
 }
 
-.calculatorStep h3 {
+.lumpsum-page .calculatorStep h3 {
   margin: 0 0 8px;
   color: #10233f;
   font-size: 17px;
 }
 
-.calculatorStep p {
+.lumpsum-page .calculatorStep p {
   margin: 0;
   color: #66768b;
   font-size: 14px;
   line-height: 1.65;
 }
 
-.calculatorComparison {
+/* =========================================================
+   LUMPSUM VS SIP
+   ========================================================= */
+
+.lumpsumComparison {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
-.calculatorComparison > div {
+.lumpsumComparison > div {
+  min-width: 0;
   padding: 24px;
   border: 1px solid #e5ebf3;
   border-radius: 15px;
   background: #f9fbfe;
 }
 
-.calculatorComparison h3 {
+.lumpsumComparison h3 {
   margin: 0 0 14px;
   color: #10233f;
 }
 
-.calculatorComparison ul {
+.lumpsumComparison ul {
   margin: 0;
   padding-left: 20px;
 }
 
-.calculatorComparison li {
+.lumpsumComparison li {
   margin-bottom: 9px;
   color: #607086;
   line-height: 1.5;
 }
 
-.calculatorNote {
+.lumpsum-page .calculatorNote {
   margin: 22px 0 0;
   color: #66768b;
   line-height: 1.7;
 }
 
-.calculatorQuickGrid {
+/* =========================================================
+   QUICK EXAMPLES
+   ========================================================= */
+
+.lumpsumQuickGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 15px;
 }
 
-.calculatorQuickCard {
+.lumpsum-page .calculatorQuickCard {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   border: 1px solid #e3eaf4;
   background: #f7faff;
   border-radius: 15px;
   padding: 20px;
   text-align: left;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.calculatorQuickCard:hover {
+.lumpsum-page .calculatorQuickCard:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(16, 35, 63, 0.08);
 }
 
-.calculatorQuickCard span {
+.lumpsum-page .calculatorQuickCard span {
   display: block;
   color: #607086;
   font-size: 13px;
   margin-bottom: 8px;
 }
 
-.calculatorQuickCard strong {
+.lumpsum-page .calculatorQuickCard strong {
   display: block;
   color: #1463d8;
   font-size: 19px;
   margin-bottom: 8px;
 }
 
-.calculatorQuickCard small {
+.lumpsum-page .calculatorQuickCard small {
   color: #7a8798;
   line-height: 1.5;
 }
 
-.calculatorRelatedGrid {
+/* =========================================================
+   RELATED CALCULATORS
+   ========================================================= */
+
+.lumpsumRelatedGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 
-.calculatorRelatedCard {
+.lumpsum-page .calculatorRelatedCard {
   display: block;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 22px;
   background: #f7faff;
   border: 1px solid #e3eaf4;
   border-radius: 15px;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.calculatorRelatedCard:hover {
+.lumpsum-page .calculatorRelatedCard:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(16, 35, 63, 0.08);
 }
 
-.calculatorRelatedCard span {
+.lumpsum-page .calculatorRelatedCard span {
   font-size: 25px;
 }
 
-.calculatorRelatedCard h3 {
+.lumpsum-page .calculatorRelatedCard h3 {
   margin: 12px 0 7px;
   color: #10233f;
 }
 
-.calculatorRelatedCard p {
+.lumpsum-page .calculatorRelatedCard p {
   margin: 0;
   color: #66768b;
   line-height: 1.6;
   font-size: 14px;
 }
 
-.calculatorCTA {
+/* =========================================================
+   CTA
+   ========================================================= */
+
+.lumpsum-page .calculatorCTA {
+  width: calc(100% - 40px);
   max-width: 1180px;
+  box-sizing: border-box;
   margin: 20px auto 30px;
   padding: 45px 30px;
   border-radius: 20px;
@@ -2984,21 +3094,27 @@
   text-align: center;
 }
 
-.calculatorCTA > div {
+.lumpsum-page .calculatorCTA > div {
   max-width: 750px;
   margin: 0 auto;
 }
 
-.calculatorCTA h2 {
+.lumpsum-page .calculatorCTA h2 {
   font-size: 30px;
 }
 
-.calculatorCTA p {
+.lumpsum-page .calculatorCTA p {
   margin-bottom: 22px;
 }
 
-.calculatorDisclaimer {
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
+
+.lumpsum-page .calculatorDisclaimer {
+  width: calc(100% - 40px);
   max-width: 1100px;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 20px;
   color: #78879a;
@@ -3007,71 +3123,110 @@
   text-align: center;
 }
 
-/* Mobile */
-@media (max-width: 900px) {
-  .calculatorInputGrid,
-  .calculatorResults,
-  .calculatorSteps,
-  .calculatorQuickGrid {
-    grid-template-columns: repeat(2, 1fr);
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .lumpsumInputGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .calculatorRelatedGrid {
-    grid-template-columns: 1fr;
+  .lumpsum-page .calculatorResults {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lumpsumSteps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lumpsumQuickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
 @media (max-width: 700px) {
-  .calculatorSection {
+  .lumpsum-page .calculatorSection {
     padding: 20px 14px;
   }
 
-  .calculatorBox,
-  .calculatorContentCard,
-  .calculatorInfoCard {
+  .lumpsum-page .calculatorBox,
+  .lumpsum-page .calculatorContentCard,
+  .lumpsum-page .calculatorInfoCard {
     padding: 20px;
     border-radius: 16px;
   }
 
-  .calculatorInputGrid,
-  .calculatorResults,
-  .calculatorInfoGrid,
-  .calculatorSteps,
-  .calculatorComparison,
-  .calculatorQuickGrid {
+  .lumpsumInputGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .lumpsum-page .calculatorResults {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .lumpsumInfoGrid {
     grid-template-columns: 1fr;
   }
 
-  .calculatorResultCard strong {
+  .lumpsumSteps {
+    grid-template-columns: 1fr;
+  }
+
+  .lumpsumComparison {
+    grid-template-columns: 1fr;
+  }
+
+  .lumpsumQuickGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .lumpsumRelatedGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .lumpsum-page .calculatorResultCard strong {
     font-size: 20px;
   }
 
-  .calculatorCTA {
-    margin: 15px 14px 25px;
-    padding: 35px 20px;
-    border-radius: 16px;
+  .lumpsum-page .calculatorSectionHeading h2 {
+    font-size: 23px;
   }
 
-  .calculatorCTA h2 {
-    font-size: 25px;
-  }
-
-  .calculatorChart {
+  .lumpsumChart {
     height: 280px;
     padding-left: 5px;
     padding-right: 5px;
   }
 
-  .calculatorChartBar {
+  .lumpsumChartBar {
     width: 24px;
     height: 190px;
   }
 
-  .calculatorChartItem {
-    min-width: 48px;
+  .lumpsumChartItem {
+    flex-basis: 48px;
   }
 
-  .calculatorSectionHeading h2 {
-    font-size: 23px;
+  .lumpsum-page .calculatorCTA {
+    width: calc(100% - 28px);
+    margin: 15px 14px 25px;
+    padding: 35px 20px;
+    border-radius: 16px;
+  }
+
+  .lumpsum-page .calculatorCTA h2 {
+    font-size: 25px;
+  }
+
+  .lumpsum-page .calculatorDisclaimer {
+    width: calc(100% - 28px);
   }
 }
+
