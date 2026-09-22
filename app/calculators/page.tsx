@@ -57,7 +57,8 @@ const planningCalculators = [
     title: "Retirement Calculator",
     description:
       "Explore retirement corpus requirements using your current assumptions and goals.",
-    href: "#",
+     href: "/calculators/retirement",
+    status: "Available",
   },
   {
     icon: "📉",
