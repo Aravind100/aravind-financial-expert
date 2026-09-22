@@ -132,11 +132,7 @@ function calculateLumpsum(
   };
 }
 
-export const metadata = {
-  title: "Lumpsum Calculator | Calculate Investment Growth",
-  description:
-    "Use the Lumpsum Calculator to estimate future investment value, estimated gains and long-term wealth growth based on investment amount, time period and expected return.",
-};
+
 
 export default function LumpsumCalculatorPage() {
   const [initialInvestment, setInitialInvestment] = useState(100000);
