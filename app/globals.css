@@ -3366,3 +3366,6 @@
   }
 }
 
+.lumpsum-page .calculatorSection:first-of-type {
+  padding-top: 10px;
+}
