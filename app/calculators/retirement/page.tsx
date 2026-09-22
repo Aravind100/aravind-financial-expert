@@ -119,7 +119,7 @@ function calculateRetirement(
   postRetirementReturn: number,
   retirementYears: number
 ) {
-  const age = Math.max(18, currentAge);
+  const age = Math.max(0, currentAge);
   const retireAge = Math.max(age + 1, retirementAge);
   const expenses = Math.max(0, monthlyExpenses);
   const savings = Math.max(0, currentSavings);
