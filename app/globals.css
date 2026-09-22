@@ -3230,3 +3230,139 @@
   }
 }
 
+/* =========================================================
+   LUMPSUM PAGE - TOP HERO FIX
+   ========================================================= */
+
+.lumpsum-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Keep the hero aligned with the website content */
+.lumpsum-page .calculatorHero {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 55px 20px 35px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+/* Small blue heading */
+.lumpsum-page .calculatorHero .calculatorEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  padding: 0;
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* Small line before eyebrow */
+.lumpsum-page .calculatorHero .calculatorEyebrow::before {
+  content: "";
+  width: 30px;
+  height: 3px;
+  flex: 0 0 auto;
+  background: #1463d8;
+  border-radius: 20px;
+}
+
+/* Main heading */
+.lumpsum-page .calculatorHero h1 {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 0 15px;
+  padding: 0;
+  color: #10233f;
+  font-size: clamp(36px, 4.2vw, 58px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+}
+
+/* Description */
+.lumpsum-page .calculatorHero p {
+  width: 100%;
+  max-width: 780px;
+  margin: 0;
+  padding: 0;
+  color: #607086;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   DESKTOP SPACING
+   ========================================================= */
+
+@media (min-width: 769px) {
+  .lumpsum-page .calculatorHero {
+    padding-top: 55px;
+    padding-bottom: 35px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .lumpsum-page .calculatorHero {
+    padding: 45px 20px 30px;
+  }
+
+  .lumpsum-page .calculatorHero h1 {
+    max-width: 800px;
+    font-size: 44px;
+  }
+
+  .lumpsum-page .calculatorHero p {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .lumpsum-page .calculatorHero {
+    padding: 32px 18px 25px;
+    text-align: left;
+  }
+
+  .lumpsum-page .calculatorHero .calculatorEyebrow {
+    gap: 7px;
+    margin-bottom: 14px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+  }
+
+  .lumpsum-page .calculatorHero .calculatorEyebrow::before {
+    width: 22px;
+    height: 2px;
+  }
+
+  .lumpsum-page .calculatorHero h1 {
+    max-width: 100%;
+    margin-bottom: 12px;
+    font-size: 32px;
+    line-height: 1.12;
+    letter-spacing: -0.8px;
+  }
+
+  .lumpsum-page .calculatorHero p {
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
