@@ -29,7 +29,11 @@ const units = [
   { number: 4, title: "Legal and Regulatory Framework" },
   { number: 5, title: "Scheme Related Information" },
   { number: 6, title: "Fund Distribution and Channel Management" },
-  { number: 7, title: "Net Asset Value, Total Expense Ratio and Investment Valuation" },
+  {
+    number: 7,
+    title:
+      "Net Asset Value, Total Expense Ratio and Investment Valuation",
+  },
   { number: 8, title: "Taxation" },
   { number: 9, title: "Investor Services" },
   { number: 10, title: "Risk, Return and Performance" },
@@ -65,7 +69,6 @@ export default function NismQuestionBank() {
 
   async function loadQuestions() {
     setLoading(true);
-    setMessage("");
 
     try {
       const params = new URLSearchParams();
@@ -92,7 +95,9 @@ export default function NismQuestionBank() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Failed to load questions");
+        throw new Error(
+          data?.error || "Failed to load questions"
+        );
       }
 
       setQuestions(data.questions || []);
@@ -181,8 +186,10 @@ export default function NismQuestionBank() {
       const payload = {
         ...form,
         unit_title:
-          units.find((item) => item.number === Number(form.unit_number))
-            ?.title || "Investment Landscape",
+          units.find(
+            (item) =>
+              item.number === Number(form.unit_number)
+          )?.title || "Investment Landscape",
       };
 
       const response = await fetch(
@@ -201,7 +208,9 @@ export default function NismQuestionBank() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Failed to save question");
+        throw new Error(
+          data?.error || "Failed to save question"
+        );
       }
 
       setMessage(
@@ -233,14 +242,19 @@ export default function NismQuestionBank() {
     }
 
     try {
-      const response = await fetch(`/api/admin/nism/questions/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/nism/questions/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Failed to deactivate question");
+        throw new Error(
+          data?.error || "Failed to deactivate question"
+        );
       }
 
       setMessage("Question deactivated successfully.");
@@ -254,8 +268,68 @@ export default function NismQuestionBank() {
     }
   }
 
+  /* =========================
+     BULK CSV UPLOAD
+     ========================= */
+
+  async function uploadCSV(file: File) {
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const csvText = await file.text();
+
+      if (!csvText.trim()) {
+        throw new Error("The CSV file is empty.");
+      }
+
+      const response = await fetch(
+        "/api/admin/nism/questions/bulk",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            csvText,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Bulk upload failed."
+        );
+      }
+
+      const invalidCount =
+        data.invalidRows?.length || 0;
+
+      setMessage(
+        `Upload complete: ${data.imported} imported, ${data.skipped} duplicates skipped, ${invalidCount} invalid rows.`
+      );
+
+      await loadQuestions();
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Bulk upload failed."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="nism-admin-page">
+
+      {/* =========================
+          HEADER
+          ========================= */}
+
       <div className="nism-admin-header">
         <div>
           <div className="nism-admin-eyebrow">
@@ -265,8 +339,9 @@ export default function NismQuestionBank() {
           <h1>NISM Question Bank</h1>
 
           <p>
-            Create, edit, search and manage original NISM V-A practice
-            questions for your mock tests.
+            Create, edit, search and manage original
+            NISM V-A practice questions for your
+            mock tests.
           </p>
         </div>
 
@@ -282,13 +357,24 @@ export default function NismQuestionBank() {
         </div>
       )}
 
+      {/* =========================
+          ADD / EDIT QUESTION
+          ========================= */}
+
       <section className="nism-admin-card">
+
         <div className="nism-admin-card-header">
           <div>
-            <h2>{editingId ? "Edit Question" : "Add New Question"}</h2>
+            <h2>
+              {editingId
+                ? "Edit Question"
+                : "Add New Question"}
+            </h2>
+
             <p>
-              Add original practice questions based on the published
-              NISM Series V-A objectives.
+              Add original practice questions based
+              on the published NISM Series V-A
+              objectives.
             </p>
           </div>
 
@@ -304,8 +390,10 @@ export default function NismQuestionBank() {
         </div>
 
         <div className="nism-admin-form-grid">
+
           <label>
             Unit
+
             <select
               value={form.unit_number}
               onChange={(event) =>
@@ -316,7 +404,10 @@ export default function NismQuestionBank() {
               }
             >
               {units.map((item) => (
-                <option key={item.number} value={item.number}>
+                <option
+                  key={item.number}
+                  value={item.number}
+                >
                   Unit {item.number} — {item.title}
                 </option>
               ))}
@@ -325,10 +416,14 @@ export default function NismQuestionBank() {
 
           <label>
             Topic
+
             <input
               value={form.topic}
               onChange={(event) =>
-                updateForm("topic", event.target.value)
+                updateForm(
+                  "topic",
+                  event.target.value
+                )
               }
               placeholder="Example: Risk Profiling"
             />
@@ -336,6 +431,7 @@ export default function NismQuestionBank() {
 
           <label>
             Difficulty
+
             <select
               value={form.difficulty}
               onChange={(event) =>
@@ -353,6 +449,7 @@ export default function NismQuestionBank() {
 
           <label>
             Correct Answer
+
             <select
               value={form.correct_option}
               onChange={(event) =>
@@ -368,10 +465,12 @@ export default function NismQuestionBank() {
               <option value="D">D</option>
             </select>
           </label>
+
         </div>
 
         <label className="nism-admin-full-field">
           Question
+
           <textarea
             rows={4}
             value={form.question_text}
@@ -386,49 +485,68 @@ export default function NismQuestionBank() {
         </label>
 
         <div className="nism-admin-options-grid">
+
           <label>
             Option A
+
             <input
               value={form.option_a}
               onChange={(event) =>
-                updateForm("option_a", event.target.value)
+                updateForm(
+                  "option_a",
+                  event.target.value
+                )
               }
             />
           </label>
 
           <label>
             Option B
+
             <input
               value={form.option_b}
               onChange={(event) =>
-                updateForm("option_b", event.target.value)
+                updateForm(
+                  "option_b",
+                  event.target.value
+                )
               }
             />
           </label>
 
           <label>
             Option C
+
             <input
               value={form.option_c}
               onChange={(event) =>
-                updateForm("option_c", event.target.value)
+                updateForm(
+                  "option_c",
+                  event.target.value
+                )
               }
             />
           </label>
 
           <label>
             Option D
+
             <input
               value={form.option_d}
               onChange={(event) =>
-                updateForm("option_d", event.target.value)
+                updateForm(
+                  "option_d",
+                  event.target.value
+                )
               }
             />
           </label>
+
         </div>
 
         <label className="nism-admin-full-field">
           Explanation
+
           <textarea
             rows={4}
             value={form.explanation}
@@ -443,6 +561,7 @@ export default function NismQuestionBank() {
         </label>
 
         <div className="nism-admin-form-actions">
+
           <button
             type="button"
             className="nism-admin-primary"
@@ -463,20 +582,105 @@ export default function NismQuestionBank() {
           >
             Clear
           </button>
+
         </div>
+
       </section>
 
-      <section className="nism-admin-card">
+      {/* =========================
+          BULK CSV UPLOAD
+          ========================= */}
+
+      <section className="nism-admin-card nism-bulk-upload-card">
+
         <div className="nism-admin-card-header">
+
           <div>
-            <h2>Question Library</h2>
+            <h2>📥 Bulk Upload Questions</h2>
+
             <p>
-              Search and manage your active practice questions.
+              Upload multiple original NISM V-A
+              practice questions using a CSV file.
             </p>
           </div>
+
+        </div>
+
+        <div className="nism-bulk-upload-box">
+
+          <div className="nism-bulk-upload-info">
+
+            <strong>CSV format</strong>
+
+            <p>
+              Your CSV must contain these columns:
+            </p>
+
+            <code>
+              unit_number, topic, question_text,
+              option_a, option_b, option_c,
+              option_d, correct_option, explanation,
+              difficulty
+            </code>
+
+            <p>
+              Correct answer must be A, B, C or D.
+              Difficulty must be Easy, Medium or Hard.
+            </p>
+
+          </div>
+
+          <label className="nism-upload-button">
+
+            {saving
+              ? "Uploading..."
+              : "Choose CSV File"}
+
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              disabled={saving}
+              onChange={(event) => {
+
+                const file =
+                  event.target.files?.[0];
+
+                if (file) {
+                  uploadCSV(file);
+                }
+
+                event.currentTarget.value = "";
+
+              }}
+            />
+
+          </label>
+
+        </div>
+
+      </section>
+
+      {/* =========================
+          QUESTION LIBRARY
+          ========================= */}
+
+      <section className="nism-admin-card">
+
+        <div className="nism-admin-card-header">
+
+          <div>
+            <h2>Question Library</h2>
+
+            <p>
+              Search and manage your active
+              practice questions.
+            </p>
+          </div>
+
         </div>
 
         <div className="nism-admin-filters">
+
           <input
             value={search}
             onChange={(event) =>
@@ -491,10 +695,15 @@ export default function NismQuestionBank() {
               setUnit(event.target.value)
             }
           >
-            <option value="">All Units</option>
+            <option value="">
+              All Units
+            </option>
 
             {units.map((item) => (
-              <option key={item.number} value={item.number}>
+              <option
+                key={item.number}
+                value={item.number}
+              >
                 Unit {item.number}
               </option>
             ))}
@@ -506,11 +715,23 @@ export default function NismQuestionBank() {
               setDifficulty(event.target.value)
             }
           >
-            <option value="">All Difficulties</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
+            <option value="">
+              All Difficulties
+            </option>
+
+            <option value="Easy">
+              Easy
+            </option>
+
+            <option value="Medium">
+              Medium
+            </option>
+
+            <option value="Hard">
+              Hard
+            </option>
           </select>
+
         </div>
 
         {loading ? (
@@ -523,80 +744,112 @@ export default function NismQuestionBank() {
           </div>
         ) : (
           <div className="nism-admin-question-list">
-            {questions.map((question, index) => (
-              <article
-                key={question.id}
-                className="nism-admin-question"
-              >
-                <div className="nism-admin-question-top">
-                  <span>
-                    #{index + 1}
-                  </span>
 
-                  <span>
-                    Unit {question.unit_number}
-                  </span>
+            {questions.map(
+              (question, index) => (
 
-                  <span>
-                    {question.difficulty}
-                  </span>
+                <article
+                  key={question.id}
+                  className="nism-admin-question"
+                >
 
-                  <span>
-                    Answer: {question.correct_option}
-                  </span>
-                </div>
+                  <div className="nism-admin-question-top">
 
-                <h3>{question.question_text}</h3>
+                    <span>
+                      #{index + 1}
+                    </span>
 
-                <div className="nism-admin-option-preview">
-                  <div>
-                    <b>A.</b> {question.option_a}
+                    <span>
+                      Unit {question.unit_number}
+                    </span>
+
+                    <span>
+                      {question.difficulty}
+                    </span>
+
+                    <span>
+                      Answer:{" "}
+                      {question.correct_option}
+                    </span>
+
                   </div>
 
-                  <div>
-                    <b>B.</b> {question.option_b}
+                  <h3>
+                    {question.question_text}
+                  </h3>
+
+                  <div className="nism-admin-option-preview">
+
+                    <div>
+                      <b>A.</b>{" "}
+                      {question.option_a}
+                    </div>
+
+                    <div>
+                      <b>B.</b>{" "}
+                      {question.option_b}
+                    </div>
+
+                    <div>
+                      <b>C.</b>{" "}
+                      {question.option_c}
+                    </div>
+
+                    <div>
+                      <b>D.</b>{" "}
+                      {question.option_d}
+                    </div>
+
                   </div>
 
-                  <div>
-                    <b>C.</b> {question.option_c}
+                  {question.explanation && (
+                    <p className="nism-admin-explanation">
+
+                      <strong>
+                        Explanation:
+                      </strong>{" "}
+
+                      {question.explanation}
+
+                    </p>
+                  )}
+
+                  <div className="nism-admin-question-actions">
+
+                    <button
+                      type="button"
+                      className="nism-admin-secondary"
+                      onClick={() =>
+                        startEdit(question)
+                      }
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="nism-admin-danger"
+                      onClick={() =>
+                        deactivateQuestion(
+                          question.id
+                        )
+                      }
+                    >
+                      Deactivate
+                    </button>
+
                   </div>
 
-                  <div>
-                    <b>D.</b> {question.option_d}
-                  </div>
-                </div>
+                </article>
 
-                {question.explanation && (
-                  <p className="nism-admin-explanation">
-                    <strong>Explanation:</strong>{" "}
-                    {question.explanation}
-                  </p>
-                )}
+              )
+            )}
 
-                <div className="nism-admin-question-actions">
-                  <button
-                    type="button"
-                    className="nism-admin-secondary"
-                    onClick={() => startEdit(question)}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    className="nism-admin-danger"
-                    onClick={() =>
-                      deactivateQuestion(question.id)
-                    }
-                  >
-                    Deactivate
-                  </button>
-                </div>
-              </article>
-            ))}
           </div>
         )}
+
       </section>
+
     </div>
   );
 }
