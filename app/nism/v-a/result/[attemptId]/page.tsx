@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import NismResultTracker from "@/components/NismResultTracker";
 
 type ResultPageProps = {
   params: Promise<{
@@ -228,9 +229,21 @@ export default async function NismResultPage({
     }
   }
 
-  return (
-    <main className="nism-result-page">
-      <section className="nism-result-hero">
+return (
+  <main className="nism-result-page">
+
+    <NismResultTracker
+      attemptId={attemptId}
+      testNumber={Number(attempt.test_number || 1)}
+      score={score}
+      percentage={percentage}
+      correct={correct}
+      wrong={wrong}
+      unanswered={unanswered}
+      passed={passed}
+    />
+
+    <section className="nism-result-hero">
         <div className="nism-result-container">
           <div className="nism-result-eyebrow">
             NISM SERIES V-A
