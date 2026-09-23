@@ -6810,3 +6810,158 @@
     flex: 1;
   }
 }
+
+/* =========================================================
+   NISM RESULT
+   ========================================================= */
+
+.nism-result-page {
+  min-height: 75vh;
+  padding: 60px 20px;
+  background: #f5f8fc;
+}
+
+.nism-result-card {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 45px;
+  background: #ffffff;
+  border: 1px solid #e3e9f2;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(16, 35, 63, 0.07);
+}
+
+.nism-result-label {
+  color: #1463d8;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.nism-result-card h1 {
+  margin: 10px 0 15px;
+  color: #10233f;
+  font-size: 38px;
+}
+
+.nism-result-status {
+  display: inline-flex;
+  padding: 8px 15px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nism-result-status.passed {
+  background: #e8f7ef;
+  color: #187548;
+}
+
+.nism-result-status.not-passed {
+  background: #fff4e6;
+  color: #a85c00;
+}
+
+.nism-result-score {
+  margin: 35px 0;
+}
+
+.nism-result-score strong {
+  display: block;
+  color: #1463d8;
+  font-size: 65px;
+  line-height: 1;
+}
+
+.nism-result-score span {
+  display: block;
+  margin-top: 10px;
+  color: #607086;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.nism-result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 30px 0;
+}
+
+.nism-result-grid div {
+  padding: 18px 8px;
+  background: #f7faff;
+  border-radius: 10px;
+}
+
+.nism-result-grid strong {
+  display: block;
+  color: #10233f;
+  font-size: 21px;
+}
+
+.nism-result-grid span {
+  display: block;
+  margin-top: 5px;
+  color: #758297;
+  font-size: 11px;
+}
+
+.nism-result-note {
+  margin: 25px 0;
+  padding: 18px;
+  background: #f8faff;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.nism-result-note strong {
+  color: #10233f;
+}
+
+.nism-result-note p {
+  margin: 6px 0 0;
+  color: #607086;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.nism-result-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .nism-result-page {
+    padding: 35px 15px;
+  }
+
+  .nism-result-card {
+    padding: 30px 18px;
+  }
+
+  .nism-result-card h1 {
+    font-size: 29px;
+  }
+
+  .nism-result-score strong {
+    font-size: 52px;
+  }
+
+  .nism-result-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nism-result-actions {
+    flex-direction: column;
+  }
+
+  .nism-result-actions .nism-primary-btn,
+  .nism-result-actions .nism-secondary-btn {
+    width: 100%;
+  }
+}
