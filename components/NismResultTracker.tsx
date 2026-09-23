@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+const STORAGE_KEY = "nism_va_attempt_history";
+
 type Props = {
   attemptId: string;
   testNumber: number;
@@ -12,8 +14,6 @@ type Props = {
   unanswered: number;
   passed: boolean;
 };
-
-const STORAGE_KEY = "nism_va_attempt_history";
 
 export default function NismResultTracker({
   attemptId,
@@ -27,18 +27,17 @@ export default function NismResultTracker({
 }: Props) {
   useEffect(() => {
     try {
-      const existing =
-        localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_KEY);
 
-      const history = existing
-        ? JSON.parse(existing)
+      const history = stored
+        ? JSON.parse(stored)
         : [];
 
-      const safeHistory = Array.isArray(history)
+      const existingHistory = Array.isArray(history)
         ? history
         : [];
 
-      const newAttempt = {
+      const newResult = {
         attemptId,
         testNumber,
         score,
@@ -50,20 +49,17 @@ export default function NismResultTracker({
         date: new Date().toISOString(),
       };
 
-      const withoutDuplicate =
-        safeHistory.filter(
+      const updatedHistory = [
+        newResult,
+        ...existingHistory.filter(
           (item: { attemptId?: string }) =>
             item.attemptId !== attemptId
-        );
-
-      const updated = [
-        newAttempt,
-        ...withoutDuplicate,
+        ),
       ].slice(0, 20);
 
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify(updated)
+        JSON.stringify(updatedHistory)
       );
     } catch (error) {
       console.error(
