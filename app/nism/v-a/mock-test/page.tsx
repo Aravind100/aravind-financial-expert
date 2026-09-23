@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type Question = {
   questionNumber: number;
@@ -21,14 +21,12 @@ type Question = {
 
 export default function NISMMockTestPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const testNumber = Number(
-    searchParams.get("test") || "1"
-  );
+  const [testNumber, setTestNumber] = useState(1);
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [attemptId, setAttemptId] = useState("");
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
   const [answers, setAnswers] = useState<
@@ -41,41 +39,73 @@ export default function NISMMockTestPage() {
 
   const [timeLeft, setTimeLeft] = useState(120 * 60);
 
-  const current = questions[currentQuestion];
+  /*
+   * Get ?test=1 from the browser only.
+   *
+   * This avoids useSearchParams() during the
+   * production build.
+   */
+  useEffect(() => {
+    const params = new URLSearchParams(
+      window.location.search
+    );
 
-  const answeredCount = useMemo(() => {
-    return Object.keys(answers).length;
-  }, [answers]);
+    const value = Number(
+      params.get("test") || "1"
+    );
 
+    if (
+      Number.isInteger(value) &&
+      value >= 1 &&
+      value <= 10
+    ) {
+      setTestNumber(value);
+    }
+  }, []);
+
+
+  /*
+   * Start the test after testNumber is known.
+   */
   useEffect(() => {
     async function startTest() {
       try {
         setLoading(true);
+        setError("");
 
-        const response = await fetch("/api/nism/start", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            testNumber,
-          }),
-        });
+        const response = await fetch(
+          "/api/nism/start",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              testNumber,
+            }),
+          }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.error || "Unable to start test."
+            data.error ||
+              "Unable to start test."
           );
         }
 
         setQuestions(data.questions);
         setAttemptId(data.attemptId);
-        setTimeLeft(data.durationMinutes * 60);
+
+        setTimeLeft(
+          data.durationMinutes * 60
+        );
+
       } catch (err: any) {
         setError(
-          err.message || "Unable to start mock test."
+          err.message ||
+            "Unable to start mock test."
         );
       } finally {
         setLoading(false);
@@ -85,21 +115,36 @@ export default function NISMMockTestPage() {
     startTest();
   }, [testNumber]);
 
+
+  /*
+   * Timer
+   */
   useEffect(() => {
-    if (loading || submitting || questions.length === 0) {
+    if (
+      loading ||
+      submitting ||
+      questions.length === 0
+    ) {
       return;
     }
 
     if (timeLeft <= 0) {
-      handleSubmit();
+      submitTest(true);
       return;
     }
 
-    const timer = setInterval(() => {
-      setTimeLeft((previous) => previous - 1);
+    const timer = window.setInterval(() => {
+      setTimeLeft(
+        (previous) =>
+          previous > 0
+            ? previous - 1
+            : 0
+      );
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () =>
+      window.clearInterval(timer);
+
   }, [
     loading,
     submitting,
@@ -107,17 +152,38 @@ export default function NISMMockTestPage() {
     timeLeft,
   ]);
 
+
+  const current = questions[currentQuestion];
+
+
+  const answeredCount = useMemo(() => {
+    return Object.keys(answers).length;
+  }, [answers]);
+
+
   function formatTime(seconds: number) {
-    const hours = Math.floor(seconds / 3600);
+    const hours = Math.floor(
+      seconds / 3600
+    );
+
     const minutes = Math.floor(
       (seconds % 3600) / 60
     );
+
     const secs = seconds % 60;
 
-    return `${String(hours).padStart(2, "0")}:${String(
-      minutes
-    ).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return `${String(hours).padStart(
+      2,
+      "0"
+    )}:${String(minutes).padStart(
+      2,
+      "0"
+    )}:${String(secs).padStart(
+      2,
+      "0"
+    )}`;
   }
+
 
   function selectAnswer(option: string) {
     if (!current) return;
@@ -128,62 +194,94 @@ export default function NISMMockTestPage() {
     }));
   }
 
+
   function goNext() {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion((previous) => previous + 1);
+    if (
+      currentQuestion <
+      questions.length - 1
+    ) {
+      setCurrentQuestion(
+        (previous) => previous + 1
+      );
     }
   }
 
+
   function goPrevious() {
     if (currentQuestion > 0) {
-      setCurrentQuestion((previous) => previous - 1);
+      setCurrentQuestion(
+        (previous) => previous - 1
+      );
     }
   }
+
 
   function goToQuestion(index: number) {
     setCurrentQuestion(index);
   }
 
-  async function handleSubmit() {
-    if (submitting || !attemptId) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to submit this mock test?"
-    );
-
-    if (!confirmed && timeLeft > 0) {
+  async function submitTest(
+    automatic = false
+  ) {
+    if (
+      submitting ||
+      !attemptId
+    ) {
       return;
+    }
+
+    if (!automatic) {
+      const confirmed =
+        window.confirm(
+          "Are you sure you want to submit this mock test?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
     }
 
     try {
       setSubmitting(true);
 
-      const answerList = questions.map((question) => ({
-        questionId: question.id,
-        selectedOption:
-          answers[question.id] || null,
-      }));
+      const answerList =
+        questions.map((question) => ({
+          questionId: question.id,
+          selectedOption:
+            answers[question.id] ||
+            null,
+        }));
 
-      const totalDuration = 120 * 60;
+      const totalDuration =
+        120 * 60;
+
       const timeTaken =
         totalDuration - timeLeft;
 
-      const response = await fetch("/api/nism/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          attemptId,
-          answers: answerList,
-          timeTakenSeconds: Math.max(
-            0,
-            timeTaken
-          ),
-        }),
-      });
+      const response =
+        await fetch(
+          "/api/nism/submit",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              attemptId,
+              answers: answerList,
+              timeTakenSeconds:
+                Math.max(
+                  0,
+                  timeTaken
+                ),
+            }),
+          }
+        );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -195,15 +293,17 @@ export default function NISMMockTestPage() {
       router.push(
         `/nism/v-a/result/${data.attemptId}`
       );
+
     } catch (err: any) {
       setSubmitting(false);
 
-      alert(
+      window.alert(
         err.message ||
           "Unable to submit test."
       );
     }
   }
+
 
   if (loading) {
     return (
@@ -217,32 +317,43 @@ export default function NISMMockTestPage() {
     );
   }
 
+
   if (error) {
     return (
       <main className="nism-test-page">
         <section className="nism-test-loading">
-          <h2>Unable to start test</h2>
+
+          <h2>
+            Unable to start test
+          </h2>
+
           <p>{error}</p>
 
           <button
-            onClick={() => router.push("/nism/v-a")}
+            type="button"
+            onClick={() =>
+              router.push(
+                "/nism/v-a"
+              )
+            }
             className="nism-primary-btn"
           >
             Back to NISM V-A
           </button>
+
         </section>
       </main>
     );
   }
 
+
   if (!current) {
     return null;
   }
 
+
   return (
     <main className="nism-test-page">
-
-      {/* TEST HEADER */}
 
       <header className="nism-test-header">
 
@@ -256,12 +367,20 @@ export default function NISMMockTestPage() {
           </h1>
         </div>
 
+
         <div className="nism-test-progress">
+
           <span>
-            {answeredCount}/{questions.length}
+            {answeredCount}/
+            {questions.length}
           </span>
-          <small>Answered</small>
+
+          <small>
+            Answered
+          </small>
+
         </div>
+
 
         <div
           className={`nism-test-timer ${
@@ -270,25 +389,23 @@ export default function NISMMockTestPage() {
               : ""
           }`}
         >
-          <span>⏱</span>
+          <span>⏱</span>{" "}
           {formatTime(timeLeft)}
         </div>
 
       </header>
 
 
-      {/* TEST BODY */}
-
       <section className="nism-test-layout">
-
-        {/* QUESTION */}
 
         <div className="nism-question-area">
 
           <div className="nism-question-top">
 
             <span>
-              Question {current.questionNumber} of{" "}
+              Question{" "}
+              {current.questionNumber}{" "}
+              of{" "}
               {questions.length}
             </span>
 
@@ -305,6 +422,7 @@ export default function NISMMockTestPage() {
               Q{current.questionNumber}
             </div>
 
+
             <h2>
               {current.questionText}
             </h2>
@@ -313,12 +431,18 @@ export default function NISMMockTestPage() {
             <div className="nism-options">
 
               {(
-                ["A", "B", "C", "D"] as const
+                [
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                ] as const
               ).map((option) => {
 
                 const selected =
-                  answers[current.id] ===
-                  option;
+                  answers[
+                    current.id
+                  ] === option;
 
                 return (
                   <button
@@ -330,16 +454,24 @@ export default function NISMMockTestPage() {
                         : ""
                     }`}
                     onClick={() =>
-                      selectAnswer(option)
+                      selectAnswer(
+                        option
+                      )
                     }
                   >
+
                     <span className="nism-option-letter">
                       {option}
                     </span>
 
                     <span>
-                      {current.options[option]}
+                      {
+                        current.options[
+                          option
+                        ]
+                      }
                     </span>
+
                   </button>
                 );
               })}
@@ -349,14 +481,16 @@ export default function NISMMockTestPage() {
           </div>
 
 
-          {/* NAVIGATION */}
-
           <div className="nism-test-navigation">
 
             <button
               type="button"
-              onClick={goPrevious}
-              disabled={currentQuestion === 0}
+              onClick={
+                goPrevious
+              }
+              disabled={
+                currentQuestion === 0
+              }
               className="nism-nav-btn secondary"
             >
               ← Previous
@@ -365,6 +499,7 @@ export default function NISMMockTestPage() {
 
             {currentQuestion <
             questions.length - 1 ? (
+
               <button
                 type="button"
                 onClick={goNext}
@@ -372,17 +507,24 @@ export default function NISMMockTestPage() {
               >
                 Next →
               </button>
+
             ) : (
+
               <button
                 type="button"
-                onClick={handleSubmit}
-                disabled={submitting}
+                onClick={() =>
+                  submitTest(false)
+                }
+                disabled={
+                  submitting
+                }
                 className="nism-nav-btn submit"
               >
                 {submitting
                   ? "Submitting..."
                   : "Submit Test"}
               </button>
+
             )}
 
           </div>
@@ -390,44 +532,64 @@ export default function NISMMockTestPage() {
         </div>
 
 
-        {/* QUESTION NAVIGATOR */}
-
         <aside className="nism-question-sidebar">
 
           <div className="nism-sidebar-heading">
-            <strong>Questions</strong>
+
+            <strong>
+              Questions
+            </strong>
 
             <span>
               {answeredCount}/
               {questions.length}
             </span>
+
           </div>
 
 
           <div className="nism-question-grid">
 
             {questions.map(
-              (question, index) => {
+              (
+                question,
+                index
+              ) => {
 
                 const answered =
                   Boolean(
-                    answers[question.id]
+                    answers[
+                      question.id
+                    ]
                   );
 
                 const active =
-                  index === currentQuestion;
+                  index ===
+                  currentQuestion;
 
                 return (
                   <button
-                    key={question.id}
+                    key={
+                      question.id
+                    }
                     type="button"
                     onClick={() =>
-                      goToQuestion(index)
+                      goToQuestion(
+                        index
+                      )
                     }
                     className={`
                       nism-question-number-btn
-                      ${answered ? "answered" : ""}
-                      ${active ? "active" : ""}
+                      ${
+                        answered
+                          ? "answered"
+                          : ""
+                      }
+                      ${
+                        active
+                          ? "active"
+                          : ""
+                      }
                     `}
                   >
                     {index + 1}
