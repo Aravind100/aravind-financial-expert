@@ -582,6 +582,17 @@ export default function NismPracticePage() {
 
           {practiceCompleted && (
             <div className="nism-practice-complete">
+
+              <NismPracticeTracker
+  unitNumber={selectedUnit || 0}
+  unitTitle={
+    units.find(
+      (unit) => unit.number === selectedUnit
+    )?.title || ""
+  }
+  questionCount={questions.length}
+  correct={correctAnswers}
+/>
               <div className="nism-small-title">
                 PRACTICE COMPLETE
               </div>
