@@ -8659,3 +8659,144 @@
     font-size: 20px;
   }
 }
+
+
+/* =========================================================
+   NISM STEP 12D - PRACTICE DASHBOARD
+   ========================================================= */
+
+.nism-dashboard-practice {
+  padding: 80px 0;
+  background: #f7faff;
+}
+
+.nism-unit-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 35px;
+}
+
+.nism-unit-progress-card {
+  background: #ffffff;
+  border: 1px solid #e6edf7;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(16, 35, 63, 0.06);
+}
+
+.nism-unit-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.nism-unit-progress-top span {
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nism-unit-progress-top strong {
+  color: #10233f;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.nism-unit-progress-card h3 {
+  margin: 0 0 18px;
+  color: #10233f;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.nism-progress-bar {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  background: #e8eef7;
+  border-radius: 50px;
+  margin-bottom: 14px;
+}
+
+.nism-progress-bar span {
+  display: block;
+  height: 100%;
+  background: #1463d8;
+  border-radius: 50px;
+  transition: width 0.3s ease;
+}
+
+.nism-unit-progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  color: #6a788d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.nism-unit-practice-link {
+  display: inline-block;
+  margin-top: 18px;
+  color: #1463d8;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.nism-unit-practice-link:hover {
+  text-decoration: underline;
+}
+
+.nism-dashboard-clear {
+  display: block;
+  margin: 30px auto 0;
+  border: 0;
+  background: transparent;
+  color: #7a8799;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nism-dashboard-clear:hover {
+  color: #d33b3b;
+}
+
+@media (max-width: 1000px) {
+  .nism-unit-progress-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .nism-dashboard-practice {
+    padding: 55px 0;
+  }
+
+  .nism-unit-progress-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .nism-unit-progress-card {
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .nism-unit-progress-card h3 {
+    font-size: 16px;
+  }
+
+  .nism-unit-progress-top strong {
+    font-size: 20px;
+  }
+
+  .nism-unit-progress-meta {
+    font-size: 11px;
+  }
+}
