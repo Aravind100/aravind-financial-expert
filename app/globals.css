@@ -8360,3 +8360,302 @@
     margin-top: 20px;
   }
 }
+
+
+/* =========================================================
+   NISM PRACTICE - ACTIVE BUTTONS & QUESTION PRACTICE
+   ========================================================= */
+
+.nism-practice-card-button.active {
+  border: none;
+  background: #1463d8;
+  color: #ffffff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nism-practice-card-button.active:hover {
+  transform: translateY(-1px);
+}
+
+.nism-practice-setup {
+  min-height: 65vh;
+  padding: 55px 0 70px;
+  background: #f7f9fc;
+}
+
+.nism-practice-back {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: #1463d8;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nism-practice-setup-card {
+  max-width: 760px;
+  margin: 35px auto 0;
+  padding: 40px;
+  border: 1px solid #e5eaf1;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(16, 35, 63, 0.06);
+  text-align: center;
+}
+
+.nism-practice-setup-card h1 {
+  margin: 10px 0;
+  color: #10233f;
+  font-size: 38px;
+}
+
+.nism-practice-setup-card p {
+  color: #68778a;
+  line-height: 1.6;
+}
+
+.nism-question-count-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.nism-question-count-options button {
+  min-height: 100px;
+  border: 1px solid #dfe5ed;
+  border-radius: 14px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.nism-question-count-options button.selected {
+  border: 2px solid #1463d8;
+  background: #eef5ff;
+}
+
+.nism-question-count-options strong {
+  display: block;
+  color: #10233f;
+  font-size: 28px;
+}
+
+.nism-question-count-options span {
+  color: #718096;
+  font-size: 12px;
+}
+
+.nism-start-practice-button {
+  width: 100%;
+  min-height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: #1463d8;
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.nism-start-practice-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.nism-practice-error {
+  margin: 15px 0;
+  padding: 13px;
+  border-radius: 9px;
+  background: #fff1f1;
+  color: #c0392b;
+  font-size: 13px;
+}
+
+.nism-question-practice {
+  min-height: 70vh;
+  padding: 35px 0 70px;
+  background: #f7f9fc;
+}
+
+.nism-practice-question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  color: #68778a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nism-practice-question-card {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 35px;
+  border: 1px solid #e5eaf1;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(16, 35, 63, 0.06);
+}
+
+.nism-question-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.nism-question-meta span {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #eef4ff;
+  color: #1463d8;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.nism-practice-question-card h1 {
+  margin: 0 0 28px;
+  color: #10233f;
+  font-size: 25px;
+  line-height: 1.55;
+}
+
+.nism-practice-options {
+  display: grid;
+  gap: 12px;
+}
+
+.nism-practice-options button {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 17px;
+  border: 1px solid #dfe5ed;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #31435b;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nism-practice-options button:hover {
+  border-color: #1463d8;
+}
+
+.nism-practice-options button.selected {
+  border: 2px solid #1463d8;
+  background: #eef5ff;
+}
+
+.nism-practice-options button:disabled {
+  cursor: default;
+}
+
+.nism-practice-options strong {
+  color: #1463d8;
+}
+
+.nism-practice-options span {
+  line-height: 1.5;
+}
+
+.nism-check-answer,
+.nism-next-question {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 22px;
+  border: none;
+  border-radius: 10px;
+  background: #1463d8;
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.nism-check-answer:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nism-practice-feedback {
+  margin-top: 22px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #f5f8fc;
+}
+
+.nism-feedback-result {
+  color: #1463d8;
+  font-weight: 900;
+}
+
+.nism-feedback-explanation {
+  margin-top: 15px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.nism-feedback-explanation strong {
+  color: #1463d8;
+}
+
+.nism-feedback-explanation p {
+  margin: 8px 0 0;
+  color: #607086;
+  line-height: 1.65;
+}
+
+.nism-practice-complete {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.nism-practice-complete h2 {
+  color: #10233f;
+}
+
+.nism-practice-complete p {
+  color: #68778a;
+}
+
+@media (max-width: 700px) {
+  .nism-practice-setup {
+    padding: 35px 0 50px;
+  }
+
+  .nism-practice-setup-card {
+    margin-top: 25px;
+    padding: 25px 18px;
+  }
+
+  .nism-practice-setup-card h1 {
+    font-size: 30px;
+  }
+
+  .nism-question-count-options {
+    gap: 8px;
+  }
+
+  .nism-question-count-options button {
+    min-height: 85px;
+  }
+
+  .nism-question-count-options strong {
+    font-size: 24px;
+  }
+
+  .nism-practice-question-header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .nism-practice-question-card {
+    padding: 22px 18px;
+  }
+
+  .nism-practice-question-card h1 {
+    font-size: 20px;
+  }
+}
