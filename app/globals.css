@@ -8011,3 +8011,352 @@
     box-sizing: border-box;
   }
 }
+
+/* =========================================================
+   NISM PRACTICE BY UNIT
+   ========================================================= */
+
+.nism-practice-page {
+  width: 100%;
+  overflow-x: hidden;
+  background: #f7f9fc;
+}
+
+.nism-practice-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+
+
+/* HERO */
+
+.nism-practice-hero {
+  padding: 60px 0 50px;
+  background: #ffffff;
+}
+
+.nism-practice-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.nism-practice-eyebrow::before {
+  content: "";
+  width: 30px;
+  height: 3px;
+  border-radius: 20px;
+  background: #1463d8;
+}
+
+.nism-practice-hero h1 {
+  margin: 0 0 15px;
+  color: #10233f;
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+}
+
+.nism-practice-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: #607086;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.nism-practice-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+
+/* SECTION */
+
+.nism-practice-section {
+  padding: 55px 0 65px;
+}
+
+.nism-practice-heading {
+  margin-bottom: 28px;
+}
+
+.nism-practice-heading .nism-small-title {
+  color: #1463d8;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.nism-practice-heading h2 {
+  margin: 8px 0;
+  color: #10233f;
+  font-size: 34px;
+}
+
+.nism-practice-heading p {
+  max-width: 720px;
+  margin: 0;
+  color: #607086;
+  line-height: 1.65;
+}
+
+
+/* UNIT CARDS */
+
+.nism-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.nism-practice-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  padding: 24px;
+  border: 1px solid #e5eaf1;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(16, 35, 63, 0.05);
+  box-sizing: border-box;
+}
+
+.nism-practice-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.nism-practice-number {
+  color: #1463d8;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.nism-practice-status {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #eef4ff;
+  color: #1463d8;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nism-practice-card h3 {
+  margin: 0 0 12px;
+  color: #10233f;
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.nism-practice-card p {
+  margin: 0;
+  color: #68778a;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.nism-practice-card-button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 0 15px;
+  border: 1px solid #dce3eb;
+  border-radius: 9px;
+  background: #f5f7fa;
+  color: #9aa5b3;
+  font-weight: 800;
+  cursor: not-allowed;
+}
+
+
+/* HOW IT WORKS */
+
+.nism-practice-info {
+  padding: 60px 0;
+  background: #ffffff;
+}
+
+.nism-practice-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.nism-practice-step {
+  padding: 22px;
+  border: 1px solid #e5eaf1;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.nism-practice-step > span {
+  color: #1463d8;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.nism-practice-step h3 {
+  margin: 12px 0 8px;
+  color: #10233f;
+  font-size: 18px;
+}
+
+.nism-practice-step p {
+  margin: 0;
+  color: #68778a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* CTA */
+
+.nism-practice-cta {
+  padding: 55px 0;
+  background: #10233f;
+}
+
+.nism-practice-cta .nism-practice-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.nism-practice-cta .nism-small-title {
+  color: #8ebcff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.nism-practice-cta h2 {
+  margin: 8px 0 10px;
+  color: #ffffff;
+  font-size: 34px;
+}
+
+.nism-practice-cta p {
+  max-width: 650px;
+  margin: 0;
+  color: #cbd6e5;
+  line-height: 1.65;
+}
+
+
+/* DISCLAIMER */
+
+.nism-practice-disclaimer {
+  padding: 22px 0;
+  background: #f1f4f8;
+}
+
+.nism-practice-disclaimer p {
+  margin: 0;
+  color: #68778a;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+
+/* TABLET */
+
+@media (max-width: 950px) {
+  .nism-practice-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nism-practice-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+  .nism-practice-container {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .nism-practice-hero {
+    padding: 35px 0 35px;
+  }
+
+  .nism-practice-hero h1 {
+    font-size: 34px;
+  }
+
+  .nism-practice-hero p {
+    font-size: 14px;
+  }
+
+  .nism-practice-buttons {
+    flex-direction: column;
+  }
+
+  .nism-practice-buttons a {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .nism-practice-section {
+    padding: 35px 0 45px;
+  }
+
+  .nism-practice-heading h2 {
+    font-size: 28px;
+  }
+
+  .nism-practice-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .nism-practice-card {
+    min-height: 270px;
+    padding: 20px;
+  }
+
+  .nism-practice-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .nism-practice-cta {
+    padding: 40px 0;
+  }
+
+  .nism-practice-cta .nism-practice-container {
+    display: block;
+  }
+
+  .nism-practice-cta h2 {
+    font-size: 28px;
+  }
+
+  .nism-practice-cta .nism-primary-btn {
+    display: inline-flex;
+    margin-top: 20px;
+  }
+}
