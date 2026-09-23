@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-export const metadata = {
-  title: "NISM Series V-A Preparation | Mutual Fund Distributors",
-  description:
-    "NISM-Series-V-A Mutual Fund Distributors preparation with chapter-wise study, practice questions and mock tests.",
-};
+
 
 const chapters = [
   {
