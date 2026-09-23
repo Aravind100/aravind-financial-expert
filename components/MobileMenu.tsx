@@ -42,6 +42,10 @@ export default function MobileMenu() {
           🧮 Calculators
         </Link>
 
+        <Link href="/nism" onClick={closeMenu}>
+  🎓 NISM EXAM
+</Link>
+
         <Link href="/articles" onClick={closeMenu}>
           Articles
         </Link>
