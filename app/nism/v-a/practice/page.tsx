@@ -3,178 +3,153 @@
 import Link from "next/link";
 import { useState } from "react";
 
+type Unit = {
+  number: number;
+  title: string;
+};
+
 type Question = {
   questionNumber: number;
   id: string;
   unitNumber: number;
-  unitTitle: string | null;
-  topic: string | null;
+  unitTitle: string;
+  topic: string;
   questionText: string;
   optionA: string;
   optionB: string;
   optionC: string;
   optionD: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  explanation: string | null;
+  difficulty: string;
 };
 
-const units = [
+const units: Unit[] = [
   {
     number: 1,
     title: "Investment Landscape",
-    description:
-      "Financial goals, savings and investments, asset classes, investment risks, risk profiling and asset allocation.",
   },
   {
     number: 2,
-    title: "Concept and Role of a Mutual Fund",
-    description:
-      "Understand mutual funds, their role, classification and development of the mutual fund industry.",
+    title: "Concept & Role of a Mutual Fund",
   },
   {
     number: 3,
     title: "Legal Structure of Mutual Funds in India",
-    description:
-      "Learn about mutual fund structure, key constituents, AMCs and service providers.",
   },
   {
     number: 4,
     title: "Legal and Regulatory Framework",
-    description:
-      "Study regulators, regulatory requirements and distributor-related practices.",
   },
   {
     number: 5,
     title: "Scheme Related Information",
-    description:
-      "Understand important scheme documents and scheme-related disclosures.",
   },
   {
     number: 6,
-    title: "Fund Distribution and Channel Management",
-    description:
-      "Learn distribution channels, distributor roles and distributor-related practices.",
+    title: "Fund Distribution and Channel Management Practices",
   },
   {
     number: 7,
-    title: "NAV, TER and Pricing of Units",
-    description:
-      "Understand NAV, valuation, expenses and pricing-related concepts.",
+    title: "NAV, Returns and Performance",
   },
   {
     number: 8,
     title: "Taxation",
-    description:
-      "Practice concepts related to taxation of mutual fund investments.",
   },
   {
     number: 9,
     title: "Investor Services",
-    description:
-      "Understand investor transactions, services and servicing-related concepts.",
   },
   {
     number: 10,
-    title: "Risk, Return and Performance",
-    description:
-      "Study risk, returns, performance measurement and related concepts.",
+    title: "Financial Planning",
   },
   {
     number: 11,
-    title: "Mutual Fund Scheme Performance",
-    description:
-      "Understand benchmarks, performance measurement and scheme performance.",
+    title: "Investment Products and Related Concepts",
   },
   {
     number: 12,
     title: "Mutual Fund Scheme Selection",
-    description:
-      "Practice scheme selection based on investor needs, preferences and risk profile.",
   },
 ];
 
+const answerOptions = [
+  { key: "A", label: "A" },
+  { key: "B", label: "B" },
+  { key: "C", label: "C" },
+  { key: "D", label: "D" },
+];
+
 export default function NismPracticePage() {
-  const [selectedUnit, setSelectedUnit] =
-    useState<number | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
+  const [questionCount, setQuestionCount] = useState(10);
 
-  const [questionCount, setQuestionCount] =
-    useState(10);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const [questions, setQuestions] =
-    useState<Question[]>([]);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [answerChecked, setAnswerChecked] = useState(false);
 
-  const [currentIndex, setCurrentIndex] =
-    useState(0);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [correctOption, setCorrectOption] = useState("");
 
-  const [selectedAnswer, setSelectedAnswer] =
-    useState<string | null>(null);
+  const [explanation, setExplanation] = useState("");
 
-  const [answerChecked, setAnswerChecked] =
-    useState(false);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState(0);
 
-  const [correctAnswers, setCorrectAnswers] =
-    useState(0);
+  const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(false);
 
-  const [answeredQuestions, setAnsweredQuestions] =
-    useState(0);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  const currentQuestion = questions[currentIndex];
 
-  const [error, setError] =
-    useState("");
-
-  const currentQuestion =
-    questions[currentIndex];
-
-  async function startPractice(
-    unitNumber: number
-  ) {
+  const startPractice = (unitNumber: number) => {
     setSelectedUnit(unitNumber);
     setQuestions([]);
     setCurrentIndex(0);
-    setSelectedAnswer(null);
+    setSelectedAnswer("");
     setAnswerChecked(false);
+    setIsCorrect(null);
+    setCorrectOption("");
+    setExplanation("");
     setCorrectAnswers(0);
     setAnsweredQuestions(0);
     setError("");
-  }
+  };
 
-  async function loadQuestions() {
+  const loadQuestions = async () => {
     if (!selectedUnit) return;
 
-    try {
-      setLoading(true);
-      setError("");
+    setLoading(true);
+    setError("");
 
-      const response = await fetch(
-        "/api/nism/practice/start",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            unitNumber: selectedUnit,
-            questionCount,
-          }),
-        }
-      );
+    try {
+      const response = await fetch("/api/nism/practice/start", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          unitNumber: selectedUnit,
+          questionCount,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data?.error ||
-            "Unable to start practice."
-        );
+        throw new Error(data?.error || "Unable to start practice.");
       }
 
       setQuestions(data.questions || []);
       setCurrentIndex(0);
-      setSelectedAnswer(null);
+      setSelectedAnswer("");
       setAnswerChecked(false);
+      setIsCorrect(null);
+      setCorrectOption("");
+      setExplanation("");
       setCorrectAnswers(0);
       setAnsweredQuestions(0);
     } catch (err) {
@@ -186,463 +161,532 @@ export default function NismPracticePage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  function selectAnswer(answer: string) {
-    if (answerChecked) return;
+  const selectAnswer = (option: string) => {
+    if (answerChecked || checking) return;
 
-    setSelectedAnswer(answer);
-  }
+    setSelectedAnswer(option);
+  };
 
-  function checkAnswer() {
-    if (!selectedAnswer || !currentQuestion) {
+  const checkAnswer = async () => {
+    if (!currentQuestion || !selectedAnswer || answerChecked) {
       return;
     }
 
-    setAnswerChecked(true);
-    setAnsweredQuestions(
-      (value) => value + 1
-    );
+    setChecking(true);
+    setError("");
 
-    /*
-      The practice API currently does not send
-      correct_option to the browser.
+    try {
+      const response = await fetch("/api/nism/practice/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          questionId: currentQuestion.id,
+          selectedOption: selectedAnswer,
+        }),
+      });
 
-      We will connect server-side answer checking
-      in the next sub-step.
-    */
-  }
+      const data = await response.json();
 
-  function nextQuestion() {
-    if (
-      currentIndex <
-      questions.length - 1
-    ) {
-      setCurrentIndex(
-        (value) => value + 1
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to check answer."
+        );
+      }
+
+      setIsCorrect(Boolean(data.correct));
+      setCorrectOption(data.correctOption || "");
+      setExplanation(data.explanation || "");
+      setAnswerChecked(true);
+
+      setAnsweredQuestions((previous) => previous + 1);
+
+      if (data.correct) {
+        setCorrectAnswers((previous) => previous + 1);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to check answer."
       );
-
-      setSelectedAnswer(null);
-      setAnswerChecked(false);
+    } finally {
+      setChecking(false);
     }
-  }
+  };
 
-  function backToUnits() {
-    setQuestions([]);
+  const nextQuestion = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((previous) => previous + 1);
+      setSelectedAnswer("");
+      setAnswerChecked(false);
+      setIsCorrect(null);
+      setCorrectOption("");
+      setExplanation("");
+      return;
+    }
+
+    setCurrentIndex(questions.length);
+  };
+
+  const backToUnits = () => {
     setSelectedUnit(null);
+    setQuestions([]);
     setCurrentIndex(0);
-    setSelectedAnswer(null);
+    setSelectedAnswer("");
     setAnswerChecked(false);
+    setIsCorrect(null);
+    setCorrectOption("");
+    setExplanation("");
     setCorrectAnswers(0);
     setAnsweredQuestions(0);
     setError("");
-  }
+  };
 
-  const selectedUnitData =
-    units.find(
-      (unit) =>
-        unit.number === selectedUnit
-    );
+  const practiceCompleted =
+    questions.length > 0 &&
+    currentIndex >= questions.length;
+
+  const percentage =
+    answeredQuestions > 0
+      ? Math.round((correctAnswers / answeredQuestions) * 100)
+      : 0;
 
   return (
     <main className="nism-practice-page">
+      <section className="nism-practice-hero">
+        <div className="nism-container">
+          <div className="nism-small-title">
+            NISM SERIES V-A
+          </div>
 
-      {!selectedUnit && (
-        <>
-          <section className="nism-practice-hero">
-            <div className="nism-practice-container">
+          <h1>Unit-wise Practice</h1>
 
-              <div className="nism-practice-eyebrow">
-                NISM SERIES V-A
-              </div>
+          <p>
+            Practice Mutual Fund Distributor concepts unit by unit
+            with randomly selected questions from your question
+            bank.
+          </p>
 
-              <h1>
-                Practice by Unit
-              </h1>
+          <div className="nism-hero-buttons">
+            <Link
+              href="/nism/v-a"
+              className="nism-secondary-btn"
+            >
+              ← Back to Preparation
+            </Link>
 
-              <p>
-                Strengthen your NISM V-A preparation
-                by practicing questions from individual
-                curriculum units.
-              </p>
+            <Link
+              href="/nism/v-a/mock-tests"
+              className="nism-primary-btn"
+            >
+              Full Mock Tests
+            </Link>
+          </div>
+        </div>
+      </section>
 
-              <div className="nism-practice-buttons">
+      <section className="nism-practice-section">
+        <div className="nism-container">
 
-                <Link
-                  href="/nism/v-a/mock-tests"
-                  className="nism-primary-btn"
-                >
-                  📝 Full Mock Tests
-                </Link>
-
-                <Link
-                  href="/nism/v-a"
-                  className="nism-secondary-btn"
-                >
-                  ← Back to Preparation
-                </Link>
-
-              </div>
-
-            </div>
-          </section>
-
-          <section className="nism-practice-section">
-            <div className="nism-practice-container">
-
-              <div className="nism-practice-heading">
-
+          {!selectedUnit && (
+            <>
+              <div className="nism-section-heading">
                 <div className="nism-small-title">
                   SELECT A UNIT
                 </div>
 
                 <h2>
-                  Choose what you want to practice
+                  Choose a unit to start practicing.
                 </h2>
 
                 <p>
-                  Select a unit to begin focused
-                  question practice.
+                  Select any of the 12 units from the current
+                  NISM-Series-V-A test objectives.
                 </p>
-
               </div>
 
               <div className="nism-practice-grid">
-
                 {units.map((unit) => (
-
-                  <div
-                    className="nism-practice-card"
+                  <button
                     key={unit.number}
+                    type="button"
+                    className="nism-practice-card-button active"
+                    onClick={() =>
+                      startPractice(unit.number)
+                    }
                   >
+                    <span className="nism-practice-number">
+                      Unit {unit.number}
+                    </span>
 
-                    <div className="nism-practice-card-top">
+                    <strong>{unit.title}</strong>
 
-                      <span className="nism-practice-number">
-                        {String(
-                          unit.number
-                        ).padStart(2, "0")}
-                      </span>
-
-                      <span className="nism-practice-status">
-                        Practice
-                      </span>
-
-                    </div>
-
-                    <h3>
-                      {unit.title}
-                    </h3>
-
-                    <p>
-                      {unit.description}
-                    </p>
-
-                    <button
-                      type="button"
-                      className="nism-practice-card-button active"
-                      onClick={() =>
-                        startPractice(
-                          unit.number
-                        )
-                      }
-                    >
+                    <span className="nism-practice-start">
                       Start Practice →
-                    </button>
-
-                  </div>
-
+                    </span>
+                  </button>
                 ))}
-
               </div>
+            </>
+          )}
 
-            </div>
-          </section>
-        </>
-      )}
-
-
-      {selectedUnit &&
-        questions.length === 0 && (
-          <section className="nism-practice-setup">
-
-            <div className="nism-practice-container">
-
+          {selectedUnit && questions.length === 0 && (
+            <div className="nism-practice-setup">
               <button
                 type="button"
                 className="nism-practice-back"
                 onClick={backToUnits}
               >
-                ← Back to Units
+                ← Choose Another Unit
               </button>
 
-              <div className="nism-practice-setup-card">
-
-                <div className="nism-practice-eyebrow">
+              <div className="nism-section-heading">
+                <div className="nism-small-title">
                   UNIT {selectedUnit}
                 </div>
 
-                <h1>
-                  {selectedUnitData?.title}
-                </h1>
+                <h2>
+                  {units.find(
+                    (unit) => unit.number === selectedUnit
+                  )?.title}
+                </h2>
 
                 <p>
-                  Choose how many questions you
-                  want to practice.
+                  Choose how many questions you want to
+                  practice.
                 </p>
-
-                <div className="nism-question-count-options">
-
-                  {[10, 20, 25].map(
-                    (count) => (
-
-                      <button
-                        type="button"
-                        key={count}
-                        className={
-                          questionCount ===
-                          count
-                            ? "selected"
-                            : ""
-                        }
-                        onClick={() =>
-                          setQuestionCount(
-                            count
-                          )
-                        }
-                      >
-                        <strong>
-                          {count}
-                        </strong>
-
-                        <span>
-                          Questions
-                        </span>
-                      </button>
-
-                    )
-                  )}
-
-                </div>
-
-                {error && (
-                  <div className="nism-practice-error">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  className="nism-start-practice-button"
-                  onClick={loadQuestions}
-                  disabled={loading}
-                >
-                  {loading
-                    ? "Loading Questions..."
-                    : `Start ${questionCount} Questions →`}
-                </button>
-
               </div>
 
-            </div>
-
-          </section>
-        )}
-
-
-      {questions.length > 0 &&
-        currentQuestion && (
-          <section className="nism-question-practice">
-
-            <div className="nism-practice-container">
-
-              <div className="nism-practice-question-header">
-
-                <button
-                  type="button"
-                  className="nism-practice-back"
-                  onClick={backToUnits}
-                >
-                  ← Exit Practice
-                </button>
-
-                <div>
-                  Question{" "}
-                  {currentIndex + 1} of{" "}
-                  {questions.length}
-                </div>
-
-              </div>
-
-
-              <div className="nism-practice-question-card">
-
-                <div className="nism-question-meta">
-
-                  <span>
-                    Unit{" "}
-                    {currentQuestion.unitNumber}
-                  </span>
-
-                  <span>
-                    {currentQuestion.difficulty}
-                  </span>
-
-                  {currentQuestion.topic && (
-                    <span>
-                      {currentQuestion.topic}
-                    </span>
-                  )}
-
-                </div>
-
-
-                <h1>
-                  {currentQuestion.questionText}
-                </h1>
-
-
-                <div className="nism-practice-options">
-
-                  {[
-                    [
-                      "A",
-                      currentQuestion.optionA,
-                    ],
-                    [
-                      "B",
-                      currentQuestion.optionB,
-                    ],
-                    [
-                      "C",
-                      currentQuestion.optionC,
-                    ],
-                    [
-                      "D",
-                      currentQuestion.optionD,
-                    ],
-                  ].map(
-                    ([letter, text]) => (
-
-                      <button
-                        type="button"
-                        key={letter}
-                        className={
-                          selectedAnswer ===
-                          letter
-                            ? "selected"
-                            : ""
-                        }
-                        onClick={() =>
-                          selectAnswer(
-                            letter
-                          )
-                        }
-                        disabled={
-                          answerChecked
-                        }
-                      >
-
-                        <strong>
-                          {letter}
-                        </strong>
-
-                        <span>
-                          {text}
-                        </span>
-
-                      </button>
-
-                    )
-                  )}
-
-                </div>
-
-
-                {!answerChecked && (
+              <div className="nism-question-count-grid">
+                {[10, 20, 25].map((count) => (
                   <button
+                    key={count}
                     type="button"
-                    className="nism-check-answer"
-                    onClick={checkAnswer}
-                    disabled={
-                      !selectedAnswer
+                    className={`nism-question-count ${
+                      questionCount === count
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setQuestionCount(count)
                     }
                   >
-                    Check Answer
+                    <strong>{count}</strong>
+                    <span>Questions</span>
                   </button>
-                )}
-
-
-                {answerChecked && (
-                  <div className="nism-practice-feedback">
-
-                    <div className="nism-feedback-result">
-                      Answer checked
-                    </div>
-
-                    {currentQuestion.explanation && (
-                      <div className="nism-feedback-explanation">
-
-                        <strong>
-                          💡 Explanation
-                        </strong>
-
-                        <p>
-                          {
-                            currentQuestion.explanation
-                          }
-                        </p>
-
-                      </div>
-                    )}
-
-                    {currentIndex <
-                    questions.length - 1 ? (
-                      <button
-                        type="button"
-                        className="nism-next-question"
-                        onClick={
-                          nextQuestion
-                        }
-                      >
-                        Next Question →
-                      </button>
-                    ) : (
-                      <div className="nism-practice-complete">
-
-                        <h2>
-                          Practice Complete 🎉
-                        </h2>
-
-                        <p>
-                          You completed{" "}
-                          {questions.length}{" "}
-                          questions.
-                        </p>
-
-                        <button
-                          type="button"
-                          className="nism-next-question"
-                          onClick={
-                            backToUnits
-                          }
-                        >
-                          Practice Another Unit
-                        </button>
-
-                      </div>
-                    )}
-
-                  </div>
-                )}
-
+                ))}
               </div>
 
+              {error && (
+                <div className="nism-practice-error">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="nism-primary-btn nism-practice-start-button"
+                onClick={loadQuestions}
+                disabled={loading}
+              >
+                {loading
+                  ? "Loading Questions..."
+                  : `Start ${questionCount}-Question Practice`}
+              </button>
+
+              <p className="nism-practice-note">
+                Questions are randomly selected from the active
+                question bank.
+              </p>
             </div>
+          )}
 
-          </section>
-        )}
+          {questions.length > 0 &&
+            !practiceCompleted && (
+              <div className="nism-question-practice">
 
+                <div className="nism-question-practice-top">
+                  <button
+                    type="button"
+                    className="nism-practice-back"
+                    onClick={backToUnits}
+                  >
+                    ← Exit Practice
+                  </button>
+
+                  <div className="nism-question-progress">
+                    Question{" "}
+                    <strong>
+                      {currentIndex + 1}
+                    </strong>{" "}
+                    of {questions.length}
+                  </div>
+                </div>
+
+                <div className="nism-question-practice-card">
+
+                  <div className="nism-question-meta">
+                    <span>
+                      Unit {currentQuestion.unitNumber}
+                    </span>
+
+                    <span>
+                      {currentQuestion.difficulty}
+                    </span>
+
+                    {currentQuestion.topic && (
+                      <span>
+                        {currentQuestion.topic}
+                      </span>
+                    )}
+                  </div>
+
+                  <h2>
+                    {currentQuestion.questionText}
+                  </h2>
+
+                  <div className="nism-practice-options">
+                    {answerOptions.map((option) => {
+                      const text =
+                        option.key === "A"
+                          ? currentQuestion.optionA
+                          : option.key === "B"
+                          ? currentQuestion.optionB
+                          : option.key === "C"
+                          ? currentQuestion.optionC
+                          : currentQuestion.optionD;
+
+                      const selected =
+                        selectedAnswer === option.key;
+
+                      const correct =
+                        answerChecked &&
+                        correctOption === option.key;
+
+                      const wrong =
+                        answerChecked &&
+                        selected &&
+                        !isCorrect;
+
+                      return (
+                        <button
+                          key={option.key}
+                          type="button"
+                          className={[
+                            "nism-practice-option",
+                            selected
+                              ? "selected"
+                              : "",
+                            correct
+                              ? "correct"
+                              : "",
+                            wrong
+                              ? "wrong"
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          onClick={() =>
+                            selectAnswer(option.key)
+                          }
+                          disabled={
+                            answerChecked || checking
+                          }
+                        >
+                          <span className="nism-option-letter">
+                            {option.label}
+                          </span>
+
+                          <span>{text}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {error && (
+                    <div className="nism-practice-error">
+                      {error}
+                    </div>
+                  )}
+
+                  {!answerChecked && (
+                    <button
+                      type="button"
+                      className="nism-primary-btn nism-check-answer"
+                      onClick={checkAnswer}
+                      disabled={
+                        !selectedAnswer || checking
+                      }
+                    >
+                      {checking
+                        ? "Checking..."
+                        : "Check Answer"}
+                    </button>
+                  )}
+
+                  {answerChecked && (
+                    <div
+                      className={`nism-practice-feedback ${
+                        isCorrect
+                          ? "is-correct"
+                          : "is-wrong"
+                      }`}
+                    >
+                      <strong>
+                        {isCorrect
+                          ? "✓ Correct Answer"
+                          : "✕ Incorrect Answer"}
+                      </strong>
+
+                      {!isCorrect && (
+                        <p>
+                          Correct answer:{" "}
+                          <strong>
+                            {correctOption}
+                          </strong>
+                        </p>
+                      )}
+
+                      {explanation && (
+                        <div className="nism-practice-explanation">
+                          <strong>
+                            Explanation
+                          </strong>
+
+                          <p>
+                            {explanation}
+                          </p>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        className="nism-primary-btn"
+                        onClick={nextQuestion}
+                      >
+                        {currentIndex <
+                        questions.length - 1
+                          ? "Next Question →"
+                          : "Finish Practice"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+          {practiceCompleted && (
+            <div className="nism-practice-complete">
+              <div className="nism-small-title">
+                PRACTICE COMPLETE
+              </div>
+
+              <h2>
+                Unit {selectedUnit} Practice Finished
+              </h2>
+
+              <div className="nism-practice-score">
+                <strong>{correctAnswers}</strong>
+                <span>
+                  / {questions.length} Correct
+                </span>
+              </div>
+
+              <p>
+                Your practice accuracy is{" "}
+                <strong>{percentage}%</strong>.
+              </p>
+
+              <div className="nism-hero-buttons">
+                <button
+                  type="button"
+                  className="nism-primary-btn"
+                  onClick={() => {
+                    setQuestions([]);
+                    setCurrentIndex(0);
+                    setSelectedAnswer("");
+                    setAnswerChecked(false);
+                    setIsCorrect(null);
+                    setCorrectOption("");
+                    setExplanation("");
+                    setCorrectAnswers(0);
+                    setAnsweredQuestions(0);
+                  }}
+                >
+                  Practice Again
+                </button>
+
+                <button
+                  type="button"
+                  className="nism-secondary-btn"
+                  onClick={backToUnits}
+                >
+                  Choose Another Unit
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="nism-practice-info">
+        <div className="nism-container">
+          <div className="nism-info-card">
+            <h2>How Practice Mode Works</h2>
+
+            <div className="nism-info-grid">
+              <div>
+                <strong>1. Select Unit</strong>
+                <p>
+                  Choose one of the 12 NISM Series V-A units.
+                </p>
+              </div>
+
+              <div>
+                <strong>2. Choose Questions</strong>
+                <p>
+                  Practice 10, 20 or 25 questions.
+                </p>
+              </div>
+
+              <div>
+                <strong>3. Answer</strong>
+                <p>
+                  Select your answer and check it instantly.
+                </p>
+              </div>
+
+              <div>
+                <strong>4. Learn</strong>
+                <p>
+                  Read the explanation after answering.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="nism-practice-disclaimer">
+        <div className="nism-container">
+          <p>
+            <strong>Important:</strong> These practice questions
+            are independently prepared for educational and
+            preparation purposes. They are not official NISM
+            examination questions and this practice platform is
+            not endorsed by NISM.
+          </p>
+
+          <p>
+            Always refer to the latest official NISM curriculum
+            and test objectives for examination preparation.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
