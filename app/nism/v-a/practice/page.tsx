@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import NismPracticeTracker from "@/components/NismPracticeTracker";
 
 type Unit = {
   number: number;
