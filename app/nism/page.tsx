@@ -404,9 +404,21 @@ export default function NISMPage() {
             </p>
           </div>
 
-          <Link href="/nism/v-a" className="nism-primary-btn">
-            Start Preparation
-          </Link>
+         <div className="nism-hero-buttons">
+  <Link
+    href="/nism/v-a"
+    className="nism-primary-btn"
+  >
+    Start Preparation
+  </Link>
+
+  <Link
+    href="/nism/v-a/dashboard"
+    className="nism-secondary-btn"
+  >
+    📊 My Study Dashboard
+  </Link>
+</div>
 
         </div>
       </section>
