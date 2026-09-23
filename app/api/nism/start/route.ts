@@ -112,8 +112,7 @@ export async function POST(request: Request) {
           optionC: question.option_c,
           optionD: question.option_d,
           difficulty: question.difficulty,
-          explanation:
-            question.explanation,
+          
         })
       );
 
