@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-export const metadata = {
-  title: "NISM Series V-A | Mutual Fund Distributors Exam Preparation",
-  description:
-    "Prepare for the NISM-Series-V-A Mutual Fund Distributors Certification Examination with study resources, chapter-wise preparation and independent practice tests.",
-};
+
 
 export default function NISMPage() {
   return (
