@@ -190,9 +190,12 @@ export default function NISMVA() {
               </p>
             </div>
 
-            <button type="button" className="nism-primary-btn">
-              Mock Tests — Coming Soon
-            </button>
+            <Link
+  href="/nism/v-a/mock-tests"
+  className="nism-primary-btn"
+>
+  View Mock Tests →
+</Link>
 
           </div>
 
