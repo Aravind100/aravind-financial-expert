@@ -31,6 +31,7 @@ export default function RootLayout({
               <Link href="/imp">IMP</Link>
               <Link href="/swp">SWP</Link>
               <Link href="/calculators">Calculators</Link>
+              <Link href="/nism">NISM EXAM</Link>
               <Link href="/articles">Articles</Link>
               <Link href="/about">About</Link>
               <Link href="/contact">Contact</Link>
