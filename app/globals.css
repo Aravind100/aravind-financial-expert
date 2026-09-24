@@ -8800,3 +8800,247 @@
     font-size: 11px;
   }
 }
+
+
+/* =========================================================
+   NISM STEP 12E - REVIEW & BOOKMARKS
+   ========================================================= */
+
+.nism-bookmark-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 18px 0 20px;
+  padding: 9px 14px;
+  border: 1px solid #d9e3f0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #53647a;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nism-bookmark-button:hover {
+  border-color: #1463d8;
+  color: #1463d8;
+}
+
+.nism-bookmark-button.bookmarked {
+  border-color: #f0c84b;
+  background: #fff9df;
+  color: #8b6a00;
+}
+
+/* Review page */
+
+.nism-review-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.nism-review-hero {
+  padding: 65px 0 45px;
+  background: #ffffff;
+}
+
+.nism-review-section {
+  padding: 65px 0 80px;
+  background: #f7faff;
+}
+
+.nism-review-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.nism-review-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: 1px solid #dce5f0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #53647a;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nism-review-tabs button span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 20px;
+  background: #edf3fb;
+  color: #1463d8;
+  font-size: 12px;
+}
+
+.nism-review-tabs button.active {
+  border-color: #1463d8;
+  background: #1463d8;
+  color: #ffffff;
+}
+
+.nism-review-tabs button.active span {
+  background: #ffffff;
+  color: #1463d8;
+}
+
+.nism-review-list {
+  display: grid;
+  gap: 18px;
+}
+
+.nism-review-card {
+  padding: 26px;
+  border: 1px solid #e1e8f2;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(16, 35, 63, 0.05);
+}
+
+.nism-review-card-top {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.nism-review-card-top span {
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #edf4ff;
+  color: #1463d8;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.nism-review-number {
+  margin-bottom: 8px;
+  color: #7b899b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nism-review-card h2 {
+  max-width: 900px;
+  margin: 0;
+  color: #10233f;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.nism-review-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.nism-review-remove {
+  border: 0;
+  background: transparent;
+  color: #7a8799;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nism-review-remove:hover {
+  color: #d33b3b;
+}
+
+.nism-review-empty {
+  padding: 55px 25px;
+  border: 1px solid #e1e8f2;
+  border-radius: 20px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.nism-review-empty h2 {
+  margin: 10px 0 10px;
+  color: #10233f;
+}
+
+.nism-review-empty p {
+  max-width: 600px;
+  margin: 0 auto 25px;
+  color: #66758a;
+  line-height: 1.7;
+}
+
+.nism-review-info {
+  padding: 70px 0;
+  background: #ffffff;
+}
+
+.nism-review-disclaimer {
+  padding: 25px 0;
+  background: #f7faff;
+}
+
+.nism-review-disclaimer p {
+  margin: 0;
+  color: #77869a;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@media (max-width: 700px) {
+  .nism-review-hero {
+    padding: 40px 0 30px;
+  }
+
+  .nism-review-section {
+    padding: 45px 0 55px;
+  }
+
+  .nism-review-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .nism-review-tabs button {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .nism-review-card {
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .nism-review-card h2 {
+    font-size: 16px;
+  }
+
+  .nism-review-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nism-review-actions .nism-primary-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nism-review-remove {
+    padding: 8px;
+  }
+
+  .nism-review-empty {
+    padding: 40px 18px;
+  }
+}
