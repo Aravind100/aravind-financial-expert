@@ -16,6 +16,12 @@ function shuffle<T>(items: T[]): T[] {
   return array;
 }
 
+/*
+  Practice-test distribution.
+
+  This is our internal practice-test structure,
+  not an official NISM question blueprint.
+*/
 const UNIT_QUOTAS: Record<number, number> = {
   1: 9,
   2: 9,
@@ -31,17 +37,15 @@ const UNIT_QUOTAS: Record<number, number> = {
   12: 8,
 };
 
-const DIFFICULTY_TARGETS = {
-  Easy: 30,
-  Medium: 50,
-  Hard: 20,
-};
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
     const testNumber = Number(body?.testNumber);
+
+    /* -------------------------------------------------------
+       1. Validate mock test number
+    ------------------------------------------------------- */
 
     if (
       !Number.isInteger(testNumber) ||
@@ -61,27 +65,30 @@ export async function POST(request: Request) {
     const admin = supabaseAdmin();
 
     /* -------------------------------------------------------
-       1. Get mock test configuration
+       2. Get mock test configuration
     ------------------------------------------------------- */
 
-    const { data: mockTest, error: mockTestError } =
-      await admin
-        .from("nism_mock_tests")
-        .select("*")
-        .eq("module_code", "V-A")
-        .eq("test_number", testNumber)
-        .eq("is_active", true)
-        .single();
+    const {
+      data: mockTest,
+      error: mockTestError,
+    } = await admin
+      .from("nism_mock_tests")
+      .select("*")
+      .eq("module_code", "V-A")
+      .eq("test_number", testNumber)
+      .eq("is_active", true)
+      .single();
 
     if (mockTestError || !mockTest) {
       console.error(
-        "Mock test fetch error:",
+        "Mock test configuration error:",
         mockTestError
       );
 
       return NextResponse.json(
         {
-          error: "Mock test configuration not found.",
+          error:
+            "Mock test configuration not found.",
         },
         {
           status: 404,
@@ -96,26 +103,28 @@ export async function POST(request: Request) {
       Number(mockTest.duration_minutes) || 120;
 
     /* -------------------------------------------------------
-       2. Get active question bank
+       3. Get active NISM questions
     ------------------------------------------------------- */
 
-    const { data: allQuestions, error: questionError } =
-      await admin
-        .from("nism_questions")
-        .select(`
-          id,
-          unit_number,
-          unit_title,
-          topic,
-          question_text,
-          option_a,
-          option_b,
-          option_c,
-          option_d,
-          difficulty
-        `)
-        .eq("module_code", "V-A")
-        .eq("is_active", true);
+    const {
+      data: allQuestions,
+      error: questionError,
+    } = await admin
+      .from("nism_questions")
+      .select(`
+        id,
+        unit_number,
+        unit_title,
+        topic,
+        question_text,
+        option_a,
+        option_b,
+        option_c,
+        option_d,
+        difficulty
+      `)
+      .eq("module_code", "V-A")
+      .eq("is_active", true);
 
     if (questionError) {
       console.error(
@@ -125,7 +134,8 @@ export async function POST(request: Request) {
 
       return NextResponse.json(
         {
-          error: "Unable to load the NISM question bank.",
+          error:
+            "Unable to load the NISM question bank.",
         },
         {
           status: 500,
@@ -140,7 +150,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "There are not enough active questions in the question bank to start this mock test.",
+            "There are not enough active questions in the question bank.",
           available:
             allQuestions?.length || 0,
           required: questionCount,
@@ -152,7 +162,7 @@ export async function POST(request: Request) {
     }
 
     /* -------------------------------------------------------
-       3. Select questions by unit
+       4. Select questions according to unit quotas
     ------------------------------------------------------- */
 
     const selectedQuestions: any[] = [];
@@ -162,10 +172,12 @@ export async function POST(request: Request) {
     )) {
       const unitNumber = Number(unitKey);
 
-      const unitQuestions = allQuestions.filter(
-        (question) =>
-          Number(question.unit_number) === unitNumber
-      );
+      const unitQuestions =
+        allQuestions.filter(
+          (question) =>
+            Number(question.unit_number) ===
+            unitNumber
+        );
 
       if (unitQuestions.length < quota) {
         return NextResponse.json(
@@ -180,82 +192,48 @@ export async function POST(request: Request) {
         );
       }
 
-      const shuffledUnit =
+      const shuffled =
         shuffle(unitQuestions);
 
       selectedQuestions.push(
-        ...shuffledUnit.slice(0, quota)
+        ...shuffled.slice(0, quota)
       );
     }
 
-    /* -------------------------------------------------------
-       4. Adjust to exact question count
-    ------------------------------------------------------- */
-
-    let finalQuestions = shuffle(
+    const finalQuestions = shuffle(
       selectedQuestions
-    );
-
-    if (finalQuestions.length > questionCount) {
-      finalQuestions =
-        finalQuestions.slice(
-          0,
-          questionCount
-        );
-    }
+    ).slice(0, questionCount);
 
     /* -------------------------------------------------------
-       5. Check difficulty distribution
+       5. CREATE MOCK TEST ATTEMPT
+       
+       IMPORTANT:
+       This matches the actual nism_attempts table schema.
     ------------------------------------------------------- */
 
-    const difficultyCounts = {
-      Easy: finalQuestions.filter(
-        (q) => q.difficulty === "Easy"
-      ).length,
+    const {
+      data: attempt,
+      error: attemptError,
+    } = await admin
+      .from("nism_attempts")
+      .insert({
+        module_code: "V-A",
 
-      Medium: finalQuestions.filter(
-        (q) => q.difficulty === "Medium"
-      ).length,
+        // Actual column in your database
+        mock_test_id: mockTest.id,
 
-      Hard: finalQuestions.filter(
-        (q) => q.difficulty === "Hard"
-      ).length,
-    };
+        // Actual column in your database
+        total_questions:
+          finalQuestions.length,
 
-    /*
-      The unit quotas above determine the 100-question
-      structure. We verify the available distribution here
-      but do not manufacture duplicate questions.
-    */
-
-    console.log(
-      "NISM Mock Test difficulty distribution:",
-      {
-        target: DIFFICULTY_TARGETS,
-        actual: difficultyCounts,
-      }
-    );
-
-    /* -------------------------------------------------------
-       6. Create attempt
-    ------------------------------------------------------- */
-
-    const { data: attempt, error: attemptError } =
-      await admin
-        .from("nism_attempts")
-        .insert({
-          module_code: "V-A",
-          test_number: testNumber,
-          question_count: finalQuestions.length,
-          duration_minutes: durationMinutes,
-          status: "started",
-        })
-        .select("id")
-        .single();
+        // status has a database default of "in_progress"
+      })
+      .select("id")
+      .single();
 
     if (attemptError || !attempt) {
       console.error(
-        "Attempt creation error:",
+        "Mock test attempt creation error:",
         attemptError
       );
 
@@ -271,7 +249,7 @@ export async function POST(request: Request) {
     }
 
     /* -------------------------------------------------------
-       7. Save question order
+       6. Save question order
     ------------------------------------------------------- */
 
     const attemptQuestions =
@@ -291,10 +269,11 @@ export async function POST(request: Request) {
 
     if (attemptQuestionError) {
       console.error(
-        "Attempt question creation error:",
+        "Attempt question error:",
         attemptQuestionError
       );
 
+      // Clean up the incomplete attempt
       await admin
         .from("nism_attempts")
         .delete()
@@ -312,14 +291,17 @@ export async function POST(request: Request) {
     }
 
     /* -------------------------------------------------------
-       8. Send safe question data to browser
-       Never send correct answers.
+       7. Send safe questions to browser
+       
+       IMPORTANT:
+       Correct answers are NOT sent to the browser.
     ------------------------------------------------------- */
 
     const safeQuestions =
       finalQuestions.map(
         (question, index) => ({
           questionNumber: index + 1,
+
           id: question.id,
 
           unitNumber:
@@ -345,6 +327,10 @@ export async function POST(request: Request) {
             question.difficulty,
         })
       );
+
+    /* -------------------------------------------------------
+       8. Return test to browser
+    ------------------------------------------------------- */
 
     return NextResponse.json({
       success: true,
