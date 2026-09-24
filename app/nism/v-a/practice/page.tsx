@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import NismPracticeTracker from "@/components/NismPracticeTracker";
+import NismQuestionTracker from "@/components/NismQuestionTracker";
 
 type Unit = {
   number: number;
@@ -445,6 +446,16 @@ export default function NismPracticePage() {
                       </span>
                     )}
                   </div>
+
+                  {answerChecked && (
+  <NismQuestionTracker
+    questionId={currentQuestion.id}
+    unitNumber={currentQuestion.unitNumber}
+    unitTitle={currentQuestion.unitTitle}
+    questionText={currentQuestion.questionText}
+    correct={Boolean(isCorrect)}
+  />
+)}
 
                   <h2>
                     {currentQuestion.questionText}
