@@ -9906,3 +9906,79 @@ strong {
   }
 
 }
+
+/* =========================================================
+   NISM MOCK TEST BUTTONS
+   ========================================================= */
+
+.nism-mock-test-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+  padding: 13px 24px;
+
+  margin-top: 18px;
+
+  border-radius: 10px;
+  border: 0;
+
+  background: #1463d8;
+
+  color: #ffffff !important;
+
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+
+  text-decoration: none !important;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.nism-mock-test-btn:hover {
+  background: #0f52b5;
+  color: #ffffff !important;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 18px rgba(20, 99, 216, 0.20);
+}
+
+.nism-mock-test-btn:visited {
+  color: #ffffff !important;
+}
+
+.nism-mock-test-btn:active {
+  color: #ffffff !important;
+  transform: translateY(0);
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+  .nism-mock-test-btn {
+    width: 100%;
+    min-height: 48px;
+
+    padding: 13px 18px;
+
+    font-size: 14px !important;
+  }
+
+}
