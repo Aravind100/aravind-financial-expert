@@ -196,6 +196,12 @@ export default function NISMVA() {
 >
   View Mock Tests →
 </Link>
+            <Link
+  href="/nism/v-a/review"
+  className="nism-secondary-btn"
+>
+  ⭐ Review Questions
+</Link>
 
           </div>
 
