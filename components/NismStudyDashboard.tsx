@@ -458,6 +458,13 @@ export default function NismStudyDashboard() {
                   Practice Unit →
                 </Link>
 
+                <Link
+  href="/nism/v-a/review"
+  className="nism-secondary-btn"
+>
+  ⭐ Review Questions
+</Link>
+
               </div>
             ))}
 
