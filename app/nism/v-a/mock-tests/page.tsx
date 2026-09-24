@@ -19,7 +19,6 @@ export default async function NISMMockTestsPage() {
     <main className="nism-page">
 
       <section className="nism-hero">
-
         <div className="nism-hero-inner">
 
           <div className="nism-eyebrow">
@@ -38,7 +37,6 @@ export default async function NISMMockTestsPage() {
           </p>
 
         </div>
-
       </section>
 
 
@@ -92,7 +90,7 @@ export default async function NISMMockTestsPage() {
 
                 <Link
                   href={`/nism/v-a/mock-test?test=${test.test_number}`}
-                  className="nism-primary-btn"
+                  className="nism-mock-test-btn"
                 >
                   Start Test →
                 </Link>
