@@ -156,9 +156,12 @@ export default function NISMVA() {
 
                 <p>{chapter.description}</p>
 
-                <button type="button" className="nism-coming-btn">
-                  Practice Questions — Coming Soon
-                </button>
+                <Link
+  href="/nism/v-a/practice"
+  className="nism-practice-card-button active"
+>
+  Practice Questions →
+</Link>
 
               </div>
             ))}
