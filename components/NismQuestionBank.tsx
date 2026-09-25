@@ -94,11 +94,21 @@ export default function NismQuestionBank() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          data?.error || "Failed to load questions"
-        );
-      }
+     if (!response.ok) {
+  const detailedError = [
+    data?.error,
+    data?.message,
+    data?.details,
+    data?.hint,
+    data?.code ? `Code: ${data.code}` : "",
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  throw new Error(
+    detailedError || "Bulk upload failed."
+  );
+}
 
       setQuestions(data.questions || []);
     } catch (error) {
