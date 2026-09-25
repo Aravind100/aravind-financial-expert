@@ -311,17 +311,27 @@ export async function POST(request: Request) {
         );
 
         return NextResponse.json(
-          {
-            error:
-              "Supabase rejected the question insert.",
-            message: insertError.message,
-            code: insertError.code,
-            hint: insertError.hint,
-            details: insertError.details,
-            importedBeforeError: imported,
-          },
-          { status: 500 }
-        );
+  {
+    error: [
+      "Supabase rejected the question insert.",
+      insertError.message,
+      insertError.code
+        ? `Code: ${insertError.code}`
+        : "",
+      insertError.details
+        ? `Details: ${insertError.details}`
+        : "",
+      insertError.hint
+        ? `Hint: ${insertError.hint}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" | "),
+
+    importedBeforeError: imported,
+  },
+  { status: 500 }
+);
       }
 
       imported += batch.length;
