@@ -10884,3 +10884,52 @@ strong {
   overflow: visible !important;
   word-break: normal !important;
 }
+
+
+
+/* =========================================================
+   NISM PRACTICE MOBILE CARD HEIGHT FIX
+   FINAL OVERRIDE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .nism-practice-page
+  .nism-practice-card-button.active {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 120px !important;
+
+    padding: 18px !important;
+    box-sizing: border-box !important;
+
+    border-radius: 15px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .nism-practice-page
+  .nism-practice-card-button.active
+  .nism-practice-number {
+    width: auto !important;
+    height: auto !important;
+
+    margin-bottom: 10px !important;
+  }
+
+  .nism-practice-page
+  .nism-practice-card-button.active
+  strong {
+    font-size: 17px !important;
+  }
+
+  .nism-practice-page
+  .nism-practice-card-button.active
+  .nism-practice-start {
+    margin-top: auto !important;
+    padding-top: 10px !important;
+  }
+
+}
