@@ -253,11 +253,15 @@ export default function NismQuestionBank() {
 
       if (!response.ok) {
         throw new Error(
-          data?.error || "Failed to deactivate question"
+          data?.error ||
+            "Failed to deactivate question"
         );
       }
 
-      setMessage("Question deactivated successfully.");
+      setMessage(
+        "Question deactivated successfully."
+      );
+
       await loadQuestions();
     } catch (error) {
       setMessage(
@@ -280,7 +284,9 @@ export default function NismQuestionBank() {
       const csvText = await file.text();
 
       if (!csvText.trim()) {
-        throw new Error("The CSV file is empty.");
+        throw new Error(
+          "The CSV file is empty."
+        );
       }
 
       const response = await fetch(
@@ -300,7 +306,8 @@ export default function NismQuestionBank() {
 
       if (!response.ok) {
         throw new Error(
-          data?.error || "Bulk upload failed."
+          data?.error ||
+            "Bulk upload failed."
         );
       }
 
@@ -308,7 +315,9 @@ export default function NismQuestionBank() {
         data.invalidRows?.length || 0;
 
       setMessage(
-        `Upload complete: ${data.imported} imported, ${data.skipped} duplicates skipped, ${invalidCount} invalid rows.`
+        `Upload complete: ${data.imported || 0} imported, ${
+          data.skipped || 0
+        } duplicates skipped, ${invalidCount} invalid rows.`
       );
 
       await loadQuestions();
@@ -331,7 +340,9 @@ export default function NismQuestionBank() {
           ========================= */}
 
       <div className="nism-admin-header">
+
         <div>
+
           <div className="nism-admin-eyebrow">
             NISM SERIES V-A
           </div>
@@ -343,19 +354,32 @@ export default function NismQuestionBank() {
             NISM V-A practice questions for your
             mock tests.
           </p>
+
         </div>
 
         <div className="nism-admin-count">
-          <strong>{questions.length}</strong>
-          <span>Questions</span>
+
+          <strong>
+            {questions.length}
+          </strong>
+
+          <span>
+            Questions
+          </span>
+
         </div>
+
       </div>
+
+
+      {/* GENERAL MESSAGE */}
 
       {message && (
         <div className="nism-admin-message">
           {message}
         </div>
       )}
+
 
       {/* =========================
           ADD / EDIT QUESTION
@@ -364,7 +388,9 @@ export default function NismQuestionBank() {
       <section className="nism-admin-card">
 
         <div className="nism-admin-card-header">
+
           <div>
+
             <h2>
               {editingId
                 ? "Edit Question"
@@ -376,6 +402,7 @@ export default function NismQuestionBank() {
               on the published NISM Series V-A
               objectives.
             </p>
+
           </div>
 
           {editingId && (
@@ -387,7 +414,9 @@ export default function NismQuestionBank() {
               Cancel Edit
             </button>
           )}
+
         </div>
+
 
         <div className="nism-admin-form-grid">
 
@@ -403,6 +432,7 @@ export default function NismQuestionBank() {
                 )
               }
             >
+
               {units.map((item) => (
                 <option
                   key={item.number}
@@ -411,8 +441,11 @@ export default function NismQuestionBank() {
                   Unit {item.number} — {item.title}
                 </option>
               ))}
+
             </select>
+
           </label>
+
 
           <label>
             Topic
@@ -427,7 +460,9 @@ export default function NismQuestionBank() {
               }
               placeholder="Example: Risk Profiling"
             />
+
           </label>
+
 
           <label>
             Difficulty
@@ -441,11 +476,23 @@ export default function NismQuestionBank() {
                 )
               }
             >
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
+
+              <option value="Easy">
+                Easy
+              </option>
+
+              <option value="Medium">
+                Medium
+              </option>
+
+              <option value="Hard">
+                Hard
+              </option>
+
             </select>
+
           </label>
+
 
           <label>
             Correct Answer
@@ -459,16 +506,32 @@ export default function NismQuestionBank() {
                 )
               }
             >
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
+
+              <option value="A">
+                A
+              </option>
+
+              <option value="B">
+                B
+              </option>
+
+              <option value="C">
+                C
+              </option>
+
+              <option value="D">
+                D
+              </option>
+
             </select>
+
           </label>
 
         </div>
 
+
         <label className="nism-admin-full-field">
+
           Question
 
           <textarea
@@ -482,11 +545,14 @@ export default function NismQuestionBank() {
             }
             placeholder="Enter the question..."
           />
+
         </label>
+
 
         <div className="nism-admin-options-grid">
 
           <label>
+
             Option A
 
             <input
@@ -498,9 +564,12 @@ export default function NismQuestionBank() {
                 )
               }
             />
+
           </label>
 
+
           <label>
+
             Option B
 
             <input
@@ -512,9 +581,12 @@ export default function NismQuestionBank() {
                 )
               }
             />
+
           </label>
 
+
           <label>
+
             Option C
 
             <input
@@ -526,9 +598,12 @@ export default function NismQuestionBank() {
                 )
               }
             />
+
           </label>
 
+
           <label>
+
             Option D
 
             <input
@@ -540,11 +615,14 @@ export default function NismQuestionBank() {
                 )
               }
             />
+
           </label>
 
         </div>
 
+
         <label className="nism-admin-full-field">
+
           Explanation
 
           <textarea
@@ -558,7 +636,9 @@ export default function NismQuestionBank() {
             }
             placeholder="Explain why the correct answer is correct..."
           />
+
         </label>
+
 
         <div className="nism-admin-form-actions">
 
@@ -568,12 +648,15 @@ export default function NismQuestionBank() {
             onClick={saveQuestion}
             disabled={saving}
           >
+
             {saving
               ? "Saving..."
               : editingId
               ? "Update Question"
               : "Add Question"}
+
           </button>
+
 
           <button
             type="button"
@@ -587,6 +670,7 @@ export default function NismQuestionBank() {
 
       </section>
 
+
       {/* =========================
           BULK CSV UPLOAD
           ========================= */}
@@ -596,21 +680,28 @@ export default function NismQuestionBank() {
         <div className="nism-admin-card-header">
 
           <div>
-            <h2>📥 Bulk Upload Questions</h2>
+
+            <h2>
+              📥 Bulk Upload Questions
+            </h2>
 
             <p>
               Upload multiple original NISM V-A
               practice questions using a CSV file.
             </p>
+
           </div>
 
         </div>
+
 
         <div className="nism-bulk-upload-box">
 
           <div className="nism-bulk-upload-info">
 
-            <strong>CSV format</strong>
+            <strong>
+              CSV format
+            </strong>
 
             <p>
               Your CSV must contain these columns:
@@ -629,6 +720,7 @@ export default function NismQuestionBank() {
             </p>
 
           </div>
+
 
           <label className="nism-upload-button">
 
@@ -656,9 +748,21 @@ export default function NismQuestionBank() {
 
           </label>
 
+
+          {/* =========================
+              BULK UPLOAD RESULT
+              ========================= */}
+
+          {message && (
+            <div className="nism-bulk-upload-message">
+              {message}
+            </div>
+          )}
+
         </div>
 
       </section>
+
 
       {/* =========================
           QUESTION LIBRARY
@@ -669,15 +773,20 @@ export default function NismQuestionBank() {
         <div className="nism-admin-card-header">
 
           <div>
-            <h2>Question Library</h2>
+
+            <h2>
+              Question Library
+            </h2>
 
             <p>
               Search and manage your active
               practice questions.
             </p>
+
           </div>
 
         </div>
+
 
         <div className="nism-admin-filters">
 
@@ -689,12 +798,14 @@ export default function NismQuestionBank() {
             placeholder="Search questions, topics or units..."
           />
 
+
           <select
             value={unit}
             onChange={(event) =>
               setUnit(event.target.value)
             }
           >
+
             <option value="">
               All Units
             </option>
@@ -707,7 +818,9 @@ export default function NismQuestionBank() {
                 Unit {item.number}
               </option>
             ))}
+
           </select>
+
 
           <select
             value={difficulty}
@@ -715,6 +828,7 @@ export default function NismQuestionBank() {
               setDifficulty(event.target.value)
             }
           >
+
             <option value="">
               All Difficulties
             </option>
@@ -730,19 +844,26 @@ export default function NismQuestionBank() {
             <option value="Hard">
               Hard
             </option>
+
           </select>
 
         </div>
 
+
         {loading ? (
+
           <div className="nism-admin-empty">
             Loading questions...
           </div>
+
         ) : questions.length === 0 ? (
+
           <div className="nism-admin-empty">
             No questions found.
           </div>
+
         ) : (
+
           <div className="nism-admin-question-list">
 
             {questions.map(
@@ -774,9 +895,11 @@ export default function NismQuestionBank() {
 
                   </div>
 
+
                   <h3>
                     {question.question_text}
                   </h3>
+
 
                   <div className="nism-admin-option-preview">
 
@@ -802,6 +925,7 @@ export default function NismQuestionBank() {
 
                   </div>
 
+
                   {question.explanation && (
                     <p className="nism-admin-explanation">
 
@@ -814,6 +938,7 @@ export default function NismQuestionBank() {
                     </p>
                   )}
 
+
                   <div className="nism-admin-question-actions">
 
                     <button
@@ -825,6 +950,7 @@ export default function NismQuestionBank() {
                     >
                       Edit
                     </button>
+
 
                     <button
                       type="button"
@@ -846,6 +972,7 @@ export default function NismQuestionBank() {
             )}
 
           </div>
+
         )}
 
       </section>
