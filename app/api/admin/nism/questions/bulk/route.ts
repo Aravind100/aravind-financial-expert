@@ -82,7 +82,9 @@ function parseCSV(text: string): string[][] {
     field += char;
   }
 
-  row.push(field);
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+  }
 
   if (row.some((value) => value.trim() !== "")) {
     rows.push(row);
@@ -95,35 +97,60 @@ function clean(value: string | undefined) {
   return (value || "").trim();
 }
 
+function normalizeQuestion(text: string) {
+  return text
+    .replace(/^\uFEFF/, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export async function POST(request: Request) {
   try {
+    // --------------------------------------------------
+    // 1. ADMIN AUTHENTICATION
+    // --------------------------------------------------
+
     const supabase = await createClient();
 
-    const { data, error } = await supabase.auth.getUser();
+    const { data: userData, error: authError } =
+      await supabase.auth.getUser();
 
-    const email = data.user?.email?.trim().toLowerCase();
+    const email = userData.user?.email?.trim().toLowerCase();
 
-    if (error || !email) {
+    if (authError || !email) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        {
+          success: false,
+          error: "Unauthorized. Please login again.",
+        },
         { status: 401 }
       );
     }
 
     if (email !== ADMIN_EMAIL) {
       return NextResponse.json(
-        { error: "Forbidden" },
+        {
+          success: false,
+          error: "Forbidden. Admin access required.",
+        },
         { status: 403 }
       );
     }
 
-    const body = await request.json();
+    // --------------------------------------------------
+    // 2. READ CSV
+    // --------------------------------------------------
 
+    const body = await request.json();
     const csvText = body?.csvText;
 
     if (!csvText || typeof csvText !== "string") {
       return NextResponse.json(
-        { error: "CSV data is missing." },
+        {
+          success: false,
+          error: "CSV data is missing.",
+        },
         { status: 400 }
       );
     }
@@ -132,10 +159,18 @@ export async function POST(request: Request) {
 
     if (rows.length < 2) {
       return NextResponse.json(
-        { error: "CSV must contain a header row and at least one question." },
+        {
+          success: false,
+          error:
+            "CSV must contain a header row and at least one question.",
+        },
         { status: 400 }
       );
     }
+
+    // --------------------------------------------------
+    // 3. CHECK HEADERS
+    // --------------------------------------------------
 
     const headers = rows[0].map((header) =>
       clean(header).toLowerCase()
@@ -161,15 +196,23 @@ export async function POST(request: Request) {
     if (missingHeaders.length > 0) {
       return NextResponse.json(
         {
+          success: false,
           error: `Missing CSV columns: ${missingHeaders.join(", ")}`,
+          headersReceived: headers,
         },
         { status: 400 }
       );
     }
 
-    const indexOf = (name: string) => headers.indexOf(name);
+    const indexOf = (name: string) =>
+      headers.indexOf(name);
+
+    // --------------------------------------------------
+    // 4. VALIDATE QUESTIONS
+    // --------------------------------------------------
 
     const validQuestions: CsvQuestion[] = [];
+
     const invalidRows: {
       row: number;
       reason: string;
@@ -185,15 +228,29 @@ export async function POST(request: Request) {
         clean(row[indexOf("unit_number")])
       );
 
-      const topic = clean(row[indexOf("topic")]);
+      const topic = clean(
+        row[indexOf("topic")]
+      );
+
       const questionText = clean(
         row[indexOf("question_text")]
       );
 
-      const optionA = clean(row[indexOf("option_a")]);
-      const optionB = clean(row[indexOf("option_b")]);
-      const optionC = clean(row[indexOf("option_c")]);
-      const optionD = clean(row[indexOf("option_d")]);
+      const optionA = clean(
+        row[indexOf("option_a")]
+      );
+
+      const optionB = clean(
+        row[indexOf("option_b")]
+      );
+
+      const optionC = clean(
+        row[indexOf("option_c")]
+      );
+
+      const optionD = clean(
+        row[indexOf("option_d")]
+      );
 
       const correctOption = clean(
         row[indexOf("correct_option")]
@@ -204,13 +261,18 @@ export async function POST(request: Request) {
       );
 
       const difficulty = clean(
-        row[indexOf("difficulty")]
+        row[indexOf("difficulty")
       );
 
-      if (!Number.isInteger(unitNumber) || !units[unitNumber]) {
+      if (
+        !Number.isInteger(unitNumber) ||
+        unitNumber < 1 ||
+        unitNumber > 12
+      ) {
         invalidRows.push({
           row: rowNumber,
-          reason: "Unit number must be between 1 and 12.",
+          reason:
+            "Unit number must be between 1 and 12.",
         });
         continue;
       }
@@ -218,49 +280,71 @@ export async function POST(request: Request) {
       if (!questionText) {
         invalidRows.push({
           row: rowNumber,
-          reason: "Question text is missing.",
+          reason:
+            "Question text is missing.",
         });
         continue;
       }
 
-      if (!optionA || !optionB || !optionC || !optionD) {
+      if (
+        !optionA ||
+        !optionB ||
+        !optionC ||
+        !optionD
+      ) {
         invalidRows.push({
           row: rowNumber,
-          reason: "All four options are required.",
+          reason:
+            "All four options are required.",
         });
         continue;
       }
 
-      if (!["A", "B", "C", "D"].includes(correctOption)) {
+      if (
+        !["A", "B", "C", "D"].includes(
+          correctOption
+        )
+      ) {
         invalidRows.push({
           row: rowNumber,
-          reason: "Correct option must be A, B, C or D.",
+          reason:
+            "Correct option must be A, B, C or D.",
         });
         continue;
       }
 
-      if (!["Easy", "Medium", "Hard"].includes(difficulty)) {
+      if (
+        !["Easy", "Medium", "Hard"].includes(
+          difficulty
+        )
+      ) {
         invalidRows.push({
           row: rowNumber,
-          reason: "Difficulty must be Easy, Medium or Hard.",
+          reason:
+            "Difficulty must be Easy, Medium or Hard.",
         });
         continue;
       }
 
-      const normalizedQuestion = questionText
-        .toLowerCase()
-        .replace(/\s+/g, " ")
-        .trim();
+      const normalizedQuestion =
+        normalizeQuestion(questionText);
 
-      if (batchQuestionTexts.has(normalizedQuestion)) {
+      if (
+        batchQuestionTexts.has(
+          normalizedQuestion
+        )
+      ) {
         invalidRows.push({
           row: rowNumber,
-          reason: "Duplicate question in this CSV file.",
+          reason:
+            "Duplicate question inside this CSV.",
         });
         continue;
       }
 
-      batchQuestionTexts.add(normalizedQuestion);
+      batchQuestionTexts.add(
+        normalizedQuestion
+      );
 
       validQuestions.push({
         unit_number: unitNumber,
@@ -270,115 +354,234 @@ export async function POST(request: Request) {
         option_b: optionB,
         option_c: optionC,
         option_d: optionD,
-        correct_option: correctOption as
-          | "A"
-          | "B"
-          | "C"
-          | "D",
+        correct_option:
+          correctOption as
+            | "A"
+            | "B"
+            | "C"
+            | "D",
         explanation,
-        difficulty: difficulty as
-          | "Easy"
-          | "Medium"
-          | "Hard",
+        difficulty:
+          difficulty as
+            | "Easy"
+            | "Medium"
+            | "Hard",
       });
     }
 
+    // --------------------------------------------------
+    // 5. STOP IF NOTHING VALID
+    // --------------------------------------------------
+
     if (validQuestions.length === 0) {
-      return NextResponse.json({
-        success: false,
-        imported: 0,
-        skipped: 0,
-        invalidRows,
-        message: "No valid questions were found.",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          imported: 0,
+          skipped: 0,
+          invalidRows,
+          message:
+            "No valid questions were found in the CSV.",
+        },
+        { status: 400 }
+      );
     }
+
+    // --------------------------------------------------
+    // 6. CONNECT WITH ADMIN SUPABASE CLIENT
+    // --------------------------------------------------
 
     const admin = supabaseAdmin();
 
-    const { data: existingQuestions, error: existingError } =
-      await admin
-        .from("nism_questions")
-        .select("question_text")
-        .eq("module_code", "V-A");
+    // --------------------------------------------------
+    // 7. FETCH EXISTING QUESTIONS
+    // --------------------------------------------------
+
+    const {
+      data: existingQuestions,
+      error: existingError,
+    } = await admin
+      .from("nism_questions")
+      .select("question_text")
+      .eq("module_code", "V-A");
 
     if (existingError) {
-      throw existingError;
+      console.error(
+        "Existing question fetch error:",
+        existingError
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Could not read existing NISM questions.",
+          details: existingError.message,
+        },
+        { status: 500 }
+      );
     }
 
-    const existingQuestionSet = new Set(
-      (existingQuestions || []).map((item) =>
-        String(item.question_text)
-          .toLowerCase()
-          .replace(/\s+/g, " ")
-          .trim()
-      )
-    );
+    const existingQuestionSet =
+      new Set<string>();
+
+    for (const item of existingQuestions || []) {
+      existingQuestionSet.add(
+        normalizeQuestion(
+          String(item.question_text || "")
+        )
+      );
+    }
+
+    // --------------------------------------------------
+    // 8. PREPARE INSERT DATA
+    // --------------------------------------------------
 
     const questionsToInsert = [];
     let skippedDuplicates = 0;
 
     for (const question of validQuestions) {
-      const normalizedQuestion = question.question_text
-        .toLowerCase()
-        .replace(/\s+/g, " ")
-        .trim();
+      const normalizedQuestion =
+        normalizeQuestion(
+          question.question_text
+        );
 
-      if (existingQuestionSet.has(normalizedQuestion)) {
+      if (
+        existingQuestionSet.has(
+          normalizedQuestion
+        )
+      ) {
         skippedDuplicates++;
         continue;
       }
 
-      existingQuestionSet.add(normalizedQuestion);
+      existingQuestionSet.add(
+        normalizedQuestion
+      );
 
       questionsToInsert.push({
         module_code: "V-A",
         unit_number: question.unit_number,
-        unit_title: units[question.unit_number],
+        unit_title:
+          units[question.unit_number],
         topic: question.topic,
-        question_text: question.question_text,
+        question_text:
+          question.question_text,
         option_a: question.option_a,
         option_b: question.option_b,
         option_c: question.option_c,
         option_d: question.option_d,
-        correct_option: question.correct_option,
-        explanation: question.explanation,
-        difficulty: question.difficulty,
-        source_type: "Original Practice Question",
+        correct_option:
+          question.correct_option,
+        explanation:
+          question.explanation,
+        difficulty:
+          question.difficulty,
+
+        source_type:
+          "Original Practice Question",
+
         source_reference:
           "Based on NISM V-A published objectives",
+
         language: "English",
+
         is_active: true,
       });
     }
 
+    // --------------------------------------------------
+    // 9. EVERYTHING WAS A DUPLICATE
+    // --------------------------------------------------
+
+    if (questionsToInsert.length === 0) {
+      return NextResponse.json({
+        success: true,
+        imported: 0,
+        skipped: skippedDuplicates,
+        invalidRows,
+        message:
+          `No new questions imported. ${skippedDuplicates} questions were already present.`,
+      });
+    }
+
+    // --------------------------------------------------
+    // 10. INSERT IN SMALL BATCHES
+    // --------------------------------------------------
+
     let imported = 0;
 
-    for (let i = 0; i < questionsToInsert.length; i += 100) {
-      const batch = questionsToInsert.slice(i, i + 100);
+    for (
+      let i = 0;
+      i < questionsToInsert.length;
+      i += 25
+    ) {
+      const batch =
+        questionsToInsert.slice(i, i + 25);
 
-      const { error: insertError } = await admin
+      const {
+        data: insertedData,
+        error: insertError,
+      } = await admin
         .from("nism_questions")
-        .insert(batch);
+        .insert(batch)
+        .select("id");
 
       if (insertError) {
-        throw insertError;
+        console.error(
+          "NISM insert error:",
+          insertError
+        );
+
+        return NextResponse.json(
+          {
+            success: false,
+            imported,
+            skipped:
+              skippedDuplicates,
+            invalidRows,
+            error:
+              "Supabase rejected the question insert.",
+            details:
+              insertError.message,
+            code:
+              insertError.code || null,
+            hint:
+              insertError.hint || null,
+            insertedBeforeError:
+              imported,
+          },
+          { status: 500 }
+        );
       }
 
-      imported += batch.length;
+      imported +=
+        insertedData?.length || batch.length;
     }
+
+    // --------------------------------------------------
+    // 11. SUCCESS
+    // --------------------------------------------------
 
     return NextResponse.json({
       success: true,
       imported,
       skipped: skippedDuplicates,
       invalidRows,
-      message: `${imported} questions imported successfully.`,
+      totalCsvRows: rows.length - 1,
+      validRows: validQuestions.length,
+      message:
+        `${imported} questions imported successfully.`,
     });
   } catch (error) {
-    console.error("NISM bulk upload error:", error);
+    console.error(
+      "NISM bulk upload error:",
+      error
+    );
 
     return NextResponse.json(
       {
+        success: false,
         error:
           error instanceof Error
             ? error.message
