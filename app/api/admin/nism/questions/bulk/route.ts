@@ -1,17 +1,32 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const ADMIN_EMAIL = (
-  process.env.ADMIN_EMAIL ||
-  "aravindchaudhary90@gmail.com"
+  process.env.ADMIN_EMAIL || "aravindchaudhary90@gmail.com"
 )
   .trim()
   .toLowerCase();
 
-function parseCSV(text: string) {
+const units: Record<number, string> = {
+  1: "Investment Landscape",
+  2: "Concept and Role of Mutual Fund",
+  3: "Legal Structure of Mutual Funds in India",
+  4: "Legal and Regulatory Framework",
+  5: "Scheme Related Information",
+  6: "Fund Distribution and Channel Management",
+  7: "Net Asset Value, Total Expense Ratio and Investment Valuation",
+  8: "Taxation",
+  9: "Investor Services",
+  10: "Risk, Return and Performance",
+  11: "Mutual Fund Scheme Selection",
+  12: "Financial Planning",
+};
+
+function parseCSV(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
-  let cell = "";
+  let field = "";
   let insideQuotes = false;
 
   for (let i = 0; i < text.length; i++) {
@@ -19,7 +34,7 @@ function parseCSV(text: string) {
     const next = text[i + 1];
 
     if (char === '"' && insideQuotes && next === '"') {
-      cell += '"';
+      field += '"';
       i++;
       continue;
     }
@@ -30,8 +45,8 @@ function parseCSV(text: string) {
     }
 
     if (char === "," && !insideQuotes) {
-      row.push(cell.trim());
-      cell = "";
+      row.push(field);
+      field = "";
       continue;
     }
 
@@ -40,10 +55,10 @@ function parseCSV(text: string) {
         i++;
       }
 
-      row.push(cell.trim());
-      cell = "";
+      row.push(field);
+      field = "";
 
-      if (row.some((value) => value !== "")) {
+      if (row.some((value) => value.trim() !== "")) {
         rows.push(row);
       }
 
@@ -51,29 +66,77 @@ function parseCSV(text: string) {
       continue;
     }
 
-    cell += char;
+    field += char;
   }
 
-  row.push(cell.trim());
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+  }
 
-  if (row.some((value) => value !== "")) {
+  if (row.some((value) => value.trim() !== "")) {
     rows.push(row);
   }
 
   return rows;
 }
 
+function clean(value: string | undefined) {
+  return (value || "").trim();
+}
+
+function normalizeQuestion(text: string) {
+  return text
+    .replace(/^\uFEFF/, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export async function POST(request: Request) {
   try {
-    const supabase = supabaseAdmin();
+    // ---------------------------------------------
+    // 1. ADMIN AUTH
+    // ---------------------------------------------
 
-    const body = await request.json();
-    const csvText = String(body?.csvText || "");
+    const supabase = await createClient();
 
-    if (!csvText.trim()) {
+    const { data, error } =
+      await supabase.auth.getUser();
+
+    const email = data.user?.email
+      ?.trim()
+      .toLowerCase();
+
+    if (error || !email) {
       return NextResponse.json(
         {
-          error: "CSV file is empty.",
+          error: "Unauthorized. Please login again.",
+        },
+        { status: 401 }
+      );
+    }
+
+    if (email !== ADMIN_EMAIL) {
+      return NextResponse.json(
+        {
+          error: "Forbidden. Admin access required.",
+        },
+        { status: 403 }
+      );
+    }
+
+    // ---------------------------------------------
+    // 2. READ CSV
+    // ---------------------------------------------
+
+    const body = await request.json();
+
+    const csvText = body?.csvText;
+
+    if (!csvText || typeof csvText !== "string") {
+      return NextResponse.json(
+        {
+          error: "CSV data is missing.",
         },
         { status: 400 }
       );
@@ -84,14 +147,19 @@ export async function POST(request: Request) {
     if (rows.length < 2) {
       return NextResponse.json(
         {
-          error: "CSV must contain a header row and at least one question.",
+          error:
+            "CSV must contain a header row and at least one question.",
         },
         { status: 400 }
       );
     }
 
+    // ---------------------------------------------
+    // 3. HEADERS
+    // ---------------------------------------------
+
     const headers = rows[0].map((header) =>
-      header.trim().toLowerCase()
+      clean(header).toLowerCase()
     );
 
     const requiredHeaders = [
@@ -107,14 +175,17 @@ export async function POST(request: Request) {
       "difficulty",
     ];
 
-    const missingHeaders = requiredHeaders.filter(
-      (header) => !headers.includes(header)
-    );
+    const missingHeaders =
+      requiredHeaders.filter(
+        (header) => !headers.includes(header)
+      );
 
     if (missingHeaders.length > 0) {
       return NextResponse.json(
         {
-          error: `Missing CSV columns: ${missingHeaders.join(", ")}`,
+          error: `Missing CSV columns: ${missingHeaders.join(
+            ", "
+          )}`,
         },
         { status: 400 }
       );
@@ -123,225 +194,404 @@ export async function POST(request: Request) {
     const indexOf = (name: string) =>
       headers.indexOf(name);
 
-    const questions: any[] = [];
-    const invalidRows: any[] = [];
-    const csvQuestionTexts = new Set<string>();
+    // ---------------------------------------------
+    // 4. VALIDATE QUESTIONS
+    // ---------------------------------------------
+
+    const validQuestions: any[] = [];
+
+    const invalidRows: {
+      row: number;
+      reason: string;
+    }[] = [];
+
+    const batchQuestionTexts =
+      new Set<string>();
 
     for (let i = 1; i < rows.length; i++) {
+      const rowNumber = i + 1;
       const row = rows[i];
 
-      const get = (name: string) =>
-        String(row[indexOf(name)] || "").trim();
+      const unitNumber = Number(
+        clean(row[indexOf("unit_number")])
+      );
 
-      const unitNumber = Number(get("unit_number"));
-      const topic = get("topic");
-      const questionText = get("question_text");
-      const optionA = get("option_a");
-      const optionB = get("option_b");
-      const optionC = get("option_c");
-      const optionD = get("option_d");
-      const correctOption = get("correct_option").toUpperCase();
-      const explanation = get("explanation");
-      const difficulty = get("difficulty");
+      const topic = clean(
+        row[indexOf("topic")]
+      );
 
-      const validationErrors: string[] = [];
+      const questionText = clean(
+        row[indexOf("question_text")]
+      );
 
+      const optionA = clean(
+        row[indexOf("option_a")]
+      );
+
+      const optionB = clean(
+        row[indexOf("option_b")]
+      );
+
+      const optionC = clean(
+        row[indexOf("option_c")]
+      );
+
+      const optionD = clean(
+        row[indexOf("option_d")]
+      );
+
+      const correctOption = clean(
+        row[indexOf("correct_option")]
+      ).toUpperCase();
+
+      const explanation = clean(
+        row[indexOf("explanation")]
+      );
+
+      const difficulty = clean(
+        row[indexOf("difficulty")]
+      );
+
+      // Unit validation
       if (
         !Number.isInteger(unitNumber) ||
-        unitNumber < 1 ||
-        unitNumber > 12
+        !units[unitNumber]
       ) {
-        validationErrors.push("Invalid unit_number");
-      }
-
-      if (!questionText) {
-        validationErrors.push("Missing question_text");
-      }
-
-      if (!optionA || !optionB || !optionC || !optionD) {
-        validationErrors.push("All four options are required");
-      }
-
-      if (!["A", "B", "C", "D"].includes(correctOption)) {
-        validationErrors.push("Invalid correct_option");
-      }
-
-      if (!["Easy", "Medium", "Hard"].includes(difficulty)) {
-        validationErrors.push("Invalid difficulty");
-      }
-
-      const normalizedQuestion =
-        questionText.toLowerCase();
-
-      if (csvQuestionTexts.has(normalizedQuestion)) {
-        validationErrors.push(
-          "Duplicate question inside CSV"
-        );
-      }
-
-      if (validationErrors.length > 0) {
         invalidRows.push({
-          row: i + 1,
-          errors: validationErrors,
-          question: questionText,
+          row: rowNumber,
+          reason:
+            "Unit number must be between 1 and 12.",
         });
 
         continue;
       }
 
-      csvQuestionTexts.add(normalizedQuestion);
+      // Question validation
+      if (!questionText) {
+        invalidRows.push({
+          row: rowNumber,
+          reason:
+            "Question text is missing.",
+        });
 
-      questions.push({
+        continue;
+      }
+
+      // Options validation
+      if (
+        !optionA ||
+        !optionB ||
+        !optionC ||
+        !optionD
+      ) {
+        invalidRows.push({
+          row: rowNumber,
+          reason:
+            "All four options are required.",
+        });
+
+        continue;
+      }
+
+      // Correct option validation
+      if (
+        !["A", "B", "C", "D"].includes(
+          correctOption
+        )
+      ) {
+        invalidRows.push({
+          row: rowNumber,
+          reason:
+            "Correct option must be A, B, C or D.",
+        });
+
+        continue;
+      }
+
+      // Difficulty validation
+      if (
+        !["Easy", "Medium", "Hard"].includes(
+          difficulty
+        )
+      ) {
+        invalidRows.push({
+          row: rowNumber,
+          reason:
+            "Difficulty must be Easy, Medium or Hard.",
+        });
+
+        continue;
+      }
+
+      const normalizedQuestion =
+        normalizeQuestion(questionText);
+
+      // Duplicate inside CSV
+      if (
+        batchQuestionTexts.has(
+          normalizedQuestion
+        )
+      ) {
+        invalidRows.push({
+          row: rowNumber,
+          reason:
+            "Duplicate question inside this CSV.",
+        });
+
+        continue;
+      }
+
+      batchQuestionTexts.add(
+        normalizedQuestion
+      );
+
+      // ---------------------------------------------
+      // IMPORTANT:
+      // unit_title is automatically generated here.
+      // ---------------------------------------------
+
+      validQuestions.push({
         module_code: "V-A",
+
         unit_number: unitNumber,
+
+        unit_title:
+          units[unitNumber],
+
         topic,
-        question_text: questionText,
+
+        question_text:
+          questionText,
+
         option_a: optionA,
+
         option_b: optionB,
+
         option_c: optionC,
+
         option_d: optionD,
-        correct_option: correctOption,
+
+        correct_option:
+          correctOption,
+
         explanation,
+
         difficulty,
-        source_type: "Original Practice Question",
+
+        source_type:
+          "Original Practice Question",
+
         source_reference:
           "Independent NISM Series V-A practice material",
+
         language: "English",
+
         is_active: true,
       });
     }
 
-    if (questions.length === 0) {
+    // ---------------------------------------------
+    // 5. NO VALID QUESTIONS
+    // ---------------------------------------------
+
+    if (validQuestions.length === 0) {
       return NextResponse.json(
         {
-          error: "No valid questions found in the CSV.",
+          success: false,
+          imported: 0,
+          skipped: 0,
           invalidRows,
+          error:
+            "No valid questions were found.",
         },
         { status: 400 }
       );
     }
 
-    /*
-     * Check existing questions to avoid duplicates.
-     */
-    const questionTexts = questions.map(
-      (question) => question.question_text
-    );
+    // ---------------------------------------------
+    // 6. ADMIN SUPABASE CLIENT
+    // ---------------------------------------------
 
-    const { data: existingQuestions, error: existingError } =
-      await supabase
-        .from("nism_questions")
-        .select("question_text")
-        .eq("module_code", "V-A")
-        .in("question_text", questionTexts);
+    const admin = supabaseAdmin();
+
+    // ---------------------------------------------
+    // 7. CHECK EXISTING QUESTIONS
+    // ---------------------------------------------
+
+    const {
+      data: existingQuestions,
+      error: existingError,
+    } = await admin
+      .from("nism_questions")
+      .select("question_text")
+      .eq("module_code", "V-A");
 
     if (existingError) {
-      console.error(
-        "Existing question lookup error:",
-        existingError
-      );
-
       return NextResponse.json(
         {
           error:
-            "Unable to check existing questions.",
-          details: existingError.message,
-          code: existingError.code,
-          hint: existingError.hint,
-          details_from_supabase:
+            "Could not read existing questions.",
+          message:
+            existingError.message,
+          code:
+            existingError.code,
+          details:
             existingError.details,
+          hint:
+            existingError.hint,
         },
         { status: 500 }
       );
     }
 
-    const existingSet = new Set(
-      (existingQuestions || []).map(
-        (question) =>
-          question.question_text.toLowerCase()
-      )
-    );
+    const existingQuestionSet =
+      new Set<string>();
 
-    const newQuestions = questions.filter(
-      (question) =>
-        !existingSet.has(
-          question.question_text.toLowerCase()
+    for (
+      const item of existingQuestions || []
+    ) {
+      existingQuestionSet.add(
+        normalizeQuestion(
+          String(
+            item.question_text || ""
+          )
         )
-    );
+      );
+    }
 
-    const skipped =
-      questions.length - newQuestions.length;
+    // ---------------------------------------------
+    // 8. REMOVE DUPLICATES
+    // ---------------------------------------------
 
-    if (newQuestions.length === 0) {
+    const questionsToInsert: any[] = [];
+
+    let skippedDuplicates = 0;
+
+    for (
+      const question of validQuestions
+    ) {
+      const normalizedQuestion =
+        normalizeQuestion(
+          question.question_text
+        );
+
+      if (
+        existingQuestionSet.has(
+          normalizedQuestion
+        )
+      ) {
+        skippedDuplicates++;
+        continue;
+      }
+
+      existingQuestionSet.add(
+        normalizedQuestion
+      );
+
+      questionsToInsert.push(
+        question
+      );
+    }
+
+    // ---------------------------------------------
+    // 9. ALL DUPLICATES
+    // ---------------------------------------------
+
+    if (questionsToInsert.length === 0) {
       return NextResponse.json({
         success: true,
         imported: 0,
-        skipped,
+        skipped:
+          skippedDuplicates,
         invalidRows,
         message:
-          "All questions in this CSV already exist.",
+          `No new questions imported. ${skippedDuplicates} questions already exist.`,
       });
     }
 
-    /*
-     * Insert in batches.
-     */
-    const batchSize = 50;
+    // ---------------------------------------------
+    // 10. INSERT
+    // ---------------------------------------------
+
     let imported = 0;
 
     for (
       let i = 0;
-      i < newQuestions.length;
-      i += batchSize
+      i < questionsToInsert.length;
+      i += 25
     ) {
-      const batch = newQuestions.slice(
-        i,
-        i + batchSize
-      );
+      const batch =
+        questionsToInsert.slice(
+          i,
+          i + 25
+        );
 
-      const { error: insertError } =
-        await supabase
-          .from("nism_questions")
-          .insert(batch);
+      const {
+        data: insertedData,
+        error: insertError,
+      } = await admin
+        .from("nism_questions")
+        .insert(batch)
+        .select("id");
 
       if (insertError) {
         console.error(
-          "Supabase question insert error:",
+          "NISM insert error:",
           insertError
         );
 
         return NextResponse.json(
-  {
-    error: [
-      "Supabase rejected the question insert.",
-      insertError.message,
-      insertError.code
-        ? `Code: ${insertError.code}`
-        : "",
-      insertError.details
-        ? `Details: ${insertError.details}`
-        : "",
-      insertError.hint
-        ? `Hint: ${insertError.hint}`
-        : "",
-    ]
-      .filter(Boolean)
-      .join(" | "),
+          {
+            error: [
+              "Supabase rejected the question insert.",
+              insertError.message,
+              insertError.code
+                ? `Code: ${insertError.code}`
+                : "",
+              insertError.details
+                ? `Details: ${insertError.details}`
+                : "",
+              insertError.hint
+                ? `Hint: ${insertError.hint}`
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" | "),
 
-    importedBeforeError: imported,
-  },
-  { status: 500 }
-);
+            importedBeforeError:
+              imported,
+          },
+          { status: 500 }
+        );
       }
 
-      imported += batch.length;
+      imported +=
+        insertedData?.length ||
+        batch.length;
     }
+
+    // ---------------------------------------------
+    // 11. SUCCESS
+    // ---------------------------------------------
 
     return NextResponse.json({
       success: true,
+
       imported,
-      skipped,
+
+      skipped:
+        skippedDuplicates,
+
       invalidRows,
+
+      totalCsvRows:
+        rows.length - 1,
+
+      validRows:
+        validQuestions.length,
+
+      message:
+        `${imported} questions imported successfully.`,
     });
   } catch (error) {
     console.error(
@@ -352,11 +602,9 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Unable to process the CSV upload.",
-        details:
           error instanceof Error
             ? error.message
-            : String(error),
+            : "Bulk upload failed.",
       },
       { status: 500 }
     );
