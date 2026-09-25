@@ -311,11 +311,15 @@ export default function NismPracticePage() {
                 </p>
               </div>
 
-             <div className="nism-practice-grid">
+            <div className="nism-practice-grid">
   {units.map((unit) => (
-    <div
+    <button
       key={unit.number}
-      className="nism-practice-card"
+      type="button"
+      className="nism-practice-card-button active"
+      onClick={() =>
+        startPractice(unit.number)
+      }
     >
       <span className="nism-practice-number">
         Unit {unit.number}
@@ -323,14 +327,10 @@ export default function NismPracticePage() {
 
       <strong>{unit.title}</strong>
 
-      <button
-        type="button"
-        className="nism-practice-start-button"
-        onClick={() => startPractice(unit.number)}
-      >
+      <span className="nism-practice-start">
         Start Practice →
-      </button>
-    </div>
+      </span>
+    </button>
   ))}
 </div>
             </>
