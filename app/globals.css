@@ -10014,14 +10014,18 @@ strong {
     gap: 15px;
   }
 
-  .nism-practice-page
-  .nism-practice-card-button.active {
-    min-height: 180px;
+ .nism-practice-page
+.nism-practice-card-button.active {
+    width: 100%;
+    min-width: 0;
+    min-height: 135px;
+    height: auto;
 
-    padding: 22px;
+    padding: 18px;
 
-    border-radius: 17px;
-  }
+    border-radius: 15px;
+    box-sizing: border-box;
+}
 
   .nism-practice-page
   .nism-practice-card-button.active
