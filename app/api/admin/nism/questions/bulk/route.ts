@@ -261,7 +261,7 @@ export async function POST(request: Request) {
       );
 
       const difficulty = clean(
-        row[indexOf("difficulty")
+        row[indexOf("difficulty")]
       );
 
       if (
