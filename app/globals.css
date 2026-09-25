@@ -8013,16 +8013,23 @@
 }
 
 /* =========================================================
-   NISM PRACTICE BY UNIT
+   NISM PRACTICE BY UNIT — PREMIUM VERSION
+   Scoped ONLY to NISM Practice page
    ========================================================= */
 
 .nism-practice-page {
   width: 100%;
+  min-height: 100vh;
   overflow-x: hidden;
-  background: #f7f9fc;
+  background: #f7faff;
+  color: #10233f;
 }
 
-.nism-practice-container {
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.nism-practice-page .nism-practice-container {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
@@ -8031,15 +8038,51 @@
   box-sizing: border-box;
 }
 
+/* =========================================================
+   HERO
+   ========================================================= */
 
-/* HERO */
-
-.nism-practice-hero {
-  padding: 60px 0 50px;
-  background: #ffffff;
+.nism-practice-page .nism-practice-hero {
+  position: relative;
+  padding: 72px 0 65px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 88% 15%,
+      rgba(20, 99, 216, 0.10),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #f7faff 0%,
+      #ffffff 58%,
+      #eef5ff 100%
+    );
+  border-bottom: 1px solid #e4eaf2;
 }
 
-.nism-practice-eyebrow {
+.nism-practice-page .nism-practice-hero::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  right: -120px;
+  top: -130px;
+  border-radius: 50%;
+  background: rgba(20, 99, 216, 0.045);
+  pointer-events: none;
+}
+
+.nism-practice-page .nism-practice-hero .nism-practice-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   EYEBROW
+   ========================================================= */
+
+.nism-practice-page .nism-practice-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -8050,225 +8093,354 @@
   letter-spacing: 2px;
 }
 
-.nism-practice-eyebrow::before {
+.nism-practice-page .nism-practice-eyebrow::before {
   content: "";
-  width: 30px;
+  width: 32px;
   height: 3px;
   border-radius: 20px;
   background: #1463d8;
 }
 
-.nism-practice-hero h1 {
-  margin: 0 0 15px;
+/* =========================================================
+   HERO TITLE
+   ========================================================= */
+
+.nism-practice-page .nism-practice-hero h1 {
+  max-width: 780px;
+  margin: 0 0 18px;
   color: #10233f;
-  font-size: clamp(38px, 5vw, 58px);
-  line-height: 1.08;
-  letter-spacing: -1.5px;
+  font-size: clamp(42px, 5vw, 62px);
+  font-weight: 900;
+  line-height: 1.04;
+  letter-spacing: -1.8px;
 }
 
-.nism-practice-hero p {
+.nism-practice-page .nism-practice-hero h1 span {
+  display: block;
+  margin-top: 8px;
+  color: #1463d8;
+}
+
+.nism-practice-page .nism-practice-hero p {
   max-width: 760px;
   margin: 0;
   color: #607086;
   font-size: 17px;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
-.nism-practice-buttons {
+/* =========================================================
+   HERO BUTTONS
+   ========================================================= */
+
+.nism-practice-page .nism-practice-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 25px;
+  margin-top: 28px;
 }
 
+/* =========================================================
+   MAIN SECTION
+   ========================================================= */
 
-/* SECTION */
-
-.nism-practice-section {
-  padding: 55px 0 65px;
+.nism-practice-page .nism-practice-section {
+  padding: 65px 0 80px;
 }
 
-.nism-practice-heading {
-  margin-bottom: 28px;
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.nism-practice-page .nism-practice-heading {
+  margin-bottom: 32px;
 }
 
-.nism-practice-heading .nism-small-title {
+.nism-practice-page .nism-practice-heading .nism-small-title {
+  display: inline-block;
+  margin-bottom: 10px;
   color: #1463d8;
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 2px;
 }
 
-.nism-practice-heading h2 {
-  margin: 8px 0;
+.nism-practice-page .nism-practice-heading h2 {
+  margin: 0 0 10px;
   color: #10233f;
-  font-size: 34px;
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.7px;
 }
 
-.nism-practice-heading p {
+.nism-practice-page .nism-practice-heading p {
   max-width: 720px;
   margin: 0;
   color: #607086;
-  line-height: 1.65;
+  font-size: 15px;
+  line-height: 1.7;
 }
 
+/* =========================================================
+   UNIT GRID
+   ========================================================= */
 
-/* UNIT CARDS */
-
-.nism-practice-grid {
+.nism-practice-page .nism-practice-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
 }
 
-.nism-practice-card {
+/* =========================================================
+   UNIT CARD
+   ========================================================= */
+
+.nism-practice-page .nism-practice-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 300px;
-  padding: 24px;
-  border: 1px solid #e5eaf1;
-  border-radius: 18px;
+  min-height: 285px;
+  padding: 26px;
+  overflow: hidden;
+  border: 1px solid #e2eaf3;
+  border-radius: 20px;
   background: #ffffff;
-  box-shadow: 0 8px 25px rgba(16, 35, 63, 0.05);
+  box-shadow: 0 8px 28px rgba(16, 35, 63, 0.055);
   box-sizing: border-box;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
-.nism-practice-card-top {
+.nism-practice-page .nism-practice-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #1463d8, #68a8f5);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.nism-practice-page .nism-practice-card:hover {
+  transform: translateY(-6px);
+  border-color: #cbdcf2;
+  box-shadow: 0 18px 42px rgba(16, 55, 100, 0.12);
+}
+
+.nism-practice-page .nism-practice-card:hover::before {
+  opacity: 1;
+}
+
+/* =========================================================
+   CARD TOP
+   ========================================================= */
+
+.nism-practice-page .nism-practice-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 22px;
 }
 
-.nism-practice-number {
+.nism-practice-page .nism-practice-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eef5ff;
   color: #1463d8;
-  font-size: 25px;
+  font-size: 12px;
   font-weight: 900;
-}
-
-.nism-practice-status {
-  padding: 5px 9px;
-  border-radius: 20px;
-  background: #eef4ff;
-  color: #1463d8;
-  font-size: 10px;
-  font-weight: 900;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.nism-practice-card h3 {
+.nism-practice-page .nism-practice-status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f6fc;
+  color: #607086;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+/* =========================================================
+   CARD CONTENT
+   ========================================================= */
+
+.nism-practice-page .nism-practice-card h3 {
   margin: 0 0 12px;
   color: #10233f;
   font-size: 20px;
+  font-weight: 900;
   line-height: 1.35;
 }
 
-.nism-practice-card p {
+.nism-practice-page .nism-practice-card p {
   margin: 0;
   color: #68778a;
   font-size: 14px;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
-.nism-practice-card-button {
+/* =========================================================
+   PRACTICE BUTTON
+   ========================================================= */
+
+.nism-practice-page .nism-practice-card-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  min-height: 44px;
+  min-height: 46px;
   margin-top: auto;
-  padding: 0 15px;
-  border: 1px solid #dce3eb;
-  border-radius: 9px;
-  background: #f5f7fa;
-  color: #9aa5b3;
-  font-weight: 800;
-  cursor: not-allowed;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #1463d8;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+.nism-practice-page .nism-practice-card-button:hover {
+  background: #0f52b5;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(20, 99, 216, 0.20);
+}
 
-/* HOW IT WORKS */
+.nism-practice-page .nism-practice-card-button:visited {
+  color: #ffffff !important;
+}
 
-.nism-practice-info {
-  padding: 60px 0;
+.nism-practice-page .nism-practice-card-button::after {
+  content: none !important;
+}
+
+/* =========================================================
+   HOW IT WORKS
+   ========================================================= */
+
+.nism-practice-page .nism-practice-info {
+  padding: 65px 0;
   background: #ffffff;
+  border-top: 1px solid #e6edf5;
+  border-bottom: 1px solid #e6edf5;
 }
 
-.nism-practice-steps {
+.nism-practice-page .nism-practice-steps {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
 
-.nism-practice-step {
-  padding: 22px;
-  border: 1px solid #e5eaf1;
-  border-radius: 16px;
+.nism-practice-page .nism-practice-step {
+  padding: 24px;
+  border: 1px solid #e2eaf3;
+  border-radius: 17px;
   background: #ffffff;
+  box-shadow: 0 7px 24px rgba(16, 35, 63, 0.045);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.nism-practice-step > span {
+.nism-practice-page .nism-practice-step:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(16, 35, 63, 0.09);
+}
+
+.nism-practice-page .nism-practice-step > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #eef5ff;
   color: #1463d8;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
 }
 
-.nism-practice-step h3 {
-  margin: 12px 0 8px;
+.nism-practice-page .nism-practice-step h3 {
+  margin: 15px 0 8px;
   color: #10233f;
   font-size: 18px;
 }
 
-.nism-practice-step p {
+.nism-practice-page .nism-practice-step p {
   margin: 0;
   color: #68778a;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+/* =========================================================
+   CTA
+   ========================================================= */
 
-/* CTA */
-
-.nism-practice-cta {
-  padding: 55px 0;
-  background: #10233f;
+.nism-practice-page .nism-practice-cta {
+  padding: 65px 0;
+  background: linear-gradient(135deg, #0e2038, #123b70);
 }
 
-.nism-practice-cta .nism-practice-container {
+.nism-practice-page .nism-practice-cta .nism-practice-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 30px;
+  gap: 35px;
 }
 
-.nism-practice-cta .nism-small-title {
+.nism-practice-page .nism-practice-cta .nism-small-title {
   color: #8ebcff;
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 2px;
 }
 
-.nism-practice-cta h2 {
-  margin: 8px 0 10px;
+.nism-practice-page .nism-practice-cta h2 {
+  margin: 9px 0 10px;
   color: #ffffff;
   font-size: 34px;
 }
 
-.nism-practice-cta p {
+.nism-practice-page .nism-practice-cta p {
   max-width: 650px;
   margin: 0;
-  color: #cbd6e5;
-  line-height: 1.65;
+  color: #d5e4f8;
+  line-height: 1.7;
 }
 
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
 
-/* DISCLAIMER */
-
-.nism-practice-disclaimer {
+.nism-practice-page .nism-practice-disclaimer {
   padding: 22px 0;
   background: #f1f4f8;
 }
 
-.nism-practice-disclaimer p {
+.nism-practice-page .nism-practice-disclaimer p {
   margin: 0;
   color: #68778a;
   font-size: 12px;
@@ -8276,91 +8448,101 @@
   text-align: center;
 }
 
-
-/* TABLET */
+/* =========================================================
+   TABLET
+   ========================================================= */
 
 @media (max-width: 950px) {
-  .nism-practice-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .nism-practice-page .nism-practice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .nism-practice-steps {
-    grid-template-columns: repeat(2, 1fr);
+  .nism-practice-page .nism-practice-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-
-/* MOBILE */
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 700px) {
-
-  .nism-practice-container {
+  .nism-practice-page .nism-practice-container {
     padding-left: 18px;
     padding-right: 18px;
   }
 
-  .nism-practice-hero {
-    padding: 35px 0 35px;
+  .nism-practice-page .nism-practice-hero {
+    padding: 48px 0 45px;
   }
 
-  .nism-practice-hero h1 {
-    font-size: 34px;
+  .nism-practice-page .nism-practice-hero h1 {
+    font-size: 38px;
+    letter-spacing: -1px;
   }
 
-  .nism-practice-hero p {
-    font-size: 14px;
+  .nism-practice-page .nism-practice-hero p {
+    font-size: 15px;
   }
 
-  .nism-practice-buttons {
+  .nism-practice-page .nism-practice-buttons {
     flex-direction: column;
   }
 
-  .nism-practice-buttons a {
+  .nism-practice-page .nism-practice-buttons a {
     width: 100%;
     box-sizing: border-box;
     text-align: center;
   }
 
-  .nism-practice-section {
-    padding: 35px 0 45px;
+  .nism-practice-page .nism-practice-section {
+    padding: 45px 0 60px;
   }
 
-  .nism-practice-heading h2 {
-    font-size: 28px;
+  .nism-practice-page .nism-practice-heading h2 {
+    font-size: 30px;
   }
 
-  .nism-practice-grid {
+  .nism-practice-page .nism-practice-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 16px;
   }
 
-  .nism-practice-card {
-    min-height: 270px;
-    padding: 20px;
+  .nism-practice-page .nism-practice-card {
+    min-height: 245px;
+    padding: 23px;
+    border-radius: 17px;
   }
 
-  .nism-practice-steps {
+  .nism-practice-page .nism-practice-card h3 {
+    font-size: 19px;
+  }
+
+  .nism-practice-page .nism-practice-steps {
     grid-template-columns: 1fr;
   }
 
-  .nism-practice-cta {
-    padding: 40px 0;
+  .nism-practice-page .nism-practice-info {
+    padding: 50px 0;
   }
 
-  .nism-practice-cta .nism-practice-container {
+  .nism-practice-page .nism-practice-cta {
+    padding: 45px 0;
+  }
+
+  .nism-practice-page .nism-practice-cta .nism-practice-container {
     display: block;
   }
 
-  .nism-practice-cta h2 {
-    font-size: 28px;
+  .nism-practice-page .nism-practice-cta h2 {
+    font-size: 29px;
   }
 
-  .nism-practice-cta .nism-primary-btn {
+  .nism-practice-page .nism-practice-cta .nism-primary-btn {
     display: inline-flex;
     margin-top: 20px;
   }
 }
-
 
 /* =========================================================
    NISM PRACTICE - ACTIVE BUTTONS & QUESTION PRACTICE
