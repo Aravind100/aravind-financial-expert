@@ -10871,3 +10871,12 @@ strong {
     height: 205px !important;
   }
 }
+
+/* NISM Practice Unit Title - Compact */
+.nism-practice-card-button.active strong {
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  word-break: normal !important;
+}
