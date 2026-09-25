@@ -10848,7 +10848,7 @@ strong {
   display: flex !important;
   flex-direction: column !important;
   min-height: 230px !important;
-  height: 230px !important;
+  height: 250px !important;
   box-sizing: border-box !important;
 }
 
