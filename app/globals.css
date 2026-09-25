@@ -10843,24 +10843,23 @@ strong {
   }
 }
 
-/* NISM Practice Cards - Keep Start Button Fixed */
+/* Fix NISM Practice Unit Card Text */
 .nism-practice-card-button.active {
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 230px !important;
-  height: 250px !important;
+  min-width: 0 !important;
+  width: 100% !important;
   box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .nism-practice-card-button.active strong {
-  display: -webkit-box !important;
-  -webkit-box-orient: vertical !important;
-  -webkit-line-clamp: 2 !important;
-  overflow: hidden !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
   line-height: 1.4 !important;
-  max-height: 53px !important;
 }
-
 .nism-practice-card-button.active .nism-practice-start {
   margin-top: auto !important;
   flex-shrink: 0 !important;
