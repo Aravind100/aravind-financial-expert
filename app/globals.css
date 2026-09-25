@@ -9982,3 +9982,17 @@ strong {
   }
 
 }
+
+.nism-bulk-upload-message {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: #eef6ff;
+  border: 1px solid #b9d7ff;
+  color: #124a8a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
