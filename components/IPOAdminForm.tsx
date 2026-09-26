@@ -61,6 +61,15 @@ type QuarterlyResult = {
   eps: number | null;
 };
 
+type ManagementMember = {
+  id?: string;
+  ipo_id?: string;
+  name: string;
+  designation: string | null;
+  role: string | null;
+  profile: string | null;
+};
+
 type Props = {
   initialIPOs: IPO[];
 };
@@ -163,6 +172,14 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     eps: null,
   });
 
+  const [managementMembers, setManagementMembers] = useState<ManagementMember[]>([]);
+  const [managementLoading, setManagementLoading] = useState(false);
+  const [managementSaving, setManagementSaving] = useState(false);
+  const [managementEditingId, setManagementEditingId] = useState<string | null>(null);
+  const [managementForm, setManagementForm] = useState<ManagementMember>({
+    name: "", designation: "", role: "", profile: "",
+  });
+
   function updateField(
     field: keyof IPO,
     value: string | number | boolean | null
@@ -208,6 +225,76 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
       ...current,
       [field]: value,
     }));
+  }
+
+  function resetManagementForm() {
+    setManagementEditingId(null);
+    setManagementForm({ name: "", designation: "", role: "", profile: "" });
+  }
+
+  function updateManagementField(field: keyof ManagementMember, value: string | null) {
+    setManagementForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function loadManagementMembers(ipoId: string) {
+    setManagementLoading(true);
+    try {
+      const response = await fetch(`/api/admin/ipo/${ipoId}/management`, { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "Unable to load management information.");
+      setManagementMembers(data.management || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to load management information.");
+    } finally { setManagementLoading(false); }
+  }
+
+  async function saveManagementMember(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editingId) { setError("Please save the IPO first before adding management members."); return; }
+    if (!managementForm.name.trim()) { setError("Management member name is required."); return; }
+    setManagementSaving(true); setError(""); setMessage("");
+    try {
+      const response = await fetch(`/api/admin/ipo/${editingId}/management`, {
+        method: managementEditingId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...managementForm, management_id: managementEditingId || undefined }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "Unable to save management member.");
+      if (managementEditingId) {
+        setManagementMembers((current) => current.map((item) => item.id === managementEditingId ? data.management : item));
+        setMessage("Management member updated successfully.");
+      } else {
+        setManagementMembers((current) => [...current, data.management]);
+        setMessage("Management member added successfully.");
+      }
+      resetManagementForm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save management member.");
+    } finally { setManagementSaving(false); }
+  }
+
+  function editManagementMember(member: ManagementMember) {
+    setManagementEditingId(member.id || null);
+    setManagementForm({ name: member.name || "", designation: member.designation || "", role: member.role || "", profile: member.profile || "" });
+  }
+
+  async function deleteManagementMember(memberId: string) {
+    if (!editingId) return;
+    if (!window.confirm("Are you sure you want to delete this management member?")) return;
+    try {
+      const response = await fetch(`/api/admin/ipo/${editingId}/management`, {
+        method: "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ management_id: memberId }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "Unable to delete management member.");
+      setManagementMembers((current) => current.filter((item) => item.id !== memberId));
+      if (managementEditingId === memberId) resetManagementForm();
+      setMessage("Management member deleted successfully.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to delete management member.");
+    }
   }
 
   async function loadQuarterlyResults(ipoId: string) {
@@ -369,6 +456,8 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     setEditingId(null);
     setQuarterlyResults([]);
     resetQuarterlyForm();
+    setManagementMembers([]);
+    resetManagementForm();
     setMessage("");
     setError("");
   }
@@ -383,6 +472,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
 
     if (ipo.id) {
       loadQuarterlyResults(ipo.id);
+      loadManagementMembers(ipo.id);
     }
 
     window.scrollTo({
@@ -1566,13 +1656,66 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           </div>
 
           {/* ================================= */}
+          {/* ================================= */}
+          {/* MANAGEMENT MEMBERS */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+            <div className="ipo-form-section-title">
+              <span>10</span>
+              <div><h3>Management Team</h3><p>Add individual management members and leadership profiles.</p></div>
+            </div>
+
+            {!editingId ? (
+              <div className="ipo-empty-state">Save the IPO first. Then add individual management members.</div>
+            ) : (
+              <>
+                <form onSubmit={saveManagementMember}>
+                  <div className="ipo-form-grid">
+                    <div className="ipo-form-group"><label>Name *</label><input type="text" value={managementForm.name} onChange={(e) => updateManagementField("name", e.target.value)} placeholder="Full name" required /></div>
+                    <div className="ipo-form-group"><label>Designation</label><input type="text" value={managementForm.designation || ""} onChange={(e) => updateManagementField("designation", e.target.value)} placeholder="Example: Managing Director" /></div>
+                    <div className="ipo-form-group"><label>Role</label><input type="text" value={managementForm.role || ""} onChange={(e) => updateManagementField("role", e.target.value)} placeholder="Example: Promoter / Director" /></div>
+                    <div className="ipo-form-group ipo-full"><label>Profile</label><textarea rows={5} value={managementForm.profile || ""} onChange={(e) => updateManagementField("profile", e.target.value)} placeholder="Brief professional profile..." /></div>
+                  </div>
+                  <div className="ipo-form-actions">
+                    <button type="submit" className="ipo-primary-button" disabled={managementSaving}>{managementSaving ? "Saving..." : managementEditingId ? "💾 Update Member" : "➕ Add Member"}</button>
+                    {managementEditingId && <button type="button" className="ipo-secondary-button" onClick={resetManagementForm}>Cancel Edit</button>}
+                  </div>
+                </form>
+                <div style={{ marginTop: 24 }}>
+                  <h4>Saved Management Members</h4>
+                  {managementLoading ? <div className="ipo-empty-state">Loading management information...</div> : managementMembers.length === 0 ? <div className="ipo-empty-state">No management members added yet.</div> : (
+                    <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+                      {managementMembers.map((member) => (
+                        <div key={member.id} style={{ border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14, padding: 16 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start" }}>
+                            <div>
+                              <strong>{member.name}</strong>
+                              {member.designation && <div className="muted">{member.designation}</div>}
+                              {member.role && <div className="muted">{member.role}</div>}
+                              {member.profile && <p style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>{member.profile}</p>}
+                            </div>
+                            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                              <button type="button" className="ipo-small-button" onClick={() => editManagementMember(member)}>✏ Edit</button>
+                              <button type="button" className="ipo-small-button danger" onClick={() => member.id && deleteManagementMember(member.id)}>🗑 Delete</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
           {/* LISTING & SUBSCRIPTION */}
           {/* ================================= */
 
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>10</span>
+              <span>11</span>
 
               <div>
                 <h3>Subscription & Listing</h3>
@@ -1624,7 +1767,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>11</span>
+              <span>12</span>
 
               <div>
                 <h3>Images</h3>
