@@ -11948,3 +11948,311 @@ strong {
   }
 }
 
+/* =====================================================
+   IPO ADMIN MANAGEMENT — SCOPED STYLING
+   Does not affect public website pages
+   ===================================================== */
+
+.admin:has(.ipo-admin-intro) {
+  --ipo-blue: #1554c0;
+  --ipo-navy: #12233d;
+  --ipo-border: #dce5f1;
+  --ipo-muted: #61728a;
+  --ipo-bg: #f7faff;
+
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 44px 24px 80px;
+  color: var(--ipo-navy);
+}
+
+/* Admin page heading */
+
+.admin:has(.ipo-admin-intro) .adminTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.admin:has(.ipo-admin-intro) .adminTop h1 {
+  margin: 0 0 10px;
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.admin:has(.ipo-admin-intro) .adminTop p {
+  margin: 0;
+  color: var(--ipo-muted);
+  line-height: 1.7;
+}
+
+.admin:has(.ipo-admin-intro) .adminTop .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin:has(.ipo-admin-intro) .adminTop .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 11px 18px;
+  border-radius: 11px;
+  background: #eaf1ff;
+  color: var(--ipo-blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Introduction */
+
+.admin:has(.ipo-admin-intro) .ipo-admin-intro {
+  padding: 28px 32px;
+  margin-bottom: 30px;
+  border: 1px solid var(--ipo-border);
+  border-radius: 18px;
+  background: linear-gradient(115deg, #edf4ff, #ffffff);
+}
+
+.admin:has(.ipo-admin-intro) .ipo-admin-eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--ipo-blue);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.admin:has(.ipo-admin-intro) .ipo-admin-intro h2 {
+  margin: 0 0 10px;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.admin:has(.ipo-admin-intro) .ipo-admin-intro p {
+  margin: 0;
+  color: var(--ipo-muted);
+  line-height: 1.7;
+}
+
+/* Main IPO form */
+
+.admin:has(.ipo-admin-intro) form {
+  width: 100%;
+  min-width: 0;
+  padding: 30px;
+  margin: 0 0 32px;
+  border: 1px solid var(--ipo-border);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(25, 55, 100, 0.035);
+}
+
+/* Sections inside the form */
+
+.admin:has(.ipo-admin-intro) form section,
+.admin:has(.ipo-admin-intro) form fieldset {
+  min-width: 0;
+  padding: 26px 0;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--ipo-border);
+}
+
+.admin:has(.ipo-admin-intro) form section:last-of-type,
+.admin:has(.ipo-admin-intro) form fieldset:last-of-type {
+  border-bottom: 0;
+}
+
+.admin:has(.ipo-admin-intro) form h2 {
+  margin: 0 0 12px;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.admin:has(.ipo-admin-intro) form h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.admin:has(.ipo-admin-intro) form p {
+  line-height: 1.65;
+}
+
+.admin:has(.ipo-admin-intro) form label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  margin: 0 0 18px;
+  color: #263c5a;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+/* Inputs and text areas */
+
+.admin:has(.ipo-admin-intro) form input:not([type="checkbox"]),
+.admin:has(.ipo-admin-intro) form select,
+.admin:has(.ipo-admin-intro) form textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  margin: 0;
+  border: 1px solid #cfdae9;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: var(--ipo-navy);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin:has(.ipo-admin-intro) form textarea {
+  min-height: 115px;
+  resize: vertical;
+}
+
+.admin:has(.ipo-admin-intro) form input:focus,
+.admin:has(.ipo-admin-intro) form select:focus,
+.admin:has(.ipo-admin-intro) form textarea:focus {
+  border-color: var(--ipo-blue);
+  box-shadow: 0 0 0 3px rgba(21, 84, 192, 0.1);
+}
+
+.admin:has(.ipo-admin-intro) form input::placeholder,
+.admin:has(.ipo-admin-intro) form textarea::placeholder {
+  color: #8a98aa;
+}
+
+/* Checkboxes */
+
+.admin:has(.ipo-admin-intro) form input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ipo-blue);
+}
+
+.admin:has(.ipo-admin-intro) form label:has(input[type="checkbox"]) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+/* Buttons */
+
+.admin:has(.ipo-admin-intro) form button {
+  min-height: 43px;
+  padding: 10px 18px;
+  border: 1px solid #d5e2f6;
+  border-radius: 10px;
+  background: #edf4ff;
+  color: var(--ipo-blue);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.admin:has(.ipo-admin-intro) form button:hover {
+  background: #dceaff;
+}
+
+.admin:has(.ipo-admin-intro) form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Tables for quarterly results and subscription */
+
+.admin:has(.ipo-admin-intro) table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin:has(.ipo-admin-intro) th,
+.admin:has(.ipo-admin-intro) td {
+  padding: 13px 15px;
+  border-bottom: 1px solid var(--ipo-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin:has(.ipo-admin-intro) th {
+  background: #f0f5fc;
+  font-weight: 750;
+}
+
+/* Existing IPO library */
+
+.admin:has(.ipo-admin-intro) form + section {
+  margin-top: 32px;
+}
+
+/* Mobile */
+
+@media (max-width: 760px) {
+  .admin:has(.ipo-admin-intro) {
+    padding: 26px 15px 55px;
+  }
+
+  .admin:has(.ipo-admin-intro) .adminTop {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin:has(.ipo-admin-intro) .adminTop .actions {
+    width: 100%;
+  }
+
+  .admin:has(.ipo-admin-intro) .adminTop .btn {
+    flex: 1 1 auto;
+  }
+
+  .admin:has(.ipo-admin-intro) .ipo-admin-intro {
+    padding: 22px 18px;
+  }
+
+  .admin:has(.ipo-admin-intro) form {
+    padding: 20px 16px;
+  }
+
+  .admin:has(.ipo-admin-intro) form section,
+  .admin:has(.ipo-admin-intro) form fieldset {
+    padding: 22px 0;
+  }
+
+  .admin:has(.ipo-admin-intro) form h3 {
+    font-size: 18px;
+  }
+
+  .admin:has(.ipo-admin-intro) table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
