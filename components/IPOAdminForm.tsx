@@ -1,0 +1,1459 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+
+type IPO = {
+  id?: string;
+  company_name: string;
+  slug: string;
+  status: string;
+  issue_type: string;
+  price_band_min: number | null;
+  price_band_max: number | null;
+  face_value: number | null;
+  issue_size: number | null;
+  fresh_issue: number | null;
+  offer_for_sale: number | null;
+  lot_size: number | null;
+  minimum_investment: number | null;
+  open_date: string | null;
+  close_date: string | null;
+  allotment_date: string | null;
+  listing_date: string | null;
+  registrar: string | null;
+  lead_managers: string | null;
+  company_overview: string | null;
+  business_description: string | null;
+  business_model: string | null;
+  industry: string | null;
+  competitive_strengths: string | null;
+  risks: string | null;
+  objects_of_issue: string | null;
+  management: string | null;
+  eps: number | null;
+  pe_ratio: number | null;
+  pb_ratio: number | null;
+  roe: number | null;
+  roce: number | null;
+  debt_equity: number | null;
+  retail_quota: number | null;
+  nii_quota: number | null;
+  qib_quota: number | null;
+  employee_quota: number | null;
+  other_quota: number | null;
+  retail_lot_size: number | null;
+  nii_lot_size: number | null;
+  subscription_data: string | null;
+  listing_information: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
+  is_published: boolean;
+};
+
+type Props = {
+  initialIPOs: IPO[];
+};
+
+const emptyIPO: IPO = {
+  company_name: "",
+  slug: "",
+  status: "upcoming",
+  issue_type: "Mainboard",
+
+  price_band_min: null,
+  price_band_max: null,
+  face_value: null,
+
+  issue_size: null,
+  fresh_issue: null,
+  offer_for_sale: null,
+
+  lot_size: null,
+  minimum_investment: null,
+
+  open_date: null,
+  close_date: null,
+  allotment_date: null,
+  listing_date: null,
+
+  registrar: "",
+  lead_managers: "",
+
+  company_overview: "",
+  business_description: "",
+  business_model: "",
+  industry: "",
+  competitive_strengths: "",
+  risks: "",
+  objects_of_issue: "",
+  management: "",
+
+  eps: null,
+  pe_ratio: null,
+  pb_ratio: null,
+  roe: null,
+  roce: null,
+  debt_equity: null,
+
+  retail_quota: null,
+  nii_quota: null,
+  qib_quota: null,
+  employee_quota: null,
+  other_quota: null,
+
+  retail_lot_size: null,
+  nii_lot_size: null,
+
+  subscription_data: "",
+  listing_information: "",
+
+  logo_url: "",
+  banner_url: "",
+
+  is_published: false,
+};
+
+function numberValue(value: string) {
+  if (value === "") return null;
+
+  const number = Number(value);
+
+  return Number.isFinite(number) ? number : null;
+}
+
+function createSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export default function IPOAdminForm({ initialIPOs }: Props) {
+  const [ipos, setIPOs] = useState<IPO[]>(initialIPOs);
+  const [form, setForm] = useState<IPO>(emptyIPO);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  function updateField(
+    field: keyof IPO,
+    value: string | number | boolean | null
+  ) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  function updateText(field: keyof IPO, value: string) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  function handleCompanyNameChange(value: string) {
+    setForm((current) => ({
+      ...current,
+      company_name: value,
+      slug: editingId ? current.slug : createSlug(value),
+    }));
+  }
+
+  function resetForm() {
+    setForm(emptyIPO);
+    setEditingId(null);
+    setMessage("");
+    setError("");
+  }
+
+  function editIPO(ipo: IPO) {
+    setForm({
+      ...emptyIPO,
+      ...ipo,
+    });
+
+    setEditingId(ipo.id || null);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  async function deleteIPO(id: string) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this IPO?"
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+    setMessage("");
+
+    try {
+      const response = await fetch(`/api/admin/ipo/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to delete IPO.");
+        return;
+      }
+
+      setIPOs((current) =>
+        current.filter((ipo) => ipo.id !== id)
+      );
+
+      if (editingId === id) {
+        resetForm();
+      }
+
+      setMessage("IPO deleted successfully.");
+    } catch {
+      setError("Unable to connect to the server.");
+    }
+  }
+
+  async function togglePublish(ipo: IPO) {
+    if (!ipo.id) return;
+
+    setError("");
+    setMessage("");
+
+    try {
+      const response = await fetch(`/api/admin/ipo/${ipo.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_published: !ipo.is_published,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to update IPO.");
+        return;
+      }
+
+      setIPOs((current) =>
+        current.map((item) =>
+          item.id === ipo.id
+            ? {
+                ...item,
+                is_published: !ipo.is_published,
+              }
+            : item
+        )
+      );
+
+      setMessage(
+        ipo.is_published
+          ? "IPO unpublished."
+          : "IPO published."
+      );
+    } catch {
+      setError("Unable to connect to the server.");
+    }
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setSaving(true);
+    setError("");
+    setMessage("");
+
+    if (!form.company_name.trim()) {
+      setError("Company name is required.");
+      setSaving(false);
+      return;
+    }
+
+    if (!form.slug.trim()) {
+      setError("Slug is required.");
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const url = editingId
+        ? `/api/admin/ipo/${editingId}`
+        : "/api/admin/ipo";
+
+      const method = editingId ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Unable to save IPO.");
+        setSaving(false);
+        return;
+      }
+
+      const savedIPO = data.ipo;
+
+      if (editingId) {
+        setIPOs((current) =>
+          current.map((ipo) =>
+            ipo.id === editingId ? savedIPO : ipo
+          )
+        );
+
+        setMessage("IPO updated successfully.");
+      } else {
+        setIPOs((current) => [
+          savedIPO,
+          ...current,
+        ]);
+
+        setMessage("IPO added successfully.");
+      }
+
+      setForm({
+        ...emptyIPO,
+        ...savedIPO,
+      });
+
+      setEditingId(savedIPO.id);
+    } catch {
+      setError("Unable to connect to the server.");
+    }
+
+    setSaving(false);
+  }
+
+  return (
+    <div className="ipo-admin-page">
+
+      {/* ================================= */}
+      {/* FORM HEADER */}
+      {/* ================================= */}
+
+      <section className="ipo-admin-card">
+
+        <div className="ipo-admin-card-header">
+          <div>
+            <span className="ipo-admin-label">
+              {editingId ? "EDIT IPO" : "ADD NEW IPO"}
+            </span>
+
+            <h2>
+              {editingId
+                ? "Update IPO Information"
+                : "Create IPO Listing"}
+            </h2>
+
+            <p>
+              Enter the factual information exactly as disclosed
+              in the relevant IPO documents.
+            </p>
+          </div>
+
+          {editingId && (
+            <button
+              type="button"
+              className="ipo-secondary-button"
+              onClick={resetForm}
+            >
+              + Add New IPO
+            </button>
+          )}
+        </div>
+
+        {message && (
+          <div className="ipo-success-message">
+            {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="ipo-error-message">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+
+          {/* ================================= */}
+          {/* BASIC INFORMATION */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>01</span>
+              <div>
+                <h3>Basic IPO Information</h3>
+                <p>Core issue details</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group ipo-full">
+                <label>Company Name *</label>
+
+                <input
+                  type="text"
+                  value={form.company_name}
+                  onChange={(e) =>
+                    handleCompanyNameChange(e.target.value)
+                  }
+                  placeholder="Example: ABC Technologies Limited"
+                  required
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>URL Slug *</label>
+
+                <input
+                  type="text"
+                  value={form.slug}
+                  onChange={(e) =>
+                    updateText(
+                      "slug",
+                      createSlug(e.target.value)
+                    )
+                  }
+                  placeholder="abc-technologies"
+                  required
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>IPO Status</label>
+
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    updateText("status", e.target.value)
+                  }
+                >
+                  <option value="upcoming">
+                    Upcoming
+                  </option>
+
+                  <option value="open">
+                    Open
+                  </option>
+
+                  <option value="closed">
+                    Closed
+                  </option>
+
+                  <option value="listed">
+                    Listed
+                  </option>
+                </select>
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Issue Type</label>
+
+                <select
+                  value={form.issue_type}
+                  onChange={(e) =>
+                    updateText(
+                      "issue_type",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="Mainboard">
+                    Mainboard
+                  </option>
+
+                  <option value="SME">
+                    SME
+                  </option>
+                </select>
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Face Value (₹)</label>
+
+                <input
+                  type="number"
+                  value={form.face_value ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "face_value",
+                      numberValue(e.target.value)
+                    )
+                  }
+                  placeholder="10"
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* PRICE & ISSUE */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>02</span>
+
+              <div>
+                <h3>Price & Issue Details</h3>
+                <p>Pricing and issue size</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>Price Band — Minimum (₹)</label>
+
+                <input
+                  type="number"
+                  value={form.price_band_min ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "price_band_min",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Price Band — Maximum (₹)</label>
+
+                <input
+                  type="number"
+                  value={form.price_band_max ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "price_band_max",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Issue Size (₹ Crore)</label>
+
+                <input
+                  type="number"
+                  value={form.issue_size ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "issue_size",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Fresh Issue (₹ Crore)</label>
+
+                <input
+                  type="number"
+                  value={form.fresh_issue ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "fresh_issue",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Offer for Sale (₹ Crore)</label>
+
+                <input
+                  type="number"
+                  value={form.offer_for_sale ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "offer_for_sale",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Lot Size (Shares)</label>
+
+                <input
+                  type="number"
+                  value={form.lot_size ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "lot_size",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Minimum Investment (₹)</label>
+
+                <input
+                  type="number"
+                  value={form.minimum_investment ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "minimum_investment",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* IMPORTANT DATES */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>03</span>
+
+              <div>
+                <h3>IPO Timeline</h3>
+                <p>Important issue dates</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>Issue Open Date</label>
+
+                <input
+                  type="date"
+                  value={form.open_date || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "open_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Issue Close Date</label>
+
+                <input
+                  type="date"
+                  value={form.close_date || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "close_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Allotment Date</label>
+
+                <input
+                  type="date"
+                  value={form.allotment_date || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "allotment_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Listing Date</label>
+
+                <input
+                  type="date"
+                  value={form.listing_date || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "listing_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* COMPANY */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>04</span>
+
+              <div>
+                <h3>Company Information</h3>
+                <p>Business and company profile</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group ipo-full">
+                <label>Company Overview</label>
+
+                <textarea
+                  rows={5}
+                  value={form.company_overview || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "company_overview",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Write a concise company overview..."
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Industry</label>
+
+                <input
+                  type="text"
+                  value={form.industry || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "industry",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Example: Financial Services"
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Registrar</label>
+
+                <input
+                  type="text"
+                  value={form.registrar || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "registrar",
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group ipo-full">
+                <label>Business Description</label>
+
+                <textarea
+                  rows={6}
+                  value={form.business_description || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "business_description",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Describe the company's business..."
+                />
+              </div>
+
+              <div className="ipo-form-group ipo-full">
+                <label>Business Model</label>
+
+                <textarea
+                  rows={5}
+                  value={form.business_model || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "business_model",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Explain how the company generates revenue..."
+                />
+              </div>
+
+              <div className="ipo-form-group ipo-full">
+                <label>Objects of the Issue</label>
+
+                <textarea
+                  rows={5}
+                  value={form.objects_of_issue || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "objects_of_issue",
+                      e.target.value
+                    )
+                  }
+                  placeholder="How the IPO proceeds are proposed to be used..."
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* STRENGTHS & RISKS */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>05</span>
+
+              <div>
+                <h3>Strengths & Risks</h3>
+                <p>Key information for investors</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>Competitive Strengths</label>
+
+                <textarea
+                  rows={7}
+                  value={form.competitive_strengths || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "competitive_strengths",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter key strengths..."
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Risks</label>
+
+                <textarea
+                  rows={7}
+                  value={form.risks || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "risks",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter key risks..."
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* MANAGEMENT */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>06</span>
+
+              <div>
+                <h3>Management</h3>
+                <p>Management and leadership information</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>Management / Promoters</label>
+
+                <textarea
+                  rows={6}
+                  value={form.management || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "management",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter management/promoter information..."
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Lead Managers</label>
+
+                <textarea
+                  rows={6}
+                  value={form.lead_managers || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "lead_managers",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter book running lead managers..."
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* VALUATION */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>07</span>
+
+              <div>
+                <h3>Valuation & Financial Metrics</h3>
+                <p>Reported metrics</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>EPS</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.eps ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "eps",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>P/E Ratio</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.pe_ratio ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "pe_ratio",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>P/B Ratio</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.pb_ratio ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "pb_ratio",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>ROE (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.roe ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "roe",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>ROCE (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.roce ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "roce",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Debt / Equity</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.debt_equity ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "debt_equity",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* RESERVATION */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>08</span>
+
+              <div>
+                <h3>IPO Reservation</h3>
+                <p>Enter the reservation disclosed for this issue</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>QIB Quota (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.qib_quota ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "qib_quota",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>NII / HNI Quota (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.nii_quota ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "nii_quota",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Retail Quota (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.retail_quota ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "retail_quota",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Employee Quota (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.employee_quota ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "employee_quota",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Other Quota (%)</label>
+
+                <input
+                  type="number"
+                  step="any"
+                  value={form.other_quota ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "other_quota",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Retail Lot Size</label>
+
+                <input
+                  type="number"
+                  value={form.retail_lot_size ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "retail_lot_size",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>NII / HNI Lot Size</label>
+
+                <input
+                  type="number"
+                  value={form.nii_lot_size ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "nii_lot_size",
+                      numberValue(e.target.value)
+                    )
+                  }
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* LISTING & SUBSCRIPTION */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>09</span>
+
+              <div>
+                <h3>Subscription & Listing</h3>
+                <p>Additional IPO information</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>Subscription Data</label>
+
+                <textarea
+                  rows={6}
+                  value={form.subscription_data || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "subscription_data",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter subscription information..."
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>Listing Information</label>
+
+                <textarea
+                  rows={6}
+                  value={form.listing_information || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "listing_information",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter listing information..."
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* IMAGES */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+
+            <div className="ipo-form-section-title">
+              <span>10</span>
+
+              <div>
+                <h3>Images</h3>
+                <p>Optional company/IPO images</p>
+              </div>
+            </div>
+
+            <div className="ipo-form-grid">
+
+              <div className="ipo-form-group">
+                <label>Company Logo URL</label>
+
+                <input
+                  type="url"
+                  value={form.logo_url || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "logo_url",
+                      e.target.value
+                    )
+                  }
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div className="ipo-form-group">
+                <label>IPO Banner URL</label>
+
+                <input
+                  type="url"
+                  value={form.banner_url || ""}
+                  onChange={(e) =>
+                    updateText(
+                      "banner_url",
+                      e.target.value
+                    )
+                  }
+                  placeholder="https://..."
+                />
+              </div>
+
+            </div>
+          </div>
+
+          {/* ================================= */}
+          {/* PUBLISH */}
+          {/* ================================= */}
+
+          <div className="ipo-publish-box">
+
+            <div>
+              <strong>
+                Publish this IPO
+              </strong>
+
+              <p>
+                Published IPOs will be visible on the
+                public IPO section of your website.
+              </p>
+            </div>
+
+            <label className="ipo-toggle">
+
+              <input
+                type="checkbox"
+                checked={form.is_published}
+                onChange={(e) =>
+                  updateField(
+                    "is_published",
+                    e.target.checked
+                  )
+                }
+              />
+
+              <span>
+                {form.is_published
+                  ? "Published"
+                  : "Draft"}
+              </span>
+
+            </label>
+
+          </div>
+
+          {/* ================================= */}
+          {/* SAVE BUTTON */}
+          {/* ================================= */}
+
+          <div className="ipo-form-actions">
+
+            <button
+              type="submit"
+              className="ipo-primary-button"
+              disabled={saving}
+            >
+              {saving
+                ? "Saving..."
+                : editingId
+                ? "💾 Update IPO"
+                : "📈 Save IPO"}
+            </button>
+
+            {editingId && (
+              <button
+                type="button"
+                className="ipo-secondary-button"
+                onClick={resetForm}
+              >
+                Cancel Edit
+              </button>
+            )}
+
+          </div>
+
+        </form>
+
+      </section>
+
+      {/* ================================= */}
+      {/* EXISTING IPOs */}
+      {/* ================================= */}
+
+      <section className="ipo-admin-card">
+
+        <div className="ipo-admin-card-header">
+          <div>
+            <span className="ipo-admin-label">
+              IPO LIBRARY
+            </span>
+
+            <h2>Existing IPOs</h2>
+
+            <p>
+              Manage IPOs already added to your website.
+            </p>
+          </div>
+        </div>
+
+        {ipos.length === 0 ? (
+          <div className="ipo-empty-state">
+            No IPOs have been added yet.
+          </div>
+        ) : (
+          <div className="ipo-admin-list">
+
+            {ipos.map((ipo) => (
+
+              <div
+                className="ipo-admin-list-item"
+                key={ipo.id}
+              >
+
+                <div className="ipo-admin-list-info">
+
+                  <strong>
+                    {ipo.company_name}
+                  </strong>
+
+                  <span>
+                    {ipo.issue_type} •{" "}
+                    {ipo.status}
+                  </span>
+
+                  {ipo.price_band_min !== null &&
+                    ipo.price_band_max !== null && (
+                      <small>
+                        ₹{ipo.price_band_min} – ₹
+                        {ipo.price_band_max}
+                      </small>
+                    )}
+
+                </div>
+
+                <div className="ipo-admin-list-actions">
+
+                  <button
+                    type="button"
+                    className="ipo-small-button"
+                    onClick={() => editIPO(ipo)}
+                  >
+                    ✏️ Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ipo-small-button"
+                    onClick={() =>
+                      togglePublish(ipo)
+                    }
+                  >
+                    {ipo.is_published
+                      ? "👁 Unpublish"
+                      : "🚀 Publish"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ipo-small-button danger"
+                    onClick={() =>
+                      ipo.id &&
+                      deleteIPO(ipo.id)
+                    }
+                  >
+                    🗑 Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+        )}
+
+      </section>
+
+    </div>
+  );
+}
