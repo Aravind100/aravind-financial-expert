@@ -50,6 +50,17 @@ type IPO = {
   is_published: boolean;
 };
 
+type QuarterlyResult = {
+  id?: string;
+  ipo_id?: string;
+  financial_year: string;
+  quarter: string;
+  revenue: number | null;
+  ebitda: number | null;
+  pat: number | null;
+  eps: number | null;
+};
+
 type Props = {
   initialIPOs: IPO[];
 };
@@ -139,6 +150,19 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const [quarterlyResults, setQuarterlyResults] = useState<QuarterlyResult[]>([]);
+  const [quarterlyLoading, setQuarterlyLoading] = useState(false);
+  const [quarterlySaving, setQuarterlySaving] = useState(false);
+  const [quarterlyEditingId, setQuarterlyEditingId] = useState<string | null>(null);
+  const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
+    financial_year: "",
+    quarter: "Q4",
+    revenue: null,
+    ebitda: null,
+    pat: null,
+    eps: null,
+  });
+
   function updateField(
     field: keyof IPO,
     value: string | number | boolean | null
@@ -164,9 +188,187 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     }));
   }
 
+  function resetQuarterlyForm() {
+    setQuarterlyEditingId(null);
+    setQuarterlyForm({
+      financial_year: "",
+      quarter: "Q4",
+      revenue: null,
+      ebitda: null,
+      pat: null,
+      eps: null,
+    });
+  }
+
+  function updateQuarterlyField(
+    field: keyof QuarterlyResult,
+    value: string | number | null
+  ) {
+    setQuarterlyForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  async function loadQuarterlyResults(ipoId: string) {
+    setQuarterlyLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${ipoId}/quarterly`,
+        { cache: "no-store" }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Unable to load quarterly results.");
+      }
+
+      setQuarterlyResults(data.results || []);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load quarterly results."
+      );
+    } finally {
+      setQuarterlyLoading(false);
+    }
+  }
+
+  async function saveQuarterlyResult(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    if (!editingId) {
+      setError("Please save the IPO first before adding quarterly results.");
+      return;
+    }
+
+    if (!quarterlyForm.financial_year.trim()) {
+      setError("Financial year is required.");
+      return;
+    }
+
+    if (!quarterlyEditingId && quarterlyResults.length >= 4) {
+      setError("Only 4 quarterly results can be managed here.");
+      return;
+    }
+
+    setQuarterlySaving(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${editingId}/quarterly`,
+        {
+          method: quarterlyEditingId ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...quarterlyForm,
+            result_id: quarterlyEditingId || undefined,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to save quarterly result."
+        );
+      }
+
+      if (quarterlyEditingId) {
+        setQuarterlyResults((current) =>
+          current.map((item) =>
+            item.id === quarterlyEditingId ? data.result : item
+          )
+        );
+        setMessage("Quarterly result updated successfully.");
+      } else {
+        setQuarterlyResults((current) => [data.result, ...current]);
+        setMessage("Quarterly result added successfully.");
+      }
+
+      resetQuarterlyForm();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to save quarterly result."
+      );
+    } finally {
+      setQuarterlySaving(false);
+    }
+  }
+
+  function editQuarterlyResult(result: QuarterlyResult) {
+    setQuarterlyEditingId(result.id || null);
+    setQuarterlyForm({
+      financial_year: result.financial_year || "",
+      quarter: result.quarter || "Q4",
+      revenue: result.revenue ?? null,
+      ebitda: result.ebitda ?? null,
+      pat: result.pat ?? null,
+      eps: result.eps ?? null,
+    });
+  }
+
+  async function deleteQuarterlyResult(resultId: string) {
+    if (!editingId) return;
+
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this quarterly result?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${editingId}/quarterly`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ result_id: resultId }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to delete quarterly result."
+        );
+      }
+
+      setQuarterlyResults((current) =>
+        current.filter((item) => item.id !== resultId)
+      );
+
+      if (quarterlyEditingId === resultId) {
+        resetQuarterlyForm();
+      }
+
+      setMessage("Quarterly result deleted successfully.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete quarterly result."
+      );
+    }
+  }
+
   function resetForm() {
     setForm(emptyIPO);
     setEditingId(null);
+    setQuarterlyResults([]);
+    resetQuarterlyForm();
     setMessage("");
     setError("");
   }
@@ -178,6 +380,10 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     });
 
     setEditingId(ipo.id || null);
+
+    if (ipo.id) {
+      loadQuarterlyResults(ipo.id);
+    }
 
     window.scrollTo({
       top: 0,
@@ -1178,13 +1384,195 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           </div>
 
           {/* ================================= */}
-          {/* LISTING & SUBSCRIPTION */}
+          {/* QUARTERLY RESULTS */}
           {/* ================================= */}
+
+          <div className="ipo-form-section">
+            <div className="ipo-form-section-title">
+              <span>09</span>
+              <div>
+                <h3>Last 4 Quarterly Results</h3>
+                <p>Add the latest four reported quarters.</p>
+              </div>
+            </div>
+
+            {!editingId ? (
+              <div className="ipo-empty-state">
+                Save the IPO first. Then add quarterly results.
+              </div>
+            ) : (
+              <>
+                <form onSubmit={saveQuarterlyResult}>
+                  <div className="ipo-form-grid">
+                    <div className="ipo-form-group">
+                      <label>Financial Year *</label>
+                      <input
+                        type="text"
+                        value={quarterlyForm.financial_year}
+                        onChange={(e) =>
+                          updateQuarterlyField(
+                            "financial_year",
+                            e.target.value
+                          )
+                        }
+                        placeholder="FY2026"
+                        required
+                      />
+                    </div>
+
+                    <div className="ipo-form-group">
+                      <label>Quarter *</label>
+                      <select
+                        value={quarterlyForm.quarter}
+                        onChange={(e) =>
+                          updateQuarterlyField(
+                            "quarter",
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="Q1">Q1</option>
+                        <option value="Q2">Q2</option>
+                        <option value="Q3">Q3</option>
+                        <option value="Q4">Q4</option>
+                      </select>
+                    </div>
+
+                    {(
+                      [
+                        ["revenue", "Revenue (₹ Crore)"],
+                        ["ebitda", "EBITDA (₹ Crore)"],
+                        ["pat", "PAT (₹ Crore)"],
+                        ["eps", "EPS (₹)"],
+                      ] as const
+                    ).map(([field, label]) => (
+                      <div className="ipo-form-group" key={field}>
+                        <label>{label}</label>
+                        <input
+                          type="number"
+                          step="any"
+                          value={quarterlyForm[field] ?? ""}
+                          onChange={(e) =>
+                            updateQuarterlyField(
+                              field,
+                              numberValue(e.target.value)
+                            )
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="ipo-form-actions">
+                    <button
+                      type="submit"
+                      className="ipo-primary-button"
+                      disabled={quarterlySaving}
+                    >
+                      {quarterlySaving
+                        ? "Saving..."
+                        : quarterlyEditingId
+                        ? "💾 Update Quarter"
+                        : "➕ Add Quarter"}
+                    </button>
+
+                    {quarterlyEditingId && (
+                      <button
+                        type="button"
+                        className="ipo-secondary-button"
+                        onClick={resetQuarterlyForm}
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+                <div style={{ marginTop: 24, overflowX: "auto" }}>
+                  <h4>Saved Quarterly Results</h4>
+
+                  {quarterlyLoading ? (
+                    <div className="ipo-empty-state">
+                      Loading quarterly results...
+                    </div>
+                  ) : quarterlyResults.length === 0 ? (
+                    <div className="ipo-empty-state">
+                      No quarterly results added yet.
+                    </div>
+                  ) : (
+                    <table
+                      style={{
+                        width: "100%",
+                        minWidth: 720,
+                        borderCollapse: "collapse",
+                      }}
+                    >
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: "left", padding: 10 }}>FY</th>
+                          <th style={{ textAlign: "left", padding: 10 }}>Quarter</th>
+                          <th style={{ textAlign: "right", padding: 10 }}>Revenue</th>
+                          <th style={{ textAlign: "right", padding: 10 }}>EBITDA</th>
+                          <th style={{ textAlign: "right", padding: 10 }}>PAT</th>
+                          <th style={{ textAlign: "right", padding: 10 }}>EPS</th>
+                          <th style={{ textAlign: "right", padding: 10 }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {quarterlyResults.map((result) => (
+                          <tr key={result.id}>
+                            <td style={{ padding: 10 }}>{result.financial_year}</td>
+                            <td style={{ padding: 10 }}>{result.quarter}</td>
+                            <td style={{ textAlign: "right", padding: 10 }}>
+                              {result.revenue ?? "—"}
+                            </td>
+                            <td style={{ textAlign: "right", padding: 10 }}>
+                              {result.ebitda ?? "—"}
+                            </td>
+                            <td style={{ textAlign: "right", padding: 10 }}>
+                              {result.pat ?? "—"}
+                            </td>
+                            <td style={{ textAlign: "right", padding: 10 }}>
+                              {result.eps ?? "—"}
+                            </td>
+                            <td style={{ textAlign: "right", padding: 10 }}>
+                              <button
+                                type="button"
+                                className="ipo-small-button"
+                                onClick={() => editQuarterlyResult(result)}
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="ipo-small-button danger"
+                                style={{ marginLeft: 8 }}
+                                onClick={() =>
+                                  result.id &&
+                                  deleteQuarterlyResult(result.id)
+                                }
+                              >
+                                🗑 Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ================================= */}
+          {/* LISTING & SUBSCRIPTION */}
+          {/* ================================= */
 
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>09</span>
+              <span>10</span>
 
               <div>
                 <h3>Subscription & Listing</h3>
@@ -1236,7 +1624,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>10</span>
+              <span>11</span>
 
               <div>
                 <h3>Images</h3>
