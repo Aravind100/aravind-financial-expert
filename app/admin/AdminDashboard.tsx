@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase/client'
+import Link from "next/link";
 
 type Lead = {
   id: number
@@ -324,6 +325,13 @@ export default function AdminDashboard({
           >
             🔄 Refresh
           </button>
+
+          <Link
+    href="/admin/ipo"
+    className="btn alt"
+  >
+    📈 IPO Management
+  </Link>
 
           <button
             type="button"
