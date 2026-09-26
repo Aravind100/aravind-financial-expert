@@ -27,7 +27,7 @@ export default function RootLayout({
             <nav className="desktop-nav">
               <Link href="/investments">Investments</Link>
               <Link href="/insurance">Insurance</Link>
-              <Link href="/loans">Loans</Link>
+              <Link href="/ipo">IPO</Link>
               <Link href="/imp">IMP</Link>
               <Link href="/swp">SWP</Link>
               <Link href="/calculators">Calculators</Link>
