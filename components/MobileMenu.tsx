@@ -26,8 +26,8 @@ export default function MobileMenu() {
           Insurance
         </Link>
 
-        <Link href="/loans" onClick={closeMenu}>
-          Loans
+         <Link href="/ipo" onClick={closeMenu}>
+          IPO
         </Link>
 
         <Link href="/imp" onClick={closeMenu}>
