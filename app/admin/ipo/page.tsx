@@ -3,6 +3,7 @@ import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import IPOAdminForm from "@/components/IPOAdminForm";
 
+
 export const dynamic = "force-dynamic";
 
 const ADMIN_EMAIL = (
