@@ -97,6 +97,13 @@ type SubscriptionRow = {
   updated_on: string | null;
 };
 
+type IPODocument = {
+  id: string;
+  document_name: string;
+  document_url: string;
+  created_at: string | null;
+};
+
 function formatDate(date: string | null) {
   if (!date) return "—";
 
@@ -222,6 +229,7 @@ export default async function IPOViewPage({
     quarterlyResponse,
     managementResponse,
     subscriptionResponse,
+    documentsResponse,
   ] = await Promise.all([
     supabase
       .from("ipo_quarterly_results")
@@ -246,6 +254,14 @@ export default async function IPOViewPage({
       .order("category", {
         ascending: true,
       }),
+
+    supabase
+      .from("ipo_documents")
+      .select("*")
+      .eq("ipo_id", ipo.id)
+      .order("created_at", {
+        ascending: true,
+      }),
   ]);
 
   const quarterlyResults: QuarterlyResult[] =
@@ -256,6 +272,9 @@ export default async function IPOViewPage({
 
   const subscriptionData: SubscriptionRow[] =
     subscriptionResponse.data || [];
+
+  const documents: IPODocument[] =
+    documentsResponse.data || [];
 
   return (
     <main className="ipo-detail-page">
@@ -963,6 +982,53 @@ export default async function IPOViewPage({
         </div>
 
       </section>
+
+      {/* ================================= */}
+      {/* OFFICIAL DOCUMENTS */}
+      {/* ================================= */}
+
+      {documents.length > 0 && (
+        <section className="ipo-detail-section">
+          <div className="ipo-container">
+            <div className="ipo-detail-section-heading">
+              <span>OFFICIAL DOCUMENTS</span>
+              <h2>IPO Documents</h2>
+            </div>
+
+            <div className="ipo-documents-grid">
+              {documents.map((document) => (
+                <div
+                  className="ipo-document-card"
+                  key={document.id}
+                >
+                  <div className="ipo-document-icon">
+                    📄
+                  </div>
+
+                  <div className="ipo-document-content">
+                    <strong>
+                      {document.document_name}
+                    </strong>
+
+                    <span>
+                      Official IPO document
+                    </span>
+                  </div>
+
+                  <a
+                    href={document.document_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ipo-document-button"
+                  >
+                    View Document ↗
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ================================= */}
       {/* LISTING */}
