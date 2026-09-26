@@ -33,14 +33,13 @@ export async function GET(
     }
 
     const { id } = await context.params;
-
     const admin = supabaseAdmin();
 
     const { data, error } = await admin
       .from("ipo_subscription")
       .select("*")
       .eq("ipo_id", id)
-      .order("subscription_date", { ascending: false });
+      .order("category", { ascending: true });
 
     if (error) {
       console.error("Subscription fetch error:", error);
@@ -79,9 +78,31 @@ export async function POST(
     const { id } = await context.params;
     const body = await request.json();
 
-    if (!body.subscription_date) {
+    const category = String(body.category || "").trim();
+
+    if (!category) {
       return NextResponse.json(
-        { error: "Subscription date is required." },
+        { error: "Category is required." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      body.subscription_times === undefined ||
+      body.subscription_times === null ||
+      body.subscription_times === ""
+    ) {
+      return NextResponse.json(
+        { error: "Subscription times is required." },
+        { status: 400 }
+      );
+    }
+
+    const subscriptionTimes = Number(body.subscription_times);
+
+    if (!Number.isFinite(subscriptionTimes) || subscriptionTimes < 0) {
+      return NextResponse.json(
+        { error: "Subscription times must be a valid non-negative number." },
         { status: 400 }
       );
     }
@@ -90,14 +111,9 @@ export async function POST(
 
     const payload = {
       ipo_id: id,
-      subscription_date: body.subscription_date,
-      retail: body.retail ?? null,
-      nii: body.nii ?? null,
-      qib: body.qib ?? null,
-      employee: body.employee ?? null,
-      other: body.other ?? null,
-      total: body.total ?? null,
-      notes: body.notes?.trim() || null,
+      category,
+      subscription_times: subscriptionTimes,
+      updated_on: body.updated_on || new Date().toISOString().slice(0, 10),
     };
 
     const { data, error } = await admin
@@ -150,9 +166,20 @@ export async function PATCH(
       );
     }
 
-    if (!body.subscription_date) {
+    const category = String(body.category || "").trim();
+
+    if (!category) {
       return NextResponse.json(
-        { error: "Subscription date is required." },
+        { error: "Category is required." },
+        { status: 400 }
+      );
+    }
+
+    const subscriptionTimes = Number(body.subscription_times);
+
+    if (!Number.isFinite(subscriptionTimes) || subscriptionTimes < 0) {
+      return NextResponse.json(
+        { error: "Subscription times must be a valid non-negative number." },
         { status: 400 }
       );
     }
@@ -160,14 +187,9 @@ export async function PATCH(
     const admin = supabaseAdmin();
 
     const updates = {
-      subscription_date: body.subscription_date,
-      retail: body.retail ?? null,
-      nii: body.nii ?? null,
-      qib: body.qib ?? null,
-      employee: body.employee ?? null,
-      other: body.other ?? null,
-      total: body.total ?? null,
-      notes: body.notes?.trim() || null,
+      category,
+      subscription_times: subscriptionTimes,
+      updated_on: body.updated_on || new Date().toISOString().slice(0, 10),
     };
 
     const { data, error } = await admin
