@@ -70,6 +70,14 @@ type ManagementMember = {
   profile: string | null;
 };
 
+type SubscriptionRecord = {
+  id?: string;
+  ipo_id?: string;
+  category: string;
+  subscription_times: number | null;
+  updated_on: string | null;
+};
+
 type Props = {
   initialIPOs: IPO[];
 };
@@ -178,6 +186,16 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   const [managementEditingId, setManagementEditingId] = useState<string | null>(null);
   const [managementForm, setManagementForm] = useState<ManagementMember>({
     name: "", designation: "", role: "", profile: "",
+  });
+
+  const [subscriptionRecords, setSubscriptionRecords] = useState<SubscriptionRecord[]>([]);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+  const [subscriptionSaving, setSubscriptionSaving] = useState(false);
+  const [subscriptionEditingId, setSubscriptionEditingId] = useState<string | null>(null);
+  const [subscriptionForm, setSubscriptionForm] = useState<SubscriptionRecord>({
+    category: "Retail",
+    subscription_times: null,
+    updated_on: new Date().toISOString().slice(0, 10),
   });
 
   function updateField(
@@ -451,6 +469,190 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     }
   }
 
+  function resetSubscriptionForm() {
+    setSubscriptionEditingId(null);
+    setSubscriptionForm({
+      category: "Retail",
+      subscription_times: null,
+      updated_on: new Date().toISOString().slice(0, 10),
+    });
+  }
+
+  function updateSubscriptionField(
+    field: keyof SubscriptionRecord,
+    value: string | number | null
+  ) {
+    setSubscriptionForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  async function loadSubscriptionRecords(ipoId: string) {
+    setSubscriptionLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${ipoId}/subscription`,
+        { cache: "no-store" }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to load subscription information."
+        );
+      }
+
+      setSubscriptionRecords(data.subscriptions || []);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load subscription information."
+      );
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  }
+
+  async function saveSubscriptionRecord(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    if (!editingId) {
+      setError("Please save the IPO first before adding subscription data.");
+      return;
+    }
+
+    if (!subscriptionForm.category.trim()) {
+      setError("Subscription category is required.");
+      return;
+    }
+
+    if (
+      subscriptionForm.subscription_times === null ||
+      subscriptionForm.subscription_times === undefined
+    ) {
+      setError("Subscription times is required.");
+      return;
+    }
+
+    setSubscriptionSaving(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${editingId}/subscription`,
+        {
+          method: subscriptionEditingId ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...subscriptionForm,
+            subscription_id: subscriptionEditingId || undefined,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to save subscription information."
+        );
+      }
+
+      if (subscriptionEditingId) {
+        setSubscriptionRecords((current) =>
+          current.map((item) =>
+            item.id === subscriptionEditingId
+              ? data.subscription
+              : item
+          )
+        );
+        setMessage("Subscription data updated successfully.");
+      } else {
+        setSubscriptionRecords((current) => [
+          ...current,
+          data.subscription,
+        ]);
+        setMessage("Subscription data added successfully.");
+      }
+
+      resetSubscriptionForm();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to save subscription information."
+      );
+    } finally {
+      setSubscriptionSaving(false);
+    }
+  }
+
+  function editSubscriptionRecord(record: SubscriptionRecord) {
+    setSubscriptionEditingId(record.id || null);
+    setSubscriptionForm({
+      category: record.category || "Retail",
+      subscription_times: record.subscription_times ?? null,
+      updated_on:
+        record.updated_on ||
+        new Date().toISOString().slice(0, 10),
+    });
+  }
+
+  async function deleteSubscriptionRecord(recordId: string) {
+    if (!editingId) return;
+
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this subscription record?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${editingId}/subscription`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subscription_id: recordId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to delete subscription record."
+        );
+      }
+
+      setSubscriptionRecords((current) =>
+        current.filter((item) => item.id !== recordId)
+      );
+
+      if (subscriptionEditingId === recordId) {
+        resetSubscriptionForm();
+      }
+
+      setMessage("Subscription data deleted successfully.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete subscription record."
+      );
+    }
+  }
+
   function resetForm() {
     setForm(emptyIPO);
     setEditingId(null);
@@ -458,6 +660,8 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     resetQuarterlyForm();
     setManagementMembers([]);
     resetManagementForm();
+    setSubscriptionRecords([]);
+    resetSubscriptionForm();
     setMessage("");
     setError("");
   }
@@ -473,6 +677,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     if (ipo.id) {
       loadQuarterlyResults(ipo.id);
       loadManagementMembers(ipo.id);
+      loadSubscriptionRecords(ipo.id);
     }
 
     window.scrollTo({
@@ -1709,13 +1914,14 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
             )}
           </div>
 
+          {/* ================================= */}
           {/* LISTING & SUBSCRIPTION */}
-          {/* ================================= */
+          {/* ================================= */}
 
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>11</span>
+              <span>12</span>
 
               <div>
                 <h3>Subscription & Listing</h3>
@@ -1767,7 +1973,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>12</span>
+              <span>13</span>
 
               <div>
                 <h3>Images</h3>
