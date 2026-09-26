@@ -78,6 +78,13 @@ type SubscriptionRecord = {
   updated_on: string | null;
 };
 
+type IPODocument = {
+  id?: string;
+  ipo_id?: string;
+  document_name: string;
+  document_url: string;
+};
+
 type Props = {
   initialIPOs: IPO[];
 };
@@ -196,6 +203,15 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     category: "Retail",
     subscription_times: null,
     updated_on: new Date().toISOString().slice(0, 10),
+  });
+
+  const [documents, setDocuments] = useState<IPODocument[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [documentsSaving, setDocumentsSaving] = useState(false);
+  const [documentEditingId, setDocumentEditingId] = useState<string | null>(null);
+  const [documentForm, setDocumentForm] = useState<IPODocument>({
+    document_name: "",
+    document_url: "",
   });
 
   function updateField(
@@ -653,6 +669,185 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     }
   }
 
+  function resetDocumentForm() {
+    setDocumentEditingId(null);
+    setDocumentForm({
+      document_name: "",
+      document_url: "",
+    });
+  }
+
+  function updateDocumentField(
+    field: keyof IPODocument,
+    value: string
+  ) {
+    setDocumentForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  async function loadDocuments(ipoId: string) {
+    setDocumentsLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${ipoId}/documents`,
+        { cache: "no-store" }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to load IPO documents."
+        );
+      }
+
+      setDocuments(data.documents || []);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load IPO documents."
+      );
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }
+
+  async function saveDocument(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    if (!editingId) {
+      setError(
+        "Please save the IPO first before adding documents."
+      );
+      return;
+    }
+
+    if (!documentForm.document_name.trim()) {
+      setError("Document name is required.");
+      return;
+    }
+
+    if (!documentForm.document_url.trim()) {
+      setError("Document URL is required.");
+      return;
+    }
+
+    setDocumentsSaving(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${editingId}/documents`,
+        {
+          method: documentEditingId ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...documentForm,
+            document_id: documentEditingId || undefined,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to save IPO document."
+        );
+      }
+
+      if (documentEditingId) {
+        setDocuments((current) =>
+          current.map((item) =>
+            item.id === documentEditingId
+              ? data.document
+              : item
+          )
+        );
+        setMessage("IPO document updated successfully.");
+      } else {
+        setDocuments((current) => [
+          ...current,
+          data.document,
+        ]);
+        setMessage("IPO document added successfully.");
+      }
+
+      resetDocumentForm();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to save IPO document."
+      );
+    } finally {
+      setDocumentsSaving(false);
+    }
+  }
+
+  function editDocument(document: IPODocument) {
+    setDocumentEditingId(document.id || null);
+    setDocumentForm({
+      document_name: document.document_name || "",
+      document_url: document.document_url || "",
+    });
+  }
+
+  async function deleteDocument(documentId: string) {
+    if (!editingId) return;
+
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this IPO document?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/ipo/${editingId}/documents`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            document_id: documentId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error || "Unable to delete IPO document."
+        );
+      }
+
+      setDocuments((current) =>
+        current.filter((item) => item.id !== documentId)
+      );
+
+      if (documentEditingId === documentId) {
+        resetDocumentForm();
+      }
+
+      setMessage("IPO document deleted successfully.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete IPO document."
+      );
+    }
+  }
+
   function resetForm() {
     setForm(emptyIPO);
     setEditingId(null);
@@ -662,6 +857,8 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     resetManagementForm();
     setSubscriptionRecords([]);
     resetSubscriptionForm();
+    setDocuments([]);
+    resetDocumentForm();
     setMessage("");
     setError("");
   }
@@ -678,6 +875,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
       loadQuarterlyResults(ipo.id);
       loadManagementMembers(ipo.id);
       loadSubscriptionRecords(ipo.id);
+      loadDocuments(ipo.id);
     }
 
     window.scrollTo({
@@ -1915,6 +2113,370 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           </div>
 
           {/* ================================= */}
+          {/* SUBSCRIPTION TRACKING */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+            <div className="ipo-form-section-title">
+              <span>11</span>
+              <div>
+                <h3>Subscription Tracking</h3>
+                <p>Manage category-wise IPO subscription figures.</p>
+              </div>
+            </div>
+
+            {!editingId ? (
+              <div className="ipo-empty-state">
+                Save the IPO first. Then add subscription figures.
+              </div>
+            ) : (
+              <>
+                <form onSubmit={saveSubscriptionRecord}>
+                  <div className="ipo-form-grid">
+                    <div className="ipo-form-group">
+                      <label>Category *</label>
+                      <select
+                        value={subscriptionForm.category}
+                        onChange={(e) =>
+                          updateSubscriptionField(
+                            "category",
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="Retail">Retail</option>
+                        <option value="NII / HNI">NII / HNI</option>
+                        <option value="QIB">QIB</option>
+                        <option value="Employee">Employee</option>
+                        <option value="Other">Other</option>
+                        <option value="Total">Total</option>
+                      </select>
+                    </div>
+
+                    <div className="ipo-form-group">
+                      <label>Subscription Times *</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={
+                          subscriptionForm.subscription_times ?? ""
+                        }
+                        onChange={(e) =>
+                          updateSubscriptionField(
+                            "subscription_times",
+                            numberValue(e.target.value)
+                          )
+                        }
+                        placeholder="Example: 12.45"
+                      />
+                    </div>
+
+                    <div className="ipo-form-group">
+                      <label>Updated On</label>
+                      <input
+                        type="date"
+                        value={
+                          subscriptionForm.updated_on ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          updateSubscriptionField(
+                            "updated_on",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div className="ipo-form-actions">
+                    <button
+                      type="submit"
+                      className="ipo-primary-button"
+                      disabled={subscriptionSaving}
+                    >
+                      {subscriptionSaving
+                        ? "Saving..."
+                        : subscriptionEditingId
+                        ? "💾 Update Subscription"
+                        : "➕ Add Subscription"}
+                    </button>
+
+                    {subscriptionEditingId && (
+                      <button
+                        type="button"
+                        className="ipo-secondary-button"
+                        onClick={resetSubscriptionForm}
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+                <div style={{ marginTop: 24 }}>
+                  <h4>Saved Subscription Data</h4>
+
+                  {subscriptionLoading ? (
+                    <div className="ipo-empty-state">
+                      Loading subscription information...
+                    </div>
+                  ) : subscriptionRecords.length === 0 ? (
+                    <div className="ipo-empty-state">
+                      No subscription data added yet.
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: "auto", marginTop: 12 }}>
+                      <table
+                        style={{
+                          width: "100%",
+                          minWidth: 620,
+                          borderCollapse: "collapse",
+                        }}
+                      >
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "left", padding: 10 }}>
+                              Category
+                            </th>
+                            <th style={{ textAlign: "right", padding: 10 }}>
+                              Times
+                            </th>
+                            <th style={{ textAlign: "left", padding: 10 }}>
+                              Updated
+                            </th>
+                            <th style={{ textAlign: "right", padding: 10 }}>
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subscriptionRecords.map((record) => (
+                            <tr key={record.id}>
+                              <td style={{ padding: 10 }}>
+                                {record.category}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "right",
+                                  padding: 10,
+                                }}
+                              >
+                                {record.subscription_times ?? "—"}x
+                              </td>
+                              <td style={{ padding: 10 }}>
+                                {record.updated_on || "—"}
+                              </td>
+                              <td
+                                style={{
+                                  textAlign: "right",
+                                  padding: 10,
+                                }}
+                              >
+                                <button
+                                  type="button"
+                                  className="ipo-small-button"
+                                  onClick={() =>
+                                    editSubscriptionRecord(record)
+                                  }
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  className="ipo-small-button danger"
+                                  style={{ marginLeft: 8 }}
+                                  onClick={() =>
+                                    record.id &&
+                                    deleteSubscriptionRecord(record.id)
+                                  }
+                                >
+                                  🗑 Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ================================= */}
+          {/* DOCUMENTS */}
+          {/* ================================= */}
+
+          <div className="ipo-form-section">
+            <div className="ipo-form-section-title">
+              <span>13</span>
+              <div>
+                <h3>IPO Documents</h3>
+                <p>
+                  Add official IPO documents such as DRHP, RHP,
+                  prospectus and company presentations.
+                </p>
+              </div>
+            </div>
+
+            {!editingId ? (
+              <div className="ipo-empty-state">
+                Save the IPO first. Then add official documents.
+              </div>
+            ) : (
+              <>
+                <form onSubmit={saveDocument}>
+                  <div className="ipo-form-grid">
+                    <div className="ipo-form-group">
+                      <label>Document Name *</label>
+                      <input
+                        type="text"
+                        value={documentForm.document_name}
+                        onChange={(e) =>
+                          updateDocumentField(
+                            "document_name",
+                            e.target.value
+                          )
+                        }
+                        placeholder="Example: Red Herring Prospectus (RHP)"
+                        required
+                      />
+                    </div>
+
+                    <div className="ipo-form-group">
+                      <label>Document URL *</label>
+                      <input
+                        type="url"
+                        value={documentForm.document_url}
+                        onChange={(e) =>
+                          updateDocumentField(
+                            "document_url",
+                            e.target.value
+                          )
+                        }
+                        placeholder="https://..."
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="ipo-form-actions">
+                    <button
+                      type="submit"
+                      className="ipo-primary-button"
+                      disabled={documentsSaving}
+                    >
+                      {documentsSaving
+                        ? "Saving..."
+                        : documentEditingId
+                        ? "💾 Update Document"
+                        : "➕ Add Document"}
+                    </button>
+
+                    {documentEditingId && (
+                      <button
+                        type="button"
+                        className="ipo-secondary-button"
+                        onClick={resetDocumentForm}
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+                <div style={{ marginTop: 24 }}>
+                  <h4>Saved Documents</h4>
+
+                  {documentsLoading ? (
+                    <div className="ipo-empty-state">
+                      Loading IPO documents...
+                    </div>
+                  ) : documents.length === 0 ? (
+                    <div className="ipo-empty-state">
+                      No documents added yet.
+                    </div>
+                  ) : (
+                    <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+                      {documents.map((document) => (
+                        <div
+                          key={document.id}
+                          style={{
+                            border: "1px solid rgba(0,0,0,0.08)",
+                            borderRadius: 14,
+                            padding: 16,
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              gap: 16,
+                              alignItems: "center",
+                            }}
+                          >
+                            <div style={{ minWidth: 0 }}>
+                              <strong>{document.document_name}</strong>
+                              <div
+                                className="muted"
+                                style={{
+                                  marginTop: 4,
+                                  wordBreak: "break-all",
+                                }}
+                              >
+                                {document.document_url}
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: 8,
+                                flexShrink: 0,
+                              }}
+                            >
+                              <a
+                                href={document.document_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ipo-small-button"
+                              >
+                                ↗ Open
+                              </a>
+                              <button
+                                type="button"
+                                className="ipo-small-button"
+                                onClick={() =>
+                                  editDocument(document)
+                                }
+                              >
+                                ✏ Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="ipo-small-button danger"
+                                onClick={() =>
+                                  document.id &&
+                                  deleteDocument(document.id)
+                                }
+                              >
+                                🗑 Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ================================= */}
           {/* LISTING & SUBSCRIPTION */}
           {/* ================================= */}
 
@@ -1973,7 +2535,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
           <div className="ipo-form-section">
 
             <div className="ipo-form-section-title">
-              <span>13</span>
+              <span>14</span>
 
               <div>
                 <h3>Images</h3>
