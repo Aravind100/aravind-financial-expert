@@ -53,6 +53,7 @@ type IPO = {
 type QuarterlyResult = {
   id?: string;
   ipo_id?: string;
+  financial_year: string;
   quarter_label: string;
   revenue: number | null;
   ebitda: number | null;
