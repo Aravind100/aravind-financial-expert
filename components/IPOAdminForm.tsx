@@ -247,16 +247,21 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
     }));
   }
 
-  function resetQuarterlyForm() {
-    setQuarterlyEditingId(null);
-    setQuarterlyForm({
-     quarter_label: "",
-      revenue: null,
-      ebitda: null,
-      pat: null,
-      eps: null,
-    });
-  }
+ function resetQuarterlyForm() {
+  setQuarterlyEditingId(null);
+  setQuarterlyForm({
+    financial_year: "",
+    quarter_label: "Q1",
+    revenue: null,
+    ebitda: null,
+    ebitda_margin: null,
+    pat: null,
+    eps: null,
+    total_assets: null,
+    total_debt: null,
+    net_worth: null,
+  });
+}
 
   function updateQuarterlyField(
     field: keyof QuarterlyResult,
