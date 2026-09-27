@@ -2207,7 +2207,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
                   </div>
                 </div>
 
-                <div style={{ marginTop: 24 }}
+                <div style={{ marginTop: 24 }}>
                   <h4>Saved Subscription Data</h4>
 
                   {subscriptionLoading ? (
