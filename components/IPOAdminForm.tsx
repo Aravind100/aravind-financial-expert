@@ -222,6 +222,9 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
     document_url: "",
   });
 
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [bannerUploading, setBannerUploading] = useState(false);
+
   function updateField(
     field: keyof IPO,
     value: string | number | boolean | null
@@ -852,6 +855,73 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
           ? err.message
           : "Unable to delete IPO document."
       );
+    }
+  }
+
+  async function uploadIPOImage(file: File, imageType: "logo" | "banner") {
+    if (!editingId) {
+      setError("Please save the IPO first before uploading an image.");
+      return;
+    }
+
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setError("Please select a PNG, JPG/JPEG or WEBP image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be 5 MB or less.");
+      return;
+    }
+
+    setError("");
+    setMessage("");
+    if (imageType === "logo") setLogoUploading(true);
+    else setBannerUploading(true);
+
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      body.append("ipo_id", editingId);
+      body.append("image_type", imageType);
+
+      const response = await fetch("/api/admin/ipo/upload-image", {
+        method: "POST",
+        body,
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || "Unable to upload image.");
+      }
+
+      const uploadedUrl = data.url as string;
+      updateText(imageType === "logo" ? "logo_url" : "banner_url", uploadedUrl);
+
+      setIPOs((current) =>
+        current.map((item) =>
+          item.id === editingId
+            ? {
+                ...item,
+                ...(imageType === "logo"
+                  ? { logo_url: uploadedUrl }
+                  : { banner_url: uploadedUrl }),
+              }
+            : item
+        )
+      );
+
+      setMessage(
+        imageType === "logo"
+          ? "Company logo uploaded successfully."
+          : "IPO banner uploaded successfully."
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to upload image.");
+    } finally {
+      if (imageType === "logo") setLogoUploading(false);
+      else setBannerUploading(false);
     }
   }
 
@@ -2557,35 +2627,91 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
             <div className="ipo-form-grid">
 
               <div className="ipo-form-group">
-                <label>Company Logo URL</label>
+                <label>Company Logo</label>
 
                 <input
-                  type="url"
-                  value={form.logo_url || ""}
-                  onChange={(e) =>
-                    updateText(
-                      "logo_url",
-                      e.target.value
-                    )
-                  }
-                  placeholder="https://..."
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  disabled={!editingId || logoUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadIPOImage(file, "logo");
+                    e.currentTarget.value = "";
+                  }}
                 />
+
+                <small className="ipo-field-help">
+                  PNG, JPG/JPEG or WEBP • Max 5 MB
+                </small>
+
+                {form.logo_url && (
+                  <div style={{ marginTop: 12 }}>
+                    <img
+                      src={form.logo_url}
+                      alt={`${form.company_name || "IPO"} company logo`}
+                      style={{
+                        width: 96,
+                        height: 96,
+                        objectFit: "contain",
+                        borderRadius: 12,
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        background: "#fff",
+                        padding: 8,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {!editingId && (
+                  <small className="ipo-field-help">
+                    Save the IPO first, then upload the company logo.
+                  </small>
+                )}
+
+                {logoUploading && (
+                  <small className="ipo-field-help">Uploading logo...</small>
+                )}
               </div>
 
               <div className="ipo-form-group">
-                <label>IPO Banner URL</label>
+                <label>IPO Banner</label>
 
                 <input
-                  type="url"
-                  value={form.banner_url || ""}
-                  onChange={(e) =>
-                    updateText(
-                      "banner_url",
-                      e.target.value
-                    )
-                  }
-                  placeholder="https://..."
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  disabled={!editingId || bannerUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadIPOImage(file, "banner");
+                    e.currentTarget.value = "";
+                  }}
                 />
+
+                <small className="ipo-field-help">
+                  PNG, JPG/JPEG or WEBP • Max 5 MB
+                </small>
+
+                {form.banner_url && (
+                  <div style={{ marginTop: 12 }}>
+                    <img
+                      src={form.banner_url}
+                      alt={`${form.company_name || "IPO"} banner`}
+                      style={{
+                        width: "100%",
+                        maxWidth: 520,
+                        height: 160,
+                        objectFit: "cover",
+                        borderRadius: 12,
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        background: "#fff",
+                      }}
+                    />
+                  </div>
+                )}
+
+                {bannerUploading && (
+                  <small className="ipo-field-help">Uploading banner...</small>
+                )}
               </div>
 
             </div>
