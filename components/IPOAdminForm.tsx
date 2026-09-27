@@ -2684,113 +2684,143 @@ async function uploadIPOImage(
             </div>
           </div>
 
-          {/* ================================= */}
-          {/* IMAGES */}
-          {/* ================================= */}
+         {/* ================================= */}
+{/* IMAGES */}
+{/* ================================= */}
 
-          <div className="ipo-form-section">
+<div className="ipo-form-section">
 
-            <div className="ipo-form-section-title">
-              <span>14</span>
+  <div className="ipo-form-section-title">
+    <span>14</span>
 
-              <div>
-                <h3>Images</h3>
-                <p>Optional company/IPO images</p>
-              </div>
-            </div>
+    <div>
+      <h3>Images</h3>
+      <p>
+        Upload company logo and IPO banner
+      </p>
+    </div>
+  </div>
 
-            <div className="ipo-form-grid">
+  <div className="ipo-form-grid">
 
-              <div className="ipo-form-group">
-                <label>Company Logo</label>
+    {/* COMPANY LOGO */}
 
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  disabled={!editingId || logoUploading}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadIPOImage(file, "logo");
-                    e.currentTarget.value = "";
-                  }}
-                />
+    <div className="ipo-form-group">
 
-                <small className="ipo-field-help">
-                  PNG, JPG/JPEG or WEBP • Max 5 MB
-                </small>
+      <label>Company Logo</label>
 
-                {form.logo_url && (
-                  <div style={{ marginTop: 12 }}>
-                    <img
-                      src={form.logo_url}
-                      alt={`${form.company_name || "IPO"} company logo`}
-                      style={{
-                        width: 96,
-                        height: 96,
-                        objectFit: "contain",
-                        borderRadius: 12,
-                        border: "1px solid rgba(0,0,0,0.08)",
-                        background: "#fff",
-                        padding: 8,
-                      }}
-                    />
-                  </div>
-                )}
+      <input
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        disabled={!editingId || uploadingImage !== null}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
 
-                {!editingId && (
-                  <small className="ipo-field-help">
-                    Save the IPO first, then upload the company logo.
-                  </small>
-                )}
+          if (file) {
+            uploadIPOImage(file, "logo");
+          }
 
-                {logoUploading && (
-                  <small className="ipo-field-help">Uploading logo...</small>
-                )}
-              </div>
+          e.currentTarget.value = "";
+        }}
+      />
 
-              <div className="ipo-form-group">
-                <label>IPO Banner</label>
+      {!editingId && (
+        <small>
+          Save the IPO first before uploading the logo.
+        </small>
+      )}
 
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  disabled={!editingId || bannerUploading}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) uploadIPOImage(file, "banner");
-                    e.currentTarget.value = "";
-                  }}
-                />
+      {uploadingImage === "logo" && (
+        <small>
+          Uploading company logo...
+        </small>
+      )}
 
-                <small className="ipo-field-help">
-                  PNG, JPG/JPEG or WEBP • Max 5 MB
-                </small>
+      {form.logo_url && (
+        <div
+          style={{
+            marginTop: "12px",
+          }}
+        >
+          <img
+            src={form.logo_url}
+            alt={`${form.company_name} logo`}
+            style={{
+              width: "120px",
+              height: "80px",
+              objectFit: "contain",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              padding: "8px",
+              background: "#fff",
+            }}
+          />
+        </div>
+      )}
 
-                {form.banner_url && (
-                  <div style={{ marginTop: 12 }}>
-                    <img
-                      src={form.banner_url}
-                      alt={`${form.company_name || "IPO"} banner`}
-                      style={{
-                        width: "100%",
-                        maxWidth: 520,
-                        height: 160,
-                        objectFit: "cover",
-                        borderRadius: 12,
-                        border: "1px solid rgba(0,0,0,0.08)",
-                        background: "#fff",
-                      }}
-                    />
-                  </div>
-                )}
+    </div>
 
-                {bannerUploading && (
-                  <small className="ipo-field-help">Uploading banner...</small>
-                )}
-              </div>
 
-            </div>
-          </div>
+    {/* IPO BANNER */}
+
+    <div className="ipo-form-group">
+
+      <label>IPO Banner</label>
+
+      <input
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        disabled={!editingId || uploadingImage !== null}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+
+          if (file) {
+            uploadIPOImage(file, "banner");
+          }
+
+          e.currentTarget.value = "";
+        }}
+      />
+
+      {!editingId && (
+        <small>
+          Save the IPO first before uploading the banner.
+        </small>
+      )}
+
+      {uploadingImage === "banner" && (
+        <small>
+          Uploading IPO banner...
+        </small>
+      )}
+
+      {form.banner_url && (
+        <div
+          style={{
+            marginTop: "12px",
+          }}
+        >
+          <img
+            src={form.banner_url}
+            alt={`${form.company_name} IPO banner`}
+            style={{
+              width: "100%",
+              maxWidth: "420px",
+              height: "140px",
+              objectFit: "cover",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              display: "block",
+            }}
+          />
+        </div>
+      )}
+
+    </div>
+
+  </div>
+
+</div>
 
           {/* ================================= */}
           {/* PUBLISH */}
