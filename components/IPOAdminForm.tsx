@@ -282,8 +282,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     } finally { setManagementLoading(false); }
   }
 
-  async function saveManagementMember(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function saveManagementMember() {
     if (!editingId) { setError("Please save the IPO first before adding management members."); return; }
     if (!managementForm.name.trim()) { setError("Management member name is required."); return; }
     setManagementSaving(true); setError(""); setMessage("");
@@ -357,10 +356,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     }
   }
 
-  async function saveQuarterlyResult(
-    event: FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
+  async function saveQuarterlyResult() {
 
     if (!editingId) {
       setError("Please save the IPO first before adding quarterly results.");
@@ -532,10 +528,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     }
   }
 
-  async function saveSubscriptionRecord(
-    event: FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
+  async function saveSubscriptionRecord() {
 
     if (!editingId) {
       setError("Please save the IPO first before adding subscription data.");
@@ -715,10 +708,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
     }
   }
 
-  async function saveDocument(
-    event: FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
+  async function saveDocument() {
 
     if (!editingId) {
       setError(
@@ -1895,7 +1885,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
               </div>
             ) : (
               <>
-                <form onSubmit={saveQuarterlyResult}>
+                <div>
                   <div className="ipo-form-grid">
                     <div className="ipo-form-group">
                       <label>Financial Year *</label>
@@ -1958,7 +1948,8 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
 
                   <div className="ipo-form-actions">
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={saveQuarterlyResult}
                       className="ipo-primary-button"
                       disabled={quarterlySaving}
                     >
@@ -1979,7 +1970,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
                       </button>
                     )}
                   </div>
-                </form>
+                </div>
 
                 <div style={{ marginTop: 24, overflowX: "auto" }}>
                   <h4>Saved Quarterly Results</h4>
@@ -2073,7 +2064,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
               <div className="ipo-empty-state">Save the IPO first. Then add individual management members.</div>
             ) : (
               <>
-                <form onSubmit={saveManagementMember}>
+                <div>
                   <div className="ipo-form-grid">
                     <div className="ipo-form-group"><label>Name *</label><input type="text" value={managementForm.name} onChange={(e) => updateManagementField("name", e.target.value)} placeholder="Full name" required /></div>
                     <div className="ipo-form-group"><label>Designation</label><input type="text" value={managementForm.designation || ""} onChange={(e) => updateManagementField("designation", e.target.value)} placeholder="Example: Managing Director" /></div>
@@ -2081,10 +2072,10 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
                     <div className="ipo-form-group ipo-full"><label>Profile</label><textarea rows={5} value={managementForm.profile || ""} onChange={(e) => updateManagementField("profile", e.target.value)} placeholder="Brief professional profile..." /></div>
                   </div>
                   <div className="ipo-form-actions">
-                    <button type="submit" className="ipo-primary-button" disabled={managementSaving}>{managementSaving ? "Saving..." : managementEditingId ? "💾 Update Member" : "➕ Add Member"}</button>
+                    <button type="button" className="ipo-primary-button" onClick={saveManagementMember} disabled={managementSaving}>{managementSaving ? "Saving..." : managementEditingId ? "💾 Update Member" : "➕ Add Member"}</button>
                     {managementEditingId && <button type="button" className="ipo-secondary-button" onClick={resetManagementForm}>Cancel Edit</button>}
                   </div>
-                </form>
+                </div>
                 <div style={{ marginTop: 24 }}>
                   <h4>Saved Management Members</h4>
                   {managementLoading ? <div className="ipo-empty-state">Loading management information...</div> : managementMembers.length === 0 ? <div className="ipo-empty-state">No management members added yet.</div> : (
@@ -2131,7 +2122,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
               </div>
             ) : (
               <>
-                <form onSubmit={saveSubscriptionRecord}>
+                <div>
                   <div className="ipo-form-grid">
                     <div className="ipo-form-group">
                       <label>Category *</label>
@@ -2192,7 +2183,8 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
 
                   <div className="ipo-form-actions">
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={saveSubscriptionRecord}
                       className="ipo-primary-button"
                       disabled={subscriptionSaving}
                     >
@@ -2213,9 +2205,9 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
                       </button>
                     )}
                   </div>
-                </form>
+                </div>
 
-                <div style={{ marginTop: 24 }}>
+                <div style={{ marginTop: 24 }}
                   <h4>Saved Subscription Data</h4>
 
                   {subscriptionLoading ? (
@@ -2328,7 +2320,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
               </div>
             ) : (
               <>
-                <form onSubmit={saveDocument}>
+                <div>
                   <div className="ipo-form-grid">
                     <div className="ipo-form-group">
                       <label>Document Name *</label>
@@ -2365,7 +2357,8 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
 
                   <div className="ipo-form-actions">
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={saveDocument}
                       className="ipo-primary-button"
                       disabled={documentsSaving}
                     >
