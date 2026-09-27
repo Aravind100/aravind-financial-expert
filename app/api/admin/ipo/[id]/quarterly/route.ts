@@ -40,7 +40,7 @@ export async function GET(
       .from("ipo_quarterly_results")
       .select("*")
       .eq("ipo_id", id)
-      .order("financial_year", {
+      .order("quarter_label", {
         ascending: false,
       })
       .order("quarter", {
@@ -89,7 +89,7 @@ export async function POST(
 
     const payload = {
       ipo_id: id,
-      financial_year: body.financial_year || null,
+      quarter_label: body.quarter_label || null,
       quarter: body.quarter || null,
       revenue: body.revenue || null,
       ebitda: body.ebitda || null,
@@ -97,7 +97,7 @@ export async function POST(
       eps: body.eps || null,
     };
 
-    if (!payload.financial_year || !payload.quarter) {
+    if (!payload.quarter_label || !payload.quarter) {
       return NextResponse.json(
         {
           error:
@@ -160,7 +160,7 @@ export async function PATCH(
     const admin = supabaseAdmin();
 
     const updates = {
-      financial_year: body.financial_year || null,
+      quarter_label: body.quarter_label || null,
       quarter: body.quarter || null,
       revenue: body.revenue || null,
       ebitda: body.ebitda || null,
