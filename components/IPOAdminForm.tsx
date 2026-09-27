@@ -56,8 +56,12 @@ type QuarterlyResult = {
   quarter_label: string;
   revenue: number | null;
   ebitda: number | null;
+  ebitda_margin: number | null;
   pat: number | null;
   eps: number | null;
+  total_assets: number | null;
+  total_debt: number | null;
+  net_worth: number | null;
 };
 
 type ManagementMember = {
