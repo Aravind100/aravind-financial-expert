@@ -178,6 +178,10 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const [uploadingImage, setUploadingImage] = useState<
+  "logo" | "banner" | null
+>(null);
+
   const [quarterlyResults, setQuarterlyResults] = useState<QuarterlyResult[]>([]);
   const [quarterlyLoading, setQuarterlyLoading] = useState(false);
   const [quarterlySaving, setQuarterlySaving] = useState(false);
@@ -241,7 +245,78 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
       [field]: value,
     }));
   }
+async function uploadIPOImage(
+  file: File,
+  type: "logo" | "banner"
+) {
+  if (!editingId) {
+    setError(
+      "Please save the IPO first before uploading an image."
+    );
+    return;
+  }
 
+  setUploadingImage(type);
+  setError("");
+  setMessage("");
+
+  try {
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("ipoId", editingId);
+    formData.append("type", type);
+
+    const response = await fetch(
+      "/api/admin/ipo/upload-image",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data?.error || "Unable to upload image."
+      );
+    }
+
+    updateText(
+      type === "logo" ? "logo_url" : "banner_url",
+      data.url
+    );
+
+    setIPOs((current) =>
+      current.map((ipo) =>
+        ipo.id === editingId
+          ? {
+              ...ipo,
+              ...(type === "logo"
+                ? { logo_url: data.url }
+                : { banner_url: data.url }),
+            }
+          : ipo
+      )
+    );
+
+    setMessage(
+      type === "logo"
+        ? "Company logo uploaded successfully."
+        : "IPO banner uploaded successfully."
+    );
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Unable to upload image."
+    );
+  } finally {
+    setUploadingImage(null);
+  }
+}
+  
   function handleCompanyNameChange(value: string) {
     setForm((current) => ({
       ...current,
