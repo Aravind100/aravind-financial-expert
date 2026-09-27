@@ -435,15 +435,21 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
   }
 
   function editQuarterlyResult(result: QuarterlyResult) {
-    setQuarterlyEditingId(result.id || null);
-    setQuarterlyForm({
-     quarter_label: result.quarter_label || "",
-      revenue: result.revenue ?? null,
-      ebitda: result.ebitda ?? null,
-      pat: result.pat ?? null,
-      eps: result.eps ?? null,
-    });
-  }
+  setQuarterlyEditingId(result.id || null);
+
+  setQuarterlyForm({
+    financial_year: result.financial_year || "",
+    quarter_label: result.quarter_label || "Q1",
+    revenue: result.revenue ?? null,
+    ebitda: result.ebitda ?? null,
+    ebitda_margin: result.ebitda_margin ?? null,
+    pat: result.pat ?? null,
+    eps: result.eps ?? null,
+    total_assets: result.total_assets ?? null,
+    total_debt: result.total_debt ?? null,
+    net_worth: result.net_worth ?? null,
+  });
+}
 
   async function deleteQuarterlyResult(resultId: string) {
     if (!editingId) return;
