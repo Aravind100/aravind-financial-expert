@@ -1914,23 +1914,25 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
                       />
                     </div>
 
-                    <div className="ipo-form-group">
-                      <label>Quarter *</label>
-                      <select
-                        value={quarterlyForm.quarter}
-                        onChange={(e) =>
-                          updateQuarterlyField(
-                            "quarter",
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="Q1">Q1</option>
-                        <option value="Q2">Q2</option>
-                        <option value="Q3">Q3</option>
-                        <option value="Q4">Q4</option>
-                      </select>
-                    </div>
+                   <div className="ipo-form-group">
+  <label>Quarter *</label>
+
+  <select
+    value={quarterlyForm.quarter_label}
+    onChange={(e) =>
+      updateQuarterlyField(
+        "quarter_label",
+        e.target.value
+      )
+    }
+  >
+    <option value="Q1">Q1</option>
+    <option value="Q2">Q2</option>
+    <option value="Q3">Q3</option>
+    <option value="Q4">Q4</option>
+  </select>
+</div>
+                    
 
                     {(
                       [
