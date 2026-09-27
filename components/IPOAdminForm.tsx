@@ -2379,7 +2379,6 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
                       </button>
                     )}
                   </div>
-                </form>
 
                 <div style={{ marginTop: 24 }}>
                   <h4>Saved Documents</h4>
