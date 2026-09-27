@@ -182,13 +182,18 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   const [quarterlyLoading, setQuarterlyLoading] = useState(false);
   const [quarterlySaving, setQuarterlySaving] = useState(false);
   const [quarterlyEditingId, setQuarterlyEditingId] = useState<string | null>(null);
-  const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
-    quarter_label: "",
-    revenue: null,
-    ebitda: null,
-    pat: null,
-    eps: null,
-  });
+const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
+  financial_year: "",
+  quarter_label: "Q1",
+  revenue: null,
+  ebitda: null,
+  ebitda_margin: null,
+  pat: null,
+  eps: null,
+  total_assets: null,
+  total_debt: null,
+  net_worth: null,
+});
 
   const [managementMembers, setManagementMembers] = useState<ManagementMember[]>([]);
   const [managementLoading, setManagementLoading] = useState(false);
