@@ -53,8 +53,7 @@ type IPO = {
 type QuarterlyResult = {
   id?: string;
   ipo_id?: string;
-  financial_year: string;
-  quarter: string;
+  quarter_label: string;
   revenue: number | null;
   ebitda: number | null;
   pat: number | null;
@@ -179,8 +178,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   const [quarterlySaving, setQuarterlySaving] = useState(false);
   const [quarterlyEditingId, setQuarterlyEditingId] = useState<string | null>(null);
   const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
-    financial_year: "",
-    quarter: "Q4",
+    quarter_label: "",
     revenue: null,
     ebitda: null,
     pat: null,
@@ -242,8 +240,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   function resetQuarterlyForm() {
     setQuarterlyEditingId(null);
     setQuarterlyForm({
-      financial_year: "",
-      quarter: "Q4",
+     quarter_label: "",
       revenue: null,
       ebitda: null,
       pat: null,
@@ -425,8 +422,7 @@ export default function IPOAdminForm({ initialIPOs }: Props) {
   function editQuarterlyResult(result: QuarterlyResult) {
     setQuarterlyEditingId(result.id || null);
     setQuarterlyForm({
-      financial_year: result.financial_year || "",
-      quarter: result.quarter || "Q4",
+     quarter_label: result.quarter_label || "",
       revenue: result.revenue ?? null,
       ebitda: result.ebitda ?? null,
       pat: result.pat ?? null,
