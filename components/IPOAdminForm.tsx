@@ -2025,7 +2025,7 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
                         {quarterlyResults.map((result) => (
                           <tr key={result.id}>
                             <td style={{ padding: 10 }}>{result.financial_year}</td>
-                            <td style={{ padding: 10 }}>{result.quarter}</td>
+                            <td style={{ padding: 10 }}>{result.quarter_label}</td>
                             <td style={{ textAlign: "right", padding: 10 }}>
                               {result.revenue ?? "—"}
                             </td>
