@@ -20,6 +20,10 @@ async function isAdmin() {
   return !!email && email === ADMIN_EMAIL;
 }
 
+/* ============================================
+   GET QUARTERLY RESULTS
+============================================ */
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> }
@@ -34,16 +38,23 @@ export async function GET(
 
     const { id } = await context.params;
 
+    if (!id) {
+      return NextResponse.json(
+        { error: "IPO ID is required." },
+        { status: 400 }
+      );
+    }
+
     const admin = supabaseAdmin();
 
     const { data, error } = await admin
       .from("ipo_quarterly_results")
       .select("*")
       .eq("ipo_id", id)
-      .order("quarter_label", {
+      .order("financial_year", {
         ascending: false,
       })
-      .order("quarter", {
+      .order("quarter_label", {
         ascending: false,
       })
       .limit(4);
@@ -64,11 +75,15 @@ export async function GET(
     console.error("Quarterly GET error:", error);
 
     return NextResponse.json(
-      { error: "Failed to load quarterly results" },
+      { error: "Failed to load quarterly results." },
       { status: 500 }
     );
   }
 }
+
+/* ============================================
+   ADD QUARTERLY RESULT
+============================================ */
 
 export async function POST(
   request: Request,
@@ -85,27 +100,42 @@ export async function POST(
     const { id } = await context.params;
     const body = await request.json();
 
+    if (!id) {
+      return NextResponse.json(
+        { error: "IPO ID is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!body.financial_year?.trim()) {
+      return NextResponse.json(
+        { error: "Financial year is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!body.quarter_label?.trim()) {
+      return NextResponse.json(
+        { error: "Quarter is required." },
+        { status: 400 }
+      );
+    }
+
     const admin = supabaseAdmin();
 
     const payload = {
       ipo_id: id,
-      quarter_label: body.quarter_label || null,
-      quarter: body.quarter || null,
-      revenue: body.revenue || null,
-      ebitda: body.ebitda || null,
-      pat: body.pat || null,
-      eps: body.eps || null,
+      financial_year: body.financial_year.trim(),
+      quarter_label: body.quarter_label.trim(),
+      revenue: body.revenue ?? null,
+      ebitda: body.ebitda ?? null,
+      ebitda_margin: body.ebitda_margin ?? null,
+      pat: body.pat ?? null,
+      eps: body.eps ?? null,
+      total_assets: body.total_assets ?? null,
+      total_debt: body.total_debt ?? null,
+      net_worth: body.net_worth ?? null,
     };
-
-    if (!payload.quarter_label || !payload.quarter) {
-      return NextResponse.json(
-        {
-          error:
-            "Financial year and quarter are required.",
-        },
-        { status: 400 }
-      );
-    }
 
     const { data, error } = await admin
       .from("ipo_quarterly_results")
@@ -114,7 +144,10 @@ export async function POST(
       .single();
 
     if (error) {
-      console.error("Quarterly results insert error:", error);
+      console.error(
+        "Quarterly results insert error:",
+        error
+      );
 
       return NextResponse.json(
         { error: error.message },
@@ -123,17 +156,22 @@ export async function POST(
     }
 
     return NextResponse.json({
+      success: true,
       result: data,
     });
   } catch (error) {
     console.error("Quarterly POST error:", error);
 
     return NextResponse.json(
-      { error: "Failed to save quarterly result" },
+      { error: "Failed to save quarterly result." },
       { status: 500 }
     );
   }
 }
+
+/* ============================================
+   UPDATE QUARTERLY RESULT
+============================================ */
 
 export async function PATCH(
   request: Request,
@@ -157,15 +195,33 @@ export async function PATCH(
       );
     }
 
+    if (!body.financial_year?.trim()) {
+      return NextResponse.json(
+        { error: "Financial year is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!body.quarter_label?.trim()) {
+      return NextResponse.json(
+        { error: "Quarter is required." },
+        { status: 400 }
+      );
+    }
+
     const admin = supabaseAdmin();
 
     const updates = {
-      quarter_label: body.quarter_label || null,
-      quarter: body.quarter || null,
-      revenue: body.revenue || null,
-      ebitda: body.ebitda || null,
-      pat: body.pat || null,
-      eps: body.eps || null,
+      financial_year: body.financial_year.trim(),
+      quarter_label: body.quarter_label.trim(),
+      revenue: body.revenue ?? null,
+      ebitda: body.ebitda ?? null,
+      ebitda_margin: body.ebitda_margin ?? null,
+      pat: body.pat ?? null,
+      eps: body.eps ?? null,
+      total_assets: body.total_assets ?? null,
+      total_debt: body.total_debt ?? null,
+      net_worth: body.net_worth ?? null,
     };
 
     const { data, error } = await admin
@@ -177,7 +233,10 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error("Quarterly results update error:", error);
+      console.error(
+        "Quarterly results update error:",
+        error
+      );
 
       return NextResponse.json(
         { error: error.message },
@@ -186,17 +245,22 @@ export async function PATCH(
     }
 
     return NextResponse.json({
+      success: true,
       result: data,
     });
   } catch (error) {
     console.error("Quarterly PATCH error:", error);
 
     return NextResponse.json(
-      { error: "Failed to update quarterly result" },
+      { error: "Failed to update quarterly result." },
       { status: 500 }
     );
   }
 }
+
+/* ============================================
+   DELETE QUARTERLY RESULT
+============================================ */
 
 export async function DELETE(
   request: Request,
@@ -229,7 +293,10 @@ export async function DELETE(
       .eq("ipo_id", id);
 
     if (error) {
-      console.error("Quarterly results delete error:", error);
+      console.error(
+        "Quarterly results delete error:",
+        error
+      );
 
       return NextResponse.json(
         { error: error.message },
@@ -244,7 +311,7 @@ export async function DELETE(
     console.error("Quarterly DELETE error:", error);
 
     return NextResponse.json(
-      { error: "Failed to delete quarterly result" },
+      { error: "Failed to delete quarterly result." },
       { status: 500 }
     );
   }
