@@ -931,7 +931,7 @@ async function uploadIPOImage(
     }
   }
 
-   }
+   
 
   function resetForm() {
     setForm(emptyIPO);
