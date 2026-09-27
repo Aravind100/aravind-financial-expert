@@ -226,9 +226,7 @@ const [quarterlyForm, setQuarterlyForm] = useState<QuarterlyResult>({
     document_url: "",
   });
 
-  const [logoUploading, setLogoUploading] = useState(false);
-  const [bannerUploading, setBannerUploading] = useState(false);
-
+  
   function updateField(
     field: keyof IPO,
     value: string | number | boolean | null
@@ -933,72 +931,7 @@ async function uploadIPOImage(
     }
   }
 
-  async function uploadIPOImage(file: File, imageType: "logo" | "banner") {
-    if (!editingId) {
-      setError("Please save the IPO first before uploading an image.");
-      return;
-    }
-
-    const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-      setError("Please select a PNG, JPG/JPEG or WEBP image.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image size must be 5 MB or less.");
-      return;
-    }
-
-    setError("");
-    setMessage("");
-    if (imageType === "logo") setLogoUploading(true);
-    else setBannerUploading(true);
-
-    try {
-      const body = new FormData();
-      body.append("file", file);
-      body.append("ipo_id", editingId);
-      body.append("image_type", imageType);
-
-      const response = await fetch("/api/admin/ipo/upload-image", {
-        method: "POST",
-        body,
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || "Unable to upload image.");
-      }
-
-      const uploadedUrl = data.url as string;
-      updateText(imageType === "logo" ? "logo_url" : "banner_url", uploadedUrl);
-
-      setIPOs((current) =>
-        current.map((item) =>
-          item.id === editingId
-            ? {
-                ...item,
-                ...(imageType === "logo"
-                  ? { logo_url: uploadedUrl }
-                  : { banner_url: uploadedUrl }),
-              }
-            : item
-        )
-      );
-
-      setMessage(
-        imageType === "logo"
-          ? "Company logo uploaded successfully."
-          : "IPO banner uploaded successfully."
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to upload image.");
-    } finally {
-      if (imageType === "logo") setLogoUploading(false);
-      else setBannerUploading(false);
-    }
-  }
+   }
 
   function resetForm() {
     setForm(emptyIPO);
