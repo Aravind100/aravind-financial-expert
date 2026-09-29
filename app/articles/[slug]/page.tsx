@@ -1,8 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '../../../lib/supabaseAdmin'
 
 export const dynamic = 'force-dynamic'
+
+const BASE_URL = 'https://aravind-financial-expert.vercel.app'
 
 type Article = {
   id: number
@@ -17,13 +20,7 @@ type Article = {
   created_at: string
 }
 
-export default async function ArticlePage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params
-
+async function getArticle(slug: string): Promise<Article | null> {
   const supabase = supabaseAdmin()
 
   const { data: article, error } = await supabase
@@ -36,9 +33,149 @@ export default async function ArticlePage({
     .maybeSingle()
 
   if (error) {
-    console.error('Article page error:', error)
-    notFound()
+    console.error('Article fetch error:', error)
+    return null
   }
+
+  return article as Article | null
+}
+
+function getAbsoluteImageUrl(imageUrl: string | null) {
+  if (!imageUrl) return undefined
+
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl
+  }
+
+  return `${BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+
+  const article = await getArticle(slug)
+
+  if (!article) {
+    return {
+      title: 'Article Not Found | Aravind Financial Expert',
+      description: 'The requested article could not be found.',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  }
+
+  const description =
+    article.excerpt ||
+    article.content
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 155)
+
+  const canonicalUrl = `${BASE_URL}/articles/${article.slug}`
+  const imageUrl = getAbsoluteImageUrl(article.image_url)
+
+  return {
+    title: `${article.title} | Aravind Financial Expert`,
+
+    description,
+
+    keywords: article.tags || [
+      article.category,
+      'investment',
+      'financial education',
+      'Indian stock market',
+      'Aravind Financial Expert',
+    ],
+
+    authors: [
+      {
+        name: 'Aravind Chaudhary',
+        url: `${BASE_URL}/about`,
+      },
+    ],
+
+    creator: 'Aravind Chaudhary',
+
+    publisher: 'Aravind Financial Expert',
+
+    alternates: {
+      canonical: canonicalUrl,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+
+    openGraph: {
+      type: 'article',
+      url: canonicalUrl,
+      title: article.title,
+      description,
+      siteName: 'Aravind Financial Expert',
+      locale: 'en_IN',
+
+      publishedTime:
+        article.published_at || article.created_at,
+
+      modifiedTime:
+        article.published_at || article.created_at,
+
+      authors: ['Aravind Chaudhary'],
+
+      section: article.category,
+
+      tags: article.tags || [],
+
+      ...(imageUrl
+        ? {
+            images: [
+              {
+                url: imageUrl,
+                width: 1200,
+                height: 630,
+                alt: article.title,
+              },
+            ],
+          }
+        : {}),
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+
+      ...(imageUrl
+        ? {
+            images: [imageUrl],
+          }
+        : {}),
+    },
+  }
+}
+
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+
+  const article = await getArticle(slug)
 
   if (!article) {
     notFound()
@@ -46,8 +183,91 @@ export default async function ArticlePage({
 
   const typedArticle = article as Article
 
+  const canonicalUrl =
+    `${BASE_URL}/articles/${typedArticle.slug}`
+
+  const imageUrl =
+    getAbsoluteImageUrl(typedArticle.image_url)
+
+  const publishedDate =
+    typedArticle.published_at ||
+    typedArticle.created_at
+
+  /*
+   * Article structured data for Google.
+   * The replace() calls safely prevent HTML/script
+   * characters inside article fields from breaking
+   * the JSON-LD script.
+   */
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+
+    headline: typedArticle.title,
+
+    description:
+      typedArticle.excerpt ||
+      typedArticle.content
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 155),
+
+    url: canonicalUrl,
+
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl,
+    },
+
+    author: {
+      '@type': 'Person',
+      name: 'Aravind Chaudhary',
+      url: `${BASE_URL}/about`,
+    },
+
+    publisher: {
+      '@type': 'Organization',
+      name: 'Aravind Financial Expert',
+      url: BASE_URL,
+    },
+
+    datePublished: publishedDate,
+
+    dateModified: publishedDate,
+
+    ...(imageUrl
+      ? {
+          image: [imageUrl],
+        }
+      : {}),
+
+    ...(typedArticle.tags &&
+    typedArticle.tags.length > 0
+      ? {
+          keywords: typedArticle.tags.join(', '),
+        }
+      : {}),
+
+    articleSection: typedArticle.category,
+  }
+
+  const safeArticleSchema = JSON.stringify(
+    articleSchema
+  )
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+
   return (
     <main className="articlePage">
+
+      {/* Google Article Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeArticleSchema,
+        }}
+      />
 
       <article className="articleContainer">
 
