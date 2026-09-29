@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /api
+
+Sitemap: https://aravind-financial-expert.vercel.app/sitemap.xml
