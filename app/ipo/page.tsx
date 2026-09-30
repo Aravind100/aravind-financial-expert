@@ -1,7 +1,52 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
+
+const BASE_URL = "https://aravind-financial-expert.vercel.app";
+
+export const metadata: Metadata = {
+  title: "IPO | Upcoming, Open, Closed & Listed IPOs",
+  description:
+    "Explore upcoming, open, closed and recently listed IPOs in India. View IPO price bands, issue size, lot size, important dates and company information.",
+  keywords: [
+    "IPO",
+    "IPO India",
+    "upcoming IPO",
+    "open IPO",
+    "IPO details",
+    "IPO price band",
+    "IPO issue size",
+    "IPO lot size",
+    "IPO listing",
+    "Indian IPO",
+    "IPO information",
+    "Aravind Financial Expert",
+  ],
+  alternates: {
+    canonical: `${BASE_URL}/ipo`,
+  },
+  openGraph: {
+    type: "website",
+    url: `${BASE_URL}/ipo`,
+    title: "IPO | Upcoming, Open, Closed & Listed IPOs",
+    description:
+      "Explore IPO information including price bands, issue size, lot size, important dates and company details.",
+    siteName: "Aravind Financial Expert",
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IPO | Upcoming, Open, Closed & Listed IPOs",
+    description:
+      "Explore upcoming, open, closed and listed IPO information in India.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 type IPO = {
   id: string;
@@ -83,11 +128,8 @@ function statusClass(status: string) {
 function IPOCard({ ipo }: { ipo: IPO }) {
   return (
     <article className="ipo-card">
-
       <div className="ipo-card-top">
-
         <div className="ipo-company-logo">
-
           {ipo.logo_url ? (
             <img
               src={ipo.logo_url}
@@ -100,13 +142,10 @@ function IPOCard({ ipo }: { ipo: IPO }) {
                 .toUpperCase()}
             </span>
           )}
-
         </div>
 
         <div className="ipo-card-heading">
-
           <div className="ipo-card-status-row">
-
             <span
               className={`ipo-status ${statusClass(
                 ipo.status
@@ -118,17 +157,13 @@ function IPOCard({ ipo }: { ipo: IPO }) {
             <span className="ipo-type">
               {ipo.issue_type}
             </span>
-
           </div>
 
           <h3>{ipo.company_name}</h3>
-
         </div>
-
       </div>
 
       <div className="ipo-card-price">
-
         <span>Price Band</span>
 
         <strong>
@@ -137,11 +172,9 @@ function IPOCard({ ipo }: { ipo: IPO }) {
             ipo.price_band_max
           )}
         </strong>
-
       </div>
 
       <div className="ipo-card-grid">
-
         <div>
           <span>Issue Size</span>
 
@@ -177,12 +210,10 @@ function IPOCard({ ipo }: { ipo: IPO }) {
             {formatDate(ipo.close_date)}
           </strong>
         </div>
-
       </div>
 
       {ipo.minimum_investment !== null && (
         <div className="ipo-minimum">
-
           <span>
             Minimum Investment
           </span>
@@ -192,7 +223,6 @@ function IPOCard({ ipo }: { ipo: IPO }) {
               "en-IN"
             )}
           </strong>
-
         </div>
       )}
 
@@ -202,7 +232,6 @@ function IPOCard({ ipo }: { ipo: IPO }) {
       >
         View IPO Details →
       </Link>
-
     </article>
   );
 }
@@ -258,17 +287,65 @@ export default async function IPOPage() {
     (ipo) => ipo.status === "listed"
   );
 
+  const ipoSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${BASE_URL}/ipo#webpage`,
+        url: `${BASE_URL}/ipo`,
+        name: "IPO | Upcoming, Open, Closed & Listed IPOs",
+        description:
+          "Explore IPO information including price bands, issue size, lot size, important dates and company information.",
+        isPartOf: {
+          "@id": `${BASE_URL}/#website`,
+        },
+        about: {
+          "@id": `${BASE_URL}/#organization`,
+        },
+        inLanguage: "en-IN",
+      },
+
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${BASE_URL}/ipo#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "IPO",
+            item: `${BASE_URL}/ipo`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="ipo-page">
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ipoSchema).replace(
+            /</g,
+            "\\u003c"
+          ),
+        }}
+      />
 
       {/* ================================= */}
       {/* HERO */}
       {/* ================================= */}
 
       <section className="ipo-hero">
-
         <div className="ipo-hero-inner">
-
           <div className="ipo-eyebrow">
             IPO INFORMATION CENTRE
           </div>
@@ -286,9 +363,7 @@ export default async function IPOPage() {
             information, financial results and
             reservation details.
           </p>
-
         </div>
-
       </section>
 
       {/* ================================= */}
@@ -296,13 +371,10 @@ export default async function IPOPage() {
       {/* ================================= */}
 
       <section className="ipo-intro-section">
-
         <div className="ipo-container">
-
           <div className="ipo-intro-grid">
 
             <div>
-
               <span className="ipo-section-label">
                 IPO DASHBOARD
               </span>
@@ -310,11 +382,9 @@ export default async function IPOPage() {
               <h2>
                 IPO information in one place
               </h2>
-
             </div>
 
             <div>
-
               <p>
                 This section provides factual
                 information about IPOs based on
@@ -328,13 +398,10 @@ export default async function IPOPage() {
                 reservation and company profile
                 before making your own decisions.
               </p>
-
             </div>
 
           </div>
-
         </div>
-
       </section>
 
       {/* ================================= */}
@@ -343,11 +410,9 @@ export default async function IPOPage() {
 
       {openIPOs.length > 0 && (
         <section className="ipo-section">
-
           <div className="ipo-container">
 
             <div className="ipo-section-heading">
-
               <div>
                 <span className="ipo-section-label">
                   CURRENTLY OPEN
@@ -364,22 +429,18 @@ export default async function IPOPage() {
                   ? "s"
                   : ""}
               </span>
-
             </div>
 
             <div className="ipo-card-grid">
-
               {openIPOs.map((ipo) => (
                 <IPOCard
                   key={ipo.id}
                   ipo={ipo}
                 />
               ))}
-
             </div>
 
           </div>
-
         </section>
       )}
 
@@ -389,11 +450,9 @@ export default async function IPOPage() {
 
       {upcomingIPOs.length > 0 && (
         <section className="ipo-section ipo-section-alt">
-
           <div className="ipo-container">
 
             <div className="ipo-section-heading">
-
               <div>
                 <span className="ipo-section-label">
                   COMING SOON
@@ -410,22 +469,18 @@ export default async function IPOPage() {
                   ? "s"
                   : ""}
               </span>
-
             </div>
 
             <div className="ipo-card-grid">
-
               {upcomingIPOs.map((ipo) => (
                 <IPOCard
                   key={ipo.id}
                   ipo={ipo}
                 />
               ))}
-
             </div>
 
           </div>
-
         </section>
       )}
 
@@ -435,11 +490,9 @@ export default async function IPOPage() {
 
       {closedIPOs.length > 0 && (
         <section className="ipo-section">
-
           <div className="ipo-container">
 
             <div className="ipo-section-heading">
-
               <div>
                 <span className="ipo-section-label">
                   RECENTLY CLOSED
@@ -456,22 +509,18 @@ export default async function IPOPage() {
                   ? "s"
                   : ""}
               </span>
-
             </div>
 
             <div className="ipo-card-grid">
-
               {closedIPOs.map((ipo) => (
                 <IPOCard
                   key={ipo.id}
                   ipo={ipo}
                 />
               ))}
-
             </div>
 
           </div>
-
         </section>
       )}
 
@@ -481,11 +530,9 @@ export default async function IPOPage() {
 
       {listedIPOs.length > 0 && (
         <section className="ipo-section ipo-section-alt">
-
           <div className="ipo-container">
 
             <div className="ipo-section-heading">
-
               <div>
                 <span className="ipo-section-label">
                   LISTED
@@ -502,22 +549,18 @@ export default async function IPOPage() {
                   ? "s"
                   : ""}
               </span>
-
             </div>
 
             <div className="ipo-card-grid">
-
               {listedIPOs.map((ipo) => (
                 <IPOCard
                   key={ipo.id}
                   ipo={ipo}
                 />
               ))}
-
             </div>
 
           </div>
-
         </section>
       )}
 
@@ -527,11 +570,9 @@ export default async function IPOPage() {
 
       {allIPOs.length === 0 && (
         <section className="ipo-empty-section">
-
           <div className="ipo-container">
 
             <div className="ipo-empty-card">
-
               <div className="ipo-empty-icon">
                 📈
               </div>
@@ -545,11 +586,9 @@ export default async function IPOPage() {
                 they are added and published from
                 the admin panel.
               </p>
-
             </div>
 
           </div>
-
         </section>
       )}
 
@@ -558,7 +597,6 @@ export default async function IPOPage() {
       {/* ================================= */}
 
       <section className="ipo-disclaimer">
-
         <div className="ipo-container">
 
           <p>
@@ -575,7 +613,6 @@ export default async function IPOPage() {
           </p>
 
         </div>
-
       </section>
 
     </main>
