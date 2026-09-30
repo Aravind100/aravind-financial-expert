@@ -2,10 +2,47 @@ import Link from "next/link";
 import EnquiryForm from "../../components/EnquiryForm";
 import styles from "./IMP.module.css";
 
-export const metadata = {
-  title: "IMP | Intelligent Model Portfolio | Aravind Chaudhary",
+import type { Metadata } from "next";
+
+const BASE_URL = "https://aravind-financial-expert.vercel.app";
+
+export const metadata: Metadata = {
+  title: "IMP | Intelligent Model Portfolio | Aravind Financial Expert",
   description:
-    "Explore IMP - Intelligent Model Portfolio, a structured and research-driven approach to long-term investing.",
+    "Explore IMP (Intelligent Model Portfolio), a structured and research-driven approach to equity investing focused on research, discipline, portfolio construction and long-term investing.",
+  keywords: [
+    "Intelligent Model Portfolio",
+    "IMP",
+    "model portfolio",
+    "equity investment",
+    "portfolio management",
+    "long term investing",
+    "research driven investing",
+    "investment portfolio",
+    "Aravind Financial Expert",
+  ],
+  alternates: {
+    canonical: `${BASE_URL}/imp`,
+  },
+  openGraph: {
+    type: "website",
+    url: `${BASE_URL}/imp`,
+    title: "IMP | Intelligent Model Portfolio | Aravind Financial Expert",
+    description:
+      "Explore IMP, a structured and research-driven approach to equity investing with a focus on discipline, portfolio construction and long-term thinking.",
+    siteName: "Aravind Financial Expert",
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IMP | Intelligent Model Portfolio",
+    description:
+      "Explore a structured, research-driven approach to equity investing through IMP.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 const process = [
@@ -141,8 +178,69 @@ const testimonials = [
 ];
 
 export default function IMPPage() {
+  const impSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${BASE_URL}/imp#webpage`,
+        url: `${BASE_URL}/imp`,
+        name: "IMP | Intelligent Model Portfolio | Aravind Financial Expert",
+        description:
+          "A structured and research-driven approach to equity investing focused on research, portfolio construction, discipline and long-term thinking.",
+        isPartOf: {
+          "@id": `${BASE_URL}/#website`,
+        },
+        about: {
+          "@id": `${BASE_URL}/#organization`,
+        },
+        inLanguage: "en-IN",
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${BASE_URL}/imp#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "IMP",
+            item: `${BASE_URL}/imp`,
+          },
+        ],
+      },
+      {
+        "@type": "Service",
+        "@id": `${BASE_URL}/imp#service`,
+        name: "Intelligent Model Portfolio",
+        description:
+          "A structured, research-driven investment approach focused on equity investing, portfolio construction, monitoring and long-term thinking.",
+        provider: {
+          "@id": `${BASE_URL}/#organization`,
+        },
+        areaServed: "IN",
+        serviceType: "Investment Portfolio Service",
+      },
+    ],
+  };
+
   return (
     <main className={styles.impPage}>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(impSchema).replace(
+            /</g,
+            "\\u003c"
+          ),
+        }}
+      />
 
       {/* ================= HERO ================= */}
       <section className={styles.hero}>
