@@ -1,15 +1,18 @@
 import "./globals.css";
 import Link from "next/link";
+import Script from "next/script";
 import MobileMenu from "../components/MobileMenu";
 import type { Metadata } from "next";
 
 const BASE_URL = "https://aravind-financial-expert.vercel.app";
+const GA_MEASUREMENT_ID = "G-BP6EKB0DY3";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 
   title: {
-    default: "Aravind Financial Expert | Investments, Insurance & Financial Solutions",
+    default:
+      "Aravind Financial Expert | Investments, Insurance & Financial Solutions",
     template: "%s | Aravind Financial Expert",
   },
 
@@ -153,6 +156,22 @@ export default function RootLayout({
       </head>
 
       <body>
+        {/* Google Analytics 4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
+
         <header className="header">
           <div className="nav">
 
