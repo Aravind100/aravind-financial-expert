@@ -1,8 +1,121 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
+
+const BASE_URL = "https://aravind-financial-expert.vercel.app";
+
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const { slug } = await params;
+
+  const supabase = supabaseAdmin();
+
+  const { data: ipo } = await supabase
+    .from("ipos")
+    .select(
+      `
+        company_name,
+        slug,
+        issue_type,
+        industry,
+        company_overview,
+        price_band_min,
+        price_band_max,
+        issue_size,
+        logo_url
+      `
+    )
+    .eq("slug", slug)
+    .eq("is_published", true)
+    .maybeSingle();
+
+  if (!ipo) {
+    return {
+      title: "IPO Details | Aravind Financial Expert",
+      description:
+        "Explore IPO information, company details, financial information, issue structure and important dates.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const priceBand =
+    ipo.price_band_min !== null &&
+    ipo.price_band_max !== null
+      ? `₹${ipo.price_band_min}–₹${ipo.price_band_max}`
+      : null;
+
+  const description = [
+    `${ipo.company_name} IPO details`,
+    ipo.issue_type ? `${ipo.issue_type} IPO` : null,
+    priceBand ? `price band ${priceBand}` : null,
+    ipo.issue_size !== null
+      ? `issue size ₹${ipo.issue_size} Cr`
+      : null,
+    ipo.industry ? ipo.industry : null,
+    "company information, financials, valuation, subscription and important dates",
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  return {
+    title: `${ipo.company_name} IPO | Price, Dates, Financials & Details`,
+    description,
+    keywords: [
+      `${ipo.company_name} IPO`,
+      `${ipo.company_name} IPO details`,
+      `${ipo.company_name} IPO price`,
+      `${ipo.company_name} IPO date`,
+      `${ipo.company_name} IPO financials`,
+      `${ipo.company_name} IPO subscription`,
+      `${ipo.company_name} IPO valuation`,
+      "IPO India",
+      "IPO details",
+      "IPO analysis",
+      "Indian IPO",
+      "Aravind Financial Expert",
+    ],
+    alternates: {
+      canonical: `${BASE_URL}/ipo/${ipo.slug}`,
+    },
+    openGraph: {
+      type: "article",
+      url: `${BASE_URL}/ipo/${ipo.slug}`,
+      title: `${ipo.company_name} IPO | Price, Dates, Financials & Details`,
+      description,
+      siteName: "Aravind Financial Expert",
+      locale: "en_IN",
+      ...(ipo.logo_url
+        ? {
+            images: [
+              {
+                url: ipo.logo_url,
+                alt: `${ipo.company_name} logo`,
+              },
+            ],
+          }
+        : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${ipo.company_name} IPO | Price, Dates, Financials & Details`,
+      description,
+      ...(ipo.logo_url
+        ? { images: [ipo.logo_url] }
+        : {}),
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 type PageProps = {
   params: Promise<{
@@ -276,8 +389,73 @@ export default async function IPOViewPage({
   const documents: IPODocument[] =
     documentsResponse.data || [];
 
+  const ipoUrl = `${BASE_URL}/ipo/${ipo.slug}`;
+
+  const ipoSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${ipoUrl}#webpage`,
+        url: ipoUrl,
+        name: `${ipo.company_name} IPO | Price, Dates, Financials & Details`,
+        description:
+          ipo.company_overview ||
+          `Detailed information about ${ipo.company_name} IPO including issue details, financial information, valuation, subscription and important dates.`,
+        isPartOf: {
+          "@id": `${BASE_URL}/#website`,
+        },
+        about: {
+          "@id": `${BASE_URL}/#organization`,
+        },
+        inLanguage: "en-IN",
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${ipoUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "IPO",
+            item: `${BASE_URL}/ipo`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: ipo.company_name,
+            item: ipoUrl,
+          },
+        ],
+      },
+      {
+        "@type": "Corporation",
+        "@id": `${ipoUrl}#company`,
+        name: ipo.company_name,
+        url: ipoUrl,
+        ...(ipo.logo_url ? { image: ipo.logo_url } : {}),
+        ...(ipo.industry ? { industry: ipo.industry } : {}),
+      },
+    ],
+  };
+
   return (
     <main className="ipo-detail-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ipoSchema).replace(
+            /</g,
+            "\\u003c"
+          ),
+        }}
+      />
 
       {/* ================================= */}
       {/* HERO */}
