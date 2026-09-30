@@ -1,6 +1,98 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import EnquiryForm from "../../components/EnquiryForm";
 import styles from "./Insurance.module.css";
+
+const BASE_URL = "https://aravind-financial-expert.vercel.app";
+
+export const metadata: Metadata = {
+  title: "Insurance | Life, Health & General Insurance Solutions",
+
+  description:
+    "Understand Life Insurance, Term Insurance, Health Insurance and General Insurance. Explore insurance categories, policy features, protection needs and important factors to compare before buying.",
+
+  keywords: [
+    "insurance",
+    "life insurance",
+    "term insurance",
+    "health insurance",
+    "general insurance",
+    "motor insurance",
+    "travel insurance",
+    "personal accident insurance",
+    "family health insurance",
+    "insurance planning",
+    "insurance awareness",
+    "insurance solutions",
+    "Aravind Financial Expert",
+  ],
+
+  alternates: {
+    canonical: `${BASE_URL}/insurance`,
+  },
+
+  openGraph: {
+    type: "website",
+    url: `${BASE_URL}/insurance`,
+    title: "Insurance Solutions | Life, Health & General Insurance",
+    description:
+      "Understand Life, Health and General Insurance and compare important policy features, coverage, exclusions and conditions before buying.",
+    siteName: "Aravind Financial Expert",
+    locale: "en_IN",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Insurance Solutions | Aravind Financial Expert",
+    description:
+      "Explore Life, Health, Term and General Insurance categories and understand important factors before buying.",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+const insuranceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/insurance#webpage`,
+      url: `${BASE_URL}/insurance`,
+      name: "Insurance Solutions | Aravind Financial Expert",
+      description:
+        "Information and awareness about Life Insurance, Term Insurance, Health Insurance and General Insurance.",
+      isPartOf: {
+        "@id": `${BASE_URL}/#website`,
+      },
+      about: {
+        "@id": `${BASE_URL}/#organization`,
+      },
+      inLanguage: "en-IN",
+    },
+
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${BASE_URL}/insurance#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: BASE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Insurance",
+          item: `${BASE_URL}/insurance`,
+        },
+      ],
+    },
+  ],
+};
 
 const lifeInsurers = [
   {
@@ -19,7 +111,6 @@ const lifeInsurers = [
     description:
       "A life insurance product offering protection options subject to eligibility, policy terms and conditions.",
   },
- 
   {
     name: "ICICI Prudential Life",
     logo: "/insurers/icici-prudential-life.png",
@@ -130,7 +221,6 @@ const generalInsurers = [
     description:
       "General insurance solutions across motor and other personal/general risk categories.",
   },
- 
   {
     name: "Go Digit",
     logo: "/insurers/go-digit.png",
@@ -186,856 +276,869 @@ function InsurerCard({
 
 export default function InsurancePage() {
   return (
-    <main className={styles.page}>
+    <>
+      {/* SEO Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(insuranceSchema).replace(
+            /</g,
+            "\\u003c"
+          ),
+        }}
+      />
 
-      {/* HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
+      <main className={styles.page}>
 
-          <div className={styles.heroContent}>
-            <span className={styles.eyebrow}>
-              INSURANCE AWARENESS
-            </span>
+        {/* HERO */}
+        <section className={styles.hero}>
+          <div className={styles.heroInner}>
 
-            <h1>
-              Protect What You&apos;ve
-              <span> Worked Hard to Build.</span>
-            </h1>
-
-            <p>
-              Insurance is designed to protect your family, health,
-              income, vehicle, property and other financial interests
-              from unexpected events.
-            </p>
-
-            <div className={styles.heroButtons}>
-              <Link
-                href="#insurance-types"
-                className={styles.primaryButton}
-              >
-                Explore Insurance
-              </Link>
-
-              <Link
-                href="#contact"
-                className={styles.secondaryButton}
-              >
-                Contact for Information
-              </Link>
-            </div>
-          </div>
-
-          <div className={styles.heroVisual}>
-            <div className={styles.shieldCircle}>
-              🛡️
-            </div>
-
-            <div className={styles.heroCard}>
-              <strong>PROTECTION</strong>
-
-              <span>
-                Today&apos;s protection for tomorrow&apos;s
-                uncertainties.
-              </span>
-            </div>
-
-            <div className={styles.heroMiniCards}>
-              <div>❤️ Life</div>
-              <div>🏥 Health</div>
-              <div>🚗 General</div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* WHY INSURANCE */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-
-          <div className={styles.sectionHeading}>
-            <span>WHY INSURANCE?</span>
-
-            <h2>
-              One unexpected event can affect years of financial planning.
-            </h2>
-
-            <p>
-              Insurance helps transfer specified financial risks to an
-              insurer in exchange for a premium, subject to policy terms,
-              conditions, exclusions and applicable regulations.
-            </p>
-          </div>
-
-          <div className={styles.reasonGrid}>
-
-            <div className={styles.reasonCard}>
-              <span>01</span>
-              <h3>Protect Income</h3>
-
-              <p>
-                Life insurance can help provide financial support to
-                dependents if the insured person dies during the policy term.
-              </p>
-            </div>
-
-            <div className={styles.reasonCard}>
-              <span>02</span>
-              <h3>Protect Health</h3>
-
-              <p>
-                Health insurance can help manage eligible hospitalisation
-                and medical expenses according to the selected policy.
-              </p>
-            </div>
-
-            <div className={styles.reasonCard}>
-              <span>03</span>
-              <h3>Protect Assets</h3>
-
-              <p>
-                General insurance can help protect vehicles, property,
-                travel-related risks and other insured assets.
-              </p>
-            </div>
-
-            <div className={styles.reasonCard}>
-              <span>04</span>
-              <h3>Protect Financial Goals</h3>
-
-              <p>
-                Appropriate insurance can reduce the possibility that an
-                unexpected event forces you to liquidate long-term investments.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* INFLATION */}
-      <section className={styles.inflationSection}>
-        <div className={styles.container}>
-
-          <div className={styles.inflationGrid}>
-
-            <div>
-              <span className={styles.lightEyebrow}>
-                THINK BEYOND TODAY
+            <div className={styles.heroContent}>
+              <span className={styles.eyebrow}>
+                INSURANCE AWARENESS
               </span>
 
-              <h2>
-                The cost of protection should be reviewed as life changes.
-              </h2>
+              <h1>
+                Protect What You&apos;ve
+                <span> Worked Hard to Build.</span>
+              </h1>
 
               <p>
-                Inflation can increase the future cost of healthcare,
-                household expenses, repairs, replacement materials and
-                other financial commitments.
+                Insurance is designed to protect your family, health,
+                income, vehicle, property and other financial interests
+                from unexpected events.
               </p>
 
-              <p>
-                That is why insurance planning should not be treated as a
-                one-time activity. Your cover may need review when your
-                income, family responsibilities, liabilities or assets change.
-              </p>
+              <div className={styles.heroButtons}>
+                <Link
+                  href="#insurance-types"
+                  className={styles.primaryButton}
+                >
+                  Explore Insurance
+                </Link>
+
+                <Link
+                  href="#contact"
+                  className={styles.secondaryButton}
+                >
+                  Contact for Information
+                </Link>
+              </div>
             </div>
 
-            <div className={styles.inflationVisual}>
-
-              <div className={styles.costRow}>
-                <span>Today</span>
-                <strong>₹</strong>
-                <p>Current cost</p>
+            <div className={styles.heroVisual}>
+              <div className={styles.shieldCircle}>
+                🛡️
               </div>
 
-              <div className={styles.arrow}>
-                →
-              </div>
-
-              <div className={styles.costRow}>
-                <span>Future</span>
-                <strong>₹₹</strong>
-                <p>Potentially higher cost</p>
-              </div>
-
-              <div className={styles.inflationMessage}>
-                <strong>
-                  Review your protection periodically.
-                </strong>
+              <div className={styles.heroCard}>
+                <strong>PROTECTION</strong>
 
                 <span>
-                  Don&apos;t plan tomorrow&apos;s protection only using
-                  yesterday&apos;s expenses.
+                  Today&apos;s protection for tomorrow&apos;s
+                  uncertainties.
                 </span>
               </div>
 
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* THREE TYPES */}
-      <section
-        id="insurance-types"
-        className={styles.section}
-      >
-        <div className={styles.container}>
-
-          <div className={styles.sectionHeading}>
-            <span>THREE IMPORTANT CATEGORIES</span>
-
-            <h2>
-              Understand the role of each type of insurance.
-            </h2>
-          </div>
-
-          <div className={styles.typeGrid}>
-
-            {/* LIFE */}
-            <article className={styles.typeCard}>
-
-              <div className={styles.typeIcon}>
-                ❤️
+              <div className={styles.heroMiniCards}>
+                <div>❤️ Life</div>
+                <div>🏥 Health</div>
+                <div>🚗 General</div>
               </div>
-
-              <span>01</span>
-
-              <h3>Life Insurance</h3>
-
-              <p>
-                Primarily designed to provide financial protection to
-                beneficiaries or nominees in the event covered by the policy.
-              </p>
-
-              <h4>Why consider it?</h4>
-
-              <ul>
-                <li>Family income protection</li>
-                <li>Children&apos;s future responsibilities</li>
-                <li>Loan and liability protection</li>
-                <li>Financial continuity for dependents</li>
-                <li>Long-term protection planning</li>
-              </ul>
-
-              <div className={styles.highlight}>
-                Your family&apos;s financial needs continue even when
-                your income does not.
-              </div>
-
-            </article>
-
-            {/* HEALTH */}
-            <article className={styles.typeCard}>
-
-              <div className={styles.typeIcon}>
-                🏥
-              </div>
-
-              <span>02</span>
-
-              <h3>Health Insurance</h3>
-
-              <p>
-                Designed to provide coverage for specified healthcare
-                and hospitalisation expenses according to policy terms.
-              </p>
-
-              <h4>Why consider it?</h4>
-
-              <ul>
-                <li>Hospitalisation expenses</li>
-                <li>Day-care procedures where covered</li>
-                <li>Pre/post-hospitalisation benefits where covered</li>
-                <li>Cashless treatment at eligible network hospitals</li>
-                <li>Family medical-risk protection</li>
-              </ul>
-
-              <div className={styles.highlight}>
-                Medical expenses can become a major financial burden
-                without adequate protection.
-              </div>
-
-            </article>
-
-            {/* GENERAL */}
-            <article className={styles.typeCard}>
-
-              <div className={styles.typeIcon}>
-                🚗
-              </div>
-
-              <span>03</span>
-
-              <h3>General Insurance</h3>
-
-              <p>
-                Covers a wide range of non-life risks depending on
-                the selected policy.
-              </p>
-
-              <h4>Common categories</h4>
-
-              <ul>
-                <li>Motor insurance</li>
-                <li>Home/property insurance</li>
-                <li>Travel insurance</li>
-                <li>Personal accident</li>
-                <li>Business and commercial insurance</li>
-              </ul>
-
-              <div className={styles.highlight}>
-                Protect valuable assets against specified unexpected risks.
-              </div>
-
-            </article>
-
-          </div>
-        </div>
-      </section>
-
-      {/* LIFE INSURANCE DETAILS */}
-      <section className={styles.detailSection}>
-        <div className={styles.container}>
-
-          <div className={styles.detailGrid}>
-
-            <div className={styles.detailNumber}>
-              01
             </div>
 
-            <div>
+          </div>
+        </section>
 
-              <span className={styles.sectionLabel}>
-                LIFE INSURANCE
-              </span>
+        {/* WHY INSURANCE */}
+        <section className={styles.section}>
+          <div className={styles.container}>
+
+            <div className={styles.sectionHeading}>
+              <span>WHY INSURANCE?</span>
 
               <h2>
-                Protect the people who depend on you.
+                One unexpected event can affect years of financial planning.
               </h2>
 
               <p>
-                Life insurance planning should consider your income,
-                dependents, liabilities, future responsibilities and
-                existing assets.
+                Insurance helps transfer specified financial risks to an
+                insurer in exchange for a premium, subject to policy terms,
+                conditions, exclusions and applicable regulations.
               </p>
-
-              <div className={styles.infoGrid}>
-
-                <div>
-                  <h3>Term Insurance</h3>
-
-                  <p>
-                    Primarily provides life protection for a specified
-                    period. Benefits depend on policy terms and conditions.
-                  </p>
-                </div>
-
-                <div>
-                  <h3>Savings-Oriented Life Products</h3>
-
-                  <p>
-                    Certain life insurance products combine insurance
-                    with savings-related features. Benefits depend on
-                    the specific product.
-                  </p>
-                </div>
-
-                <div>
-                  <h3>ULIP</h3>
-
-                  <p>
-                    Unit-linked insurance products combine insurance and
-                    investment components. Investment risk in the investment
-                    portfolio is borne by the policyholder.
-                  </p>
-                </div>
-
-                <div>
-                  <h3>Riders</h3>
-
-                  <p>
-                    Additional benefits may be available through riders,
-                    subject to eligibility, additional premium and
-                    policy conditions.
-                  </p>
-                </div>
-
-              </div>
-
             </div>
 
-          </div>
+            <div className={styles.reasonGrid}>
 
-        </div>
-      </section>
-
-      {/* HEALTH INSURANCE DETAILS */}
-      <section className={styles.sectionAlt}>
-        <div className={styles.container}>
-
-          <div className={styles.detailGrid}>
-
-            <div className={styles.detailNumber}>
-              02
-            </div>
-
-            <div>
-
-              <span className={styles.sectionLabel}>
-                HEALTH INSURANCE
-              </span>
-
-              <h2>
-                Medical protection is an important part of financial planning.
-              </h2>
-
-              <p>
-                A health policy should be evaluated not only on premium
-                but also on coverage, exclusions, waiting periods,
-                room-rent conditions, co-payment, sub-limits, network
-                hospitals and restoration or recharge features where applicable.
-              </p>
-
-              <div className={styles.checkGrid}>
-
-                <div>✓ Individual cover</div>
-                <div>✓ Family floater</div>
-                <div>✓ Senior citizen options</div>
-                <div>✓ Super top-up</div>
-                <div>✓ Critical illness options</div>
-                <div>✓ Personal accident cover</div>
-
-              </div>
-
-              <div className={styles.warningBox}>
-
-                <strong>Important:</strong>
+              <div className={styles.reasonCard}>
+                <span>01</span>
+                <h3>Protect Income</h3>
 
                 <p>
-                  A higher sum insured does not automatically mean every
-                  medical expense will be payable. Coverage depends on the
-                  policy wording, exclusions, waiting periods, limits and
-                  other applicable conditions.
+                  Life insurance can help provide financial support to
+                  dependents if the insured person dies during the policy term.
                 </p>
+              </div>
+
+              <div className={styles.reasonCard}>
+                <span>02</span>
+                <h3>Protect Health</h3>
+
+                <p>
+                  Health insurance can help manage eligible hospitalisation
+                  and medical expenses according to the selected policy.
+                </p>
+              </div>
+
+              <div className={styles.reasonCard}>
+                <span>03</span>
+                <h3>Protect Assets</h3>
+
+                <p>
+                  General insurance can help protect vehicles, property,
+                  travel-related risks and other insured assets.
+                </p>
+              </div>
+
+              <div className={styles.reasonCard}>
+                <span>04</span>
+                <h3>Protect Financial Goals</h3>
+
+                <p>
+                  Appropriate insurance can reduce the possibility that an
+                  unexpected event forces you to liquidate long-term investments.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* INFLATION */}
+        <section className={styles.inflationSection}>
+          <div className={styles.container}>
+
+            <div className={styles.inflationGrid}>
+
+              <div>
+                <span className={styles.lightEyebrow}>
+                  THINK BEYOND TODAY
+                </span>
+
+                <h2>
+                  The cost of protection should be reviewed as life changes.
+                </h2>
+
+                <p>
+                  Inflation can increase the future cost of healthcare,
+                  household expenses, repairs, replacement materials and
+                  other financial commitments.
+                </p>
+
+                <p>
+                  That is why insurance planning should not be treated as a
+                  one-time activity. Your cover may need review when your
+                  income, family responsibilities, liabilities or assets change.
+                </p>
+              </div>
+
+              <div className={styles.inflationVisual}>
+
+                <div className={styles.costRow}>
+                  <span>Today</span>
+                  <strong>₹</strong>
+                  <p>Current cost</p>
+                </div>
+
+                <div className={styles.arrow}>
+                  →
+                </div>
+
+                <div className={styles.costRow}>
+                  <span>Future</span>
+                  <strong>₹₹</strong>
+                  <p>Potentially higher cost</p>
+                </div>
+
+                <div className={styles.inflationMessage}>
+                  <strong>
+                    Review your protection periodically.
+                  </strong>
+
+                  <span>
+                    Don&apos;t plan tomorrow&apos;s protection only using
+                    yesterday&apos;s expenses.
+                  </span>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* THREE TYPES */}
+        <section
+          id="insurance-types"
+          className={styles.section}
+        >
+          <div className={styles.container}>
+
+            <div className={styles.sectionHeading}>
+              <span>THREE IMPORTANT CATEGORIES</span>
+
+              <h2>
+                Understand the role of each type of insurance.
+              </h2>
+            </div>
+
+            <div className={styles.typeGrid}>
+
+              {/* LIFE */}
+              <article className={styles.typeCard}>
+
+                <div className={styles.typeIcon}>
+                  ❤️
+                </div>
+
+                <span>01</span>
+
+                <h3>Life Insurance</h3>
+
+                <p>
+                  Primarily designed to provide financial protection to
+                  beneficiaries or nominees in the event covered by the policy.
+                </p>
+
+                <h4>Why consider it?</h4>
+
+                <ul>
+                  <li>Family income protection</li>
+                  <li>Children&apos;s future responsibilities</li>
+                  <li>Loan and liability protection</li>
+                  <li>Financial continuity for dependents</li>
+                  <li>Long-term protection planning</li>
+                </ul>
+
+                <div className={styles.highlight}>
+                  Your family&apos;s financial needs continue even when
+                  your income does not.
+                </div>
+
+              </article>
+
+              {/* HEALTH */}
+              <article className={styles.typeCard}>
+
+                <div className={styles.typeIcon}>
+                  🏥
+                </div>
+
+                <span>02</span>
+
+                <h3>Health Insurance</h3>
+
+                <p>
+                  Designed to provide coverage for specified healthcare
+                  and hospitalisation expenses according to policy terms.
+                </p>
+
+                <h4>Why consider it?</h4>
+
+                <ul>
+                  <li>Hospitalisation expenses</li>
+                  <li>Day-care procedures where covered</li>
+                  <li>Pre/post-hospitalisation benefits where covered</li>
+                  <li>Cashless treatment at eligible network hospitals</li>
+                  <li>Family medical-risk protection</li>
+                </ul>
+
+                <div className={styles.highlight}>
+                  Medical expenses can become a major financial burden
+                  without adequate protection.
+                </div>
+
+              </article>
+
+              {/* GENERAL */}
+              <article className={styles.typeCard}>
+
+                <div className={styles.typeIcon}>
+                  🚗
+                </div>
+
+                <span>03</span>
+
+                <h3>General Insurance</h3>
+
+                <p>
+                  Covers a wide range of non-life risks depending on
+                  the selected policy.
+                </p>
+
+                <h4>Common categories</h4>
+
+                <ul>
+                  <li>Motor insurance</li>
+                  <li>Home/property insurance</li>
+                  <li>Travel insurance</li>
+                  <li>Personal accident</li>
+                  <li>Business and commercial insurance</li>
+                </ul>
+
+                <div className={styles.highlight}>
+                  Protect valuable assets against specified unexpected risks.
+                </div>
+
+              </article>
+
+            </div>
+          </div>
+        </section>
+
+        {/* LIFE INSURANCE DETAILS */}
+        <section className={styles.detailSection}>
+          <div className={styles.container}>
+
+            <div className={styles.detailGrid}>
+
+              <div className={styles.detailNumber}>
+                01
+              </div>
+
+              <div>
+
+                <span className={styles.sectionLabel}>
+                  LIFE INSURANCE
+                </span>
+
+                <h2>
+                  Protect the people who depend on you.
+                </h2>
+
+                <p>
+                  Life insurance planning should consider your income,
+                  dependents, liabilities, future responsibilities and
+                  existing assets.
+                </p>
+
+                <div className={styles.infoGrid}>
+
+                  <div>
+                    <h3>Term Insurance</h3>
+
+                    <p>
+                      Primarily provides life protection for a specified
+                      period. Benefits depend on policy terms and conditions.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3>Savings-Oriented Life Products</h3>
+
+                    <p>
+                      Certain life insurance products combine insurance
+                      with savings-related features. Benefits depend on
+                      the specific product.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3>ULIP</h3>
+
+                    <p>
+                      Unit-linked insurance products combine insurance and
+                      investment components. Investment risk in the investment
+                      portfolio is borne by the policyholder.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3>Riders</h3>
+
+                    <p>
+                      Additional benefits may be available through riders,
+                      subject to eligibility, additional premium and
+                      policy conditions.
+                    </p>
+                  </div>
+
+                </div>
 
               </div>
 
             </div>
 
           </div>
+        </section>
 
-        </div>
-      </section>
+        {/* HEALTH INSURANCE DETAILS */}
+        <section className={styles.sectionAlt}>
+          <div className={styles.container}>
 
-      {/* GENERAL INSURANCE */}
-      <section className={styles.section}>
-        <div className={styles.container}>
+            <div className={styles.detailGrid}>
 
-          <div className={styles.sectionHeading}>
+              <div className={styles.detailNumber}>
+                02
+              </div>
 
-            <span>GENERAL INSURANCE</span>
+              <div>
 
-            <h2>
-              Protect the assets and risks around your everyday life.
-            </h2>
+                <span className={styles.sectionLabel}>
+                  HEALTH INSURANCE
+                </span>
+
+                <h2>
+                  Medical protection is an important part of financial planning.
+                </h2>
+
+                <p>
+                  A health policy should be evaluated not only on premium
+                  but also on coverage, exclusions, waiting periods,
+                  room-rent conditions, co-payment, sub-limits, network
+                  hospitals and restoration or recharge features where applicable.
+                </p>
+
+                <div className={styles.checkGrid}>
+
+                  <div>✓ Individual cover</div>
+                  <div>✓ Family floater</div>
+                  <div>✓ Senior citizen options</div>
+                  <div>✓ Super top-up</div>
+                  <div>✓ Critical illness options</div>
+                  <div>✓ Personal accident cover</div>
+
+                </div>
+
+                <div className={styles.warningBox}>
+
+                  <strong>Important:</strong>
+
+                  <p>
+                    A higher sum insured does not automatically mean every
+                    medical expense will be payable. Coverage depends on the
+                    policy wording, exclusions, waiting periods, limits and
+                    other applicable conditions.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
 
           </div>
+        </section>
 
-          <div className={styles.generalGrid}>
+        {/* GENERAL INSURANCE */}
+        <section className={styles.section}>
+          <div className={styles.container}>
 
-            <div>
-              <span>🚗</span>
+            <div className={styles.sectionHeading}>
 
-              <h3>Motor Insurance</h3>
+              <span>GENERAL INSURANCE</span>
+
+              <h2>
+                Protect the assets and risks around your everyday life.
+              </h2>
+
+            </div>
+
+            <div className={styles.generalGrid}>
+
+              <div>
+                <span>🚗</span>
+
+                <h3>Motor Insurance</h3>
+
+                <p>
+                  Protection options for cars and two-wheelers including
+                  third-party and broader own-damage/comprehensive covers
+                  as applicable.
+                </p>
+              </div>
+
+              <div>
+                <span>🏠</span>
+
+                <h3>Home & Property</h3>
+
+                <p>
+                  Protection against specified risks affecting property,
+                  contents or other insured interests.
+                </p>
+              </div>
+
+              <div>
+                <span>✈️</span>
+
+                <h3>Travel Insurance</h3>
+
+                <p>
+                  Can provide protection for specified travel-related risks,
+                  depending on the selected plan and destination.
+                </p>
+              </div>
+
+              <div>
+                <span>👤</span>
+
+                <h3>Personal Accident</h3>
+
+                <p>
+                  Provides benefits for specified accidental events
+                  according to the policy terms.
+                </p>
+              </div>
+
+              <div>
+                <span>🏢</span>
+
+                <h3>Business Insurance</h3>
+
+                <p>
+                  Insurance solutions can address selected risks faced by
+                  shops, offices, businesses and commercial operations.
+                </p>
+              </div>
+
+              <div>
+                <span>💻</span>
+
+                <h3>Specialised Risks</h3>
+
+                <p>
+                  Depending on insurer and eligibility, specialised covers
+                  may include cyber, liability, marine and other commercial risks.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* BEFORE BUYING */}
+        <section className={styles.checkSection}>
+          <div className={styles.container}>
+
+            <div className={styles.sectionHeading}>
+
+              <span>BEFORE BUYING</span>
+
+              <h2>
+                Don&apos;t compare only the premium.
+              </h2>
 
               <p>
-                Protection options for cars and two-wheelers including
-                third-party and broader own-damage/comprehensive covers
-                as applicable.
+                Compare the protection offered and understand the policy
+                conditions.
               </p>
+
             </div>
 
-            <div>
-              <span>🏠</span>
+            <div className={styles.checklist}>
 
-              <h3>Home & Property</h3>
+              <div>
+                <strong>01</strong>
+                <span>Coverage / Sum Insured</span>
+              </div>
+
+              <div>
+                <strong>02</strong>
+                <span>Policy Term</span>
+              </div>
+
+              <div>
+                <strong>03</strong>
+                <span>Waiting Periods</span>
+              </div>
+
+              <div>
+                <strong>04</strong>
+                <span>Exclusions</span>
+              </div>
+
+              <div>
+                <strong>05</strong>
+                <span>Deductibles / Co-payment</span>
+              </div>
+
+              <div>
+                <strong>06</strong>
+                <span>Sub-limits / Conditions</span>
+              </div>
+
+              <div>
+                <strong>07</strong>
+                <span>Claim Process</span>
+              </div>
+
+              <div>
+                <strong>08</strong>
+                <span>Renewal Conditions</span>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* INSURERS */}
+        <section className={styles.section}>
+          <div className={styles.container}>
+
+            <div className={styles.sectionHeading}>
+
+              <span>
+                SELECTED INSURERS & PRODUCT EXAMPLES
+              </span>
+
+              <h2>
+                Explore insurance companies and product categories.
+              </h2>
 
               <p>
-                Protection against specified risks affecting property,
-                contents or other insured interests.
+                The examples below are provided for awareness and
+                comparison of categories. They are not rankings or
+                recommendations.
               </p>
+
             </div>
 
-            <div>
-              <span>✈️</span>
+            <h3 className={styles.groupTitle}>
+              Life Insurance
+            </h3>
 
-              <h3>Travel Insurance</h3>
+            <div className={styles.insurerGrid}>
+              {lifeInsurers.map((item) => (
+                <InsurerCard
+                  key={item.name}
+                  item={item}
+                />
+              ))}
+            </div>
+
+            <h3 className={styles.groupTitle}>
+              Health Insurance
+            </h3>
+
+            <div className={styles.insurerGrid}>
+              {healthInsurers.map((item) => (
+                <InsurerCard
+                  key={item.name}
+                  item={item}
+                />
+              ))}
+            </div>
+
+            <h3 className={styles.groupTitle}>
+              General Insurance
+            </h3>
+
+            <div className={styles.insurerGrid}>
+              {generalInsurers.map((item) => (
+                <InsurerCard
+                  key={item.name}
+                  item={item}
+                />
+              ))}
+            </div>
+
+            <div className={styles.sourceNote}>
+
+              <strong>Product information:</strong>
+
+              Product names and features can change. Always verify the
+              current insurer website, prospectus, Customer Information
+              Sheet and policy wording before making a purchase.
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* WORKFLOW */}
+        <section className={styles.workflowSection}>
+          <div className={styles.container}>
+
+            <div className={styles.sectionHeading}>
+
+              <span>OUR SIMPLE PROCESS</span>
+
+              <h2>
+                Understand first. Choose carefully.
+              </h2>
+
+            </div>
+
+            <div className={styles.workflow}>
+
+              <div>
+                <span>01</span>
+                <h3>Understand</h3>
+                <p>
+                  Your family, health, assets and financial responsibilities.
+                </p>
+              </div>
+
+              <div>
+                <span>02</span>
+                <h3>Assess</h3>
+                <p>
+                  Existing insurance, gaps, liabilities and future needs.
+                </p>
+              </div>
+
+              <div>
+                <span>03</span>
+                <h3>Compare</h3>
+                <p>
+                  Relevant products, features, exclusions and conditions.
+                </p>
+              </div>
+
+              <div>
+                <span>04</span>
+                <h3>Decide</h3>
+                <p>
+                  Select according to your requirements and suitability.
+                </p>
+              </div>
+
+              <div>
+                <span>05</span>
+                <h3>Review</h3>
+                <p>
+                  Revisit your protection when your circumstances change.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* CONTACT */}
+        <section
+          id="contact"
+          className={styles.ctaSection}
+        >
+          <div className={styles.container}>
+
+            <div className={styles.ctaBox}>
+
+              <span>
+                NEED HELP UNDERSTANDING INSURANCE?
+              </span>
+
+              <h2>
+                Let&apos;s understand your requirements first.
+              </h2>
 
               <p>
-                Can provide protection for specified travel-related risks,
-                depending on the selected plan and destination.
+                Share your requirement and get information about relevant
+                insurance categories and available options.
               </p>
-            </div>
 
-            <div>
-              <span>👤</span>
+              <div className={styles.contactDetails}>
 
-              <h3>Personal Accident</h3>
+                <a href="tel:+919173334069">
+                  📞 +91 91733 34069
+                </a>
 
-              <p>
-                Provides benefits for specified accidental events
-                according to the policy terms.
-              </p>
-            </div>
+                <a href="mailto:aravindchaudhary90@gmail.com">
+                  ✉️ aravindchaudhary90@gmail.com
+                </a>
 
-            <div>
-              <span>🏢</span>
+              </div>
 
-              <h3>Business Insurance</h3>
+              <div className={styles.ctaButtons}>
 
-              <p>
-                Insurance solutions can address selected risks faced by
-                shops, offices, businesses and commercial operations.
-              </p>
-            </div>
+                <a
+                  href="https://wa.me/919173334069?text=Hello%20Aravind%2C%20I%20would%20like%20information%20about%20insurance."
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.whatsappButton}
+                >
+                  WhatsApp for Information
+                </a>
 
-            <div>
-              <span>💻</span>
+                <a
+                  href="tel:+919173334069"
+                  className={styles.callButton}
+                >
+                  Call Now
+                </a>
 
-              <h3>Specialised Risks</h3>
-
-              <p>
-                Depending on insurer and eligibility, specialised covers
-                may include cyber, liability, marine and other commercial risks.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* BEFORE BUYING */}
-      <section className={styles.checkSection}>
-        <div className={styles.container}>
-
-          <div className={styles.sectionHeading}>
-
-            <span>BEFORE BUYING</span>
-
-            <h2>
-              Don&apos;t compare only the premium.
-            </h2>
-
-            <p>
-              Compare the protection offered and understand the policy
-              conditions.
-            </p>
-
-          </div>
-
-          <div className={styles.checklist}>
-
-            <div>
-              <strong>01</strong>
-              <span>Coverage / Sum Insured</span>
-            </div>
-
-            <div>
-              <strong>02</strong>
-              <span>Policy Term</span>
-            </div>
-
-            <div>
-              <strong>03</strong>
-              <span>Waiting Periods</span>
-            </div>
-
-            <div>
-              <strong>04</strong>
-              <span>Exclusions</span>
-            </div>
-
-            <div>
-              <strong>05</strong>
-              <span>Deductibles / Co-payment</span>
-            </div>
-
-            <div>
-              <strong>06</strong>
-              <span>Sub-limits / Conditions</span>
-            </div>
-
-            <div>
-              <strong>07</strong>
-              <span>Claim Process</span>
-            </div>
-
-            <div>
-              <strong>08</strong>
-              <span>Renewal Conditions</span>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* INSURERS */}
-      <section className={styles.section}>
-        <div className={styles.container}>
-
-          <div className={styles.sectionHeading}>
-
-            <span>
-              SELECTED INSURERS & PRODUCT EXAMPLES
-            </span>
-
-            <h2>
-              Explore insurance companies and product categories.
-            </h2>
-
-            <p>
-              The examples below are provided for awareness and
-              comparison of categories. They are not rankings or
-              recommendations.
-            </p>
-
-          </div>
-
-          <h3 className={styles.groupTitle}>
-            Life Insurance
-          </h3>
-
-          <div className={styles.insurerGrid}>
-            {lifeInsurers.map((item) => (
-              <InsurerCard
-                key={item.name}
-                item={item}
-              />
-            ))}
-          </div>
-
-          <h3 className={styles.groupTitle}>
-            Health Insurance
-          </h3>
-
-          <div className={styles.insurerGrid}>
-            {healthInsurers.map((item) => (
-              <InsurerCard
-                key={item.name}
-                item={item}
-              />
-            ))}
-          </div>
-
-          <h3 className={styles.groupTitle}>
-            General Insurance
-          </h3>
-
-          <div className={styles.insurerGrid}>
-            {generalInsurers.map((item) => (
-              <InsurerCard
-                key={item.name}
-                item={item}
-              />
-            ))}
-          </div>
-
-          <div className={styles.sourceNote}>
-
-            <strong>Product information:</strong>
-
-            Product names and features can change. Always verify the
-            current insurer website, prospectus, Customer Information
-            Sheet and policy wording before making a purchase.
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* WORKFLOW */}
-      <section className={styles.workflowSection}>
-        <div className={styles.container}>
-
-          <div className={styles.sectionHeading}>
-
-            <span>OUR SIMPLE PROCESS</span>
-
-            <h2>
-              Understand first. Choose carefully.
-            </h2>
-
-          </div>
-
-          <div className={styles.workflow}>
-
-            <div>
-              <span>01</span>
-              <h3>Understand</h3>
-              <p>
-                Your family, health, assets and financial responsibilities.
-              </p>
-            </div>
-
-            <div>
-              <span>02</span>
-              <h3>Assess</h3>
-              <p>
-                Existing insurance, gaps, liabilities and future needs.
-              </p>
-            </div>
-
-            <div>
-              <span>03</span>
-              <h3>Compare</h3>
-              <p>
-                Relevant products, features, exclusions and conditions.
-              </p>
-            </div>
-
-            <div>
-              <span>04</span>
-              <h3>Decide</h3>
-              <p>
-                Select according to your requirements and suitability.
-              </p>
-            </div>
-
-            <div>
-              <span>05</span>
-              <h3>Review</h3>
-              <p>
-                Revisit your protection when your circumstances change.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section
-        id="contact"
-        className={styles.ctaSection}
-      >
-        <div className={styles.container}>
-
-          <div className={styles.ctaBox}>
-
-            <span>
-              NEED HELP UNDERSTANDING INSURANCE?
-            </span>
-
-            <h2>
-              Let&apos;s understand your requirements first.
-            </h2>
-
-            <p>
-              Share your requirement and get information about relevant
-              insurance categories and available options.
-            </p>
-
-            <div className={styles.contactDetails}>
-
-              <a href="tel:+919173334069">
-                📞 +91 91733 34069
-              </a>
-
-              <a href="mailto:aravindchaudhary90@gmail.com">
-                ✉️ aravindchaudhary90@gmail.com
-              </a>
-
-            </div>
-
-            <div className={styles.ctaButtons}>
-
-              <a
-                href="https://wa.me/919173334069?text=Hello%20Aravind%2C%20I%20would%20like%20information%20about%20insurance."
-                target="_blank"
-                rel="noreferrer"
-                className={styles.whatsappButton}
-              >
-                WhatsApp for Information
-              </a>
-
-              <a
-                href="tel:+919173334069"
-                className={styles.callButton}
-              >
-                Call Now
-              </a>
+              </div>
 
             </div>
 
           </div>
+        </section>
 
-        </div>
-      </section>
+        {/* ENQUIRY FORM */}
+        <section className={styles.formSection}>
+          <div className={styles.container}>
 
-      {/* ENQUIRY FORM */}
-      <section className={styles.formSection}>
-        <div className={styles.container}>
+            <div className={styles.sectionHeading}>
 
-          <div className={styles.sectionHeading}>
+              <span>INSURANCE ENQUIRY</span>
 
-            <span>INSURANCE ENQUIRY</span>
+              <h2>
+                Tell us what you need.
+              </h2>
 
-            <h2>
-              Tell us what you need.
-            </h2>
+            </div>
+
+            <EnquiryForm />
 
           </div>
+        </section>
 
-          <EnquiryForm />
+        {/* DISCLAIMER */}
+        <section className={styles.disclaimer}>
+          <div className={styles.container}>
 
-        </div>
-      </section>
-
-      {/* DISCLAIMER */}
-      <section className={styles.disclaimer}>
-        <div className={styles.container}>
-
-          <strong>
-            Important Insurance Disclaimer
-          </strong>
-
-          <p>
-            Insurance products are subject to applicable regulations and
-            the terms, conditions, exclusions, waiting periods, limits
-            and eligibility requirements specified in the respective
-            policy documents. Product names, features, premiums,
-            benefits and UINs may change.
-          </p>
-
-          <p>
-            Information on this page is provided for general awareness
-            and should not be treated as a representation that any
-            particular product is suitable for every person.
-          </p>
-
-          <p>
-            Please read the policy wording, prospectus and Customer
-            Information Sheet carefully before purchasing.
-          </p>
-
-          <p>
-            No product on this page is represented as universally best,
-            guaranteed, risk-free or suitable for everyone.
-          </p>
-
-          <p>
             <strong>
-              Insurance is the subject matter of solicitation.
+              Important Insurance Disclaimer
             </strong>
-          </p>
 
-        </div>
-      </section>
+            <p>
+              Insurance products are subject to applicable regulations and
+              the terms, conditions, exclusions, waiting periods, limits
+              and eligibility requirements specified in the respective
+              policy documents. Product names, features, premiums,
+              benefits and UINs may change.
+            </p>
 
-    </main>
+            <p>
+              Information on this page is provided for general awareness
+              and should not be treated as a representation that any
+              particular product is suitable for every person.
+            </p>
+
+            <p>
+              Please read the policy wording, prospectus and Customer
+              Information Sheet carefully before purchasing.
+            </p>
+
+            <p>
+              No product on this page is represented as universally best,
+              guaranteed, risk-free or suitable for everyone.
+            </p>
+
+            <p>
+              <strong>
+                Insurance is the subject matter of solicitation.
+              </strong>
+            </p>
+
+          </div>
+        </section>
+
+      </main>
+    </>
   );
 }
