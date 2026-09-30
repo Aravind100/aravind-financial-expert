@@ -1,8 +1,116 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
+const BASE_URL = "https://aravind-financial-expert.vercel.app";
+
+export const metadata: Metadata = {
+  title: "About Aravind Chaudhary | Financial Services & Wealth Solutions",
+  description:
+    "Learn about Aravind Chaudhary, his approach to financial education, investments, insurance, loans and financial solutions for individuals, families, investors and entrepreneurs.",
+  keywords: [
+    "Aravind Chaudhary",
+    "financial services professional",
+    "financial solutions",
+    "investment guidance",
+    "financial awareness",
+    "wealth solutions",
+    "insurance solutions",
+    "investment education",
+    "Aravind Financial Expert",
+  ],
+  alternates: {
+    canonical: `${BASE_URL}/about`,
+  },
+  openGraph: {
+    type: "profile",
+    url: `${BASE_URL}/about`,
+    title: "About Aravind Chaudhary | Financial Services & Wealth Solutions",
+    description:
+      "Learn about Aravind Chaudhary and his approach to financial education, investments, insurance and financial solutions.",
+    siteName: "Aravind Financial Expert",
+    locale: "en_IN",
+    images: [
+      {
+        url: `${BASE_URL}/aravind-chaudhary.png`,
+        alt: "Aravind Chaudhary - Financial Services Professional",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Aravind Chaudhary | Financial Services & Wealth Solutions",
+    description:
+      "Learn about Aravind Chaudhary and his approach to financial education, investments, insurance and financial solutions.",
+    images: [`${BASE_URL}/aravind-chaudhary.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
 export default function AboutPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfilePage",
+        "@id": `${BASE_URL}/about#profile`,
+        url: `${BASE_URL}/about`,
+        name: "About Aravind Chaudhary",
+        description:
+          "Profile and professional information about Aravind Chaudhary and his financial services and wealth solutions focus.",
+        mainEntity: {
+          "@id": `${BASE_URL}/about#person`,
+        },
+        breadcrumb: {
+          "@id": `${BASE_URL}/about#breadcrumb`,
+        },
+      },
+      {
+        "@type": "Person",
+        "@id": `${BASE_URL}/about#person`,
+        name: "Aravind Chaudhary",
+        jobTitle: "Financial Services Professional",
+        url: `${BASE_URL}/about`,
+        image: `${BASE_URL}/aravind-chaudhary.png`,
+        worksFor: {
+          "@type": "Organization",
+          name: "Aravind Financial Expert",
+          url: BASE_URL,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${BASE_URL}/about#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "About",
+            item: `${BASE_URL}/about`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
-    <main className="about-page">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\u003c"),
+        }}
+      />
+
+      <main className="about-page">
 
       {/* HERO */}
       <section className="about-hero">
@@ -339,6 +447,7 @@ export default function AboutPage() {
 
       </section>
 
-    </main>
+      </main>
+    </>
   );
 }
