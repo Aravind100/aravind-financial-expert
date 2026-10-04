@@ -3,15 +3,17 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 /* =========================================================
    NISM V-A MOCK TEST START API
-   ---------------------------------------------------------
-   Purpose:
-   - Generate 100-question mock tests
-   - Preserve 12-unit distribution
-   - Preserve 25/50/25 difficulty distribution
-   - Avoid previous test question sets
-   - Prefer better-quality / application-oriented questions
-   - Balance correct-answer positions
-   - Work with 1,000+ question banks safely
+
+   Features:
+   - 100 questions
+   - 12-unit distribution
+   - 25 Easy / 50 Medium / 25 Hard
+   - Avoid previous mock-test question sets
+   - Prefer Approved questions
+   - Prefer Scenario / Application / Calculation questions
+   - Balance A/B/C/D answer positions
+   - Fetch 1,100+ questions safely in pages
+   - Existing frontend response format preserved
    ========================================================= */
 
 const MODULE_CODE = "V-A";
@@ -65,7 +67,16 @@ type QuestionRecord = {
   is_calculation: boolean | null;
 };
 
-type SelectedQuestion = QuestionRecord;
+type AttemptRecord = {
+  id: string;
+  mock_test_id: string;
+  submitted_at: string | null;
+  created_at: string | null;
+};
+
+/* =========================================================
+   SHUFFLE
+   ========================================================= */
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array];
@@ -79,8 +90,16 @@ function shuffle<T>(array: T[]): T[] {
   return result;
 }
 
-function normalizeDifficulty(value: string | null | undefined): string {
-  const v = String(value || "").trim().toLowerCase();
+/* =========================================================
+   NORMALIZE DIFFICULTY
+   ========================================================= */
+
+function normalizeDifficulty(
+  value: string | null | undefined
+): string {
+  const v = String(value || "")
+    .trim()
+    .toLowerCase();
 
   if (v === "easy") return "Easy";
   if (v === "medium") return "Medium";
@@ -89,8 +108,16 @@ function normalizeDifficulty(value: string | null | undefined): string {
   return "Medium";
 }
 
-function normalizeAnswer(value: string | null | undefined): string {
-  const v = String(value || "").trim().toUpperCase();
+/* =========================================================
+   NORMALIZE ANSWER
+   ========================================================= */
+
+function normalizeAnswer(
+  value: string | null | undefined
+): string {
+  const v = String(value || "")
+    .trim()
+    .toUpperCase();
 
   if (["A", "B", "C", "D"].includes(v)) {
     return v;
@@ -99,10 +126,16 @@ function normalizeAnswer(value: string | null | undefined): string {
   return "A";
 }
 
+/* =========================================================
+   NORMALIZE QUESTION TYPE
+   ========================================================= */
+
 function normalizeQuestionType(
   value: string | null | undefined
 ): string {
-  const v = String(value || "").trim().toLowerCase();
+  const v = String(value || "")
+    .trim()
+    .toLowerCase();
 
   if (v === "scenario") return "Scenario";
   if (v === "application") return "Application";
@@ -112,61 +145,105 @@ function normalizeQuestionType(
   return "Conceptual";
 }
 
-function qualityScore(question: QuestionRecord): number {
-  const status = String(question.quality_status || "")
+/* =========================================================
+   QUALITY SCORE
+
+   Approved questions are preferred.
+   Review questions remain eligible so Tests 2-10 can be
+   generated without requiring another 900-question manual
+   approval exercise.
+   ========================================================= */
+
+function qualityScore(
+  question: QuestionRecord
+): number {
+  const status = String(
+    question.quality_status || ""
+  )
     .trim()
     .toLowerCase();
 
-  if (status === "approved") return 30;
-  if (status === "review") return 10;
+  if (status === "approved") {
+    return 30;
+  }
+
+  if (status === "review") {
+    return 10;
+  }
 
   return 0;
 }
+
+/* =========================================================
+   TYPE SCORE
+
+   Prefer application/scenario/calculation questions where
+   available.
+
+   These are preferences, NOT hard requirements.
+   ========================================================= */
 
 function typeScore(
   question: QuestionRecord,
   currentScenarioApplication: number,
   currentCalculations: number
 ): number {
-  const type = normalizeQuestionType(question.question_type);
+  const type = normalizeQuestionType(
+    question.question_type
+  );
 
   let score = 0;
 
   if (
-    (type === "Scenario" || type === "Application") &&
+    (type === "Scenario" ||
+      type === "Application") &&
     currentScenarioApplication < 30
   ) {
     score += 25;
   }
 
   if (
-    (type === "Calculation" || question.is_calculation === true) &&
+    (type === "Calculation" ||
+      question.is_calculation === true) &&
     currentCalculations < 10
   ) {
     score += 30;
   }
 
-  if (question.is_scenario === true && currentScenarioApplication < 30) {
+  if (
+    question.is_scenario === true &&
+    currentScenarioApplication < 30
+  ) {
     score += 10;
   }
 
   return score;
 }
 
+/* =========================================================
+   ANSWER POSITION SCORE
+   ========================================================= */
+
 function answerBalanceScore(
   question: QuestionRecord,
   answerCounts: Record<string, number>
 ): number {
-  const answer = normalizeAnswer(question.correct_option);
+  const answer = normalizeAnswer(
+    question.correct_option
+  );
 
-  const target = ANSWER_TARGETS[answer] ?? 25;
-  const current = answerCounts[answer] ?? 0;
+  const target =
+    ANSWER_TARGETS[answer] ?? 25;
 
-  /*
-    Higher score when this answer position is currently under target.
-  */
+  const current =
+    answerCounts[answer] ?? 0;
+
   return (target - current) * 4;
 }
+
+/* =========================================================
+   TOTAL CANDIDATE SCORE
+   ========================================================= */
 
 function candidateScore(
   question: QuestionRecord,
@@ -182,58 +259,77 @@ function candidateScore(
     currentCalculations
   );
 
-  const answer = answerBalanceScore(question, answerCounts);
+  const answer = answerBalanceScore(
+    question,
+    answerCounts
+  );
 
   /*
-    Small random component prevents every test from producing
-    exactly the same ordering.
+    Small random component so different users do not
+    always receive exactly the same ordering.
   */
-  const randomness = Math.random() * 8;
+  const randomness =
+    Math.random() * 8;
 
-  return quality + type + answer + randomness;
+  return (
+    quality +
+    type +
+    answer +
+    randomness
+  );
 }
 
 /* =========================================================
-   Fetch ALL active questions safely.
+   FETCH ALL ACTIVE QUESTIONS
 
-   Supabase projects may have a 1,000-row response limit.
-   Therefore we fetch in 500-row pages instead of assuming
-   one .select() returns the complete 1,100-question bank.
+   Supabase can limit large result sets.
+
+   We therefore fetch:
+     0-499
+     500-999
+     1000-1499
+     ...
+
+   This safely supports the current 1,100-question bank.
    ========================================================= */
 
-async function fetchAllActiveQuestions(): Promise<QuestionRecord[]> {
+async function fetchAllActiveQuestions(): Promise<
+  QuestionRecord[]
+> {
   const allQuestions: QuestionRecord[] = [];
 
   let from = 0;
 
   while (true) {
-    const to = from + PAGE_SIZE - 1;
+    const to =
+      from + PAGE_SIZE - 1;
 
-    const { data, error } = await supabaseAdmin
-      .from("nism_questions")
-      .select(
-        `
-        id,
-        module_code,
-        unit_number,
-        unit_title,
-        topic,
-        question_text,
-        option_a,
-        option_b,
-        option_c,
-        option_d,
-        correct_option,
-        difficulty,
-        question_type,
-        quality_status,
-        is_scenario,
-        is_calculation
-        `
-      )
-      .eq("module_code", MODULE_CODE)
-      .eq("is_active", true)
-      .range(from, to);
+    const { data, error } =
+      await supabaseAdmin()
+        .from("nism_questions")
+        .select(
+          `
+          id,
+          module_code,
+          unit_number,
+          unit_title,
+          topic,
+          question_text,
+          option_a,
+          option_b,
+          option_c,
+          option_d,
+          correct_option,
+          difficulty,
+          question_type,
+          quality_status,
+          is_scenario,
+          is_calculation
+          `
+        )
+        .eq("module_code", MODULE_CODE)
+        .eq("is_active", true)
+        .range(from, to);
 
     if (error) {
       throw new Error(
@@ -245,7 +341,9 @@ async function fetchAllActiveQuestions(): Promise<QuestionRecord[]> {
       break;
     }
 
-    allQuestions.push(...(data as QuestionRecord[]));
+    allQuestions.push(
+      ...(data as QuestionRecord[])
+    );
 
     if (data.length < PAGE_SIZE) {
       break;
@@ -258,17 +356,25 @@ async function fetchAllActiveQuestions(): Promise<QuestionRecord[]> {
 }
 
 /* =========================================================
-   Find question IDs used by the latest completed attempt
-   of each previous mock test.
+   GET PREVIOUS TEST QUESTION IDS
 
-   Example:
-   Test 2 excludes the latest Test 1 question set.
-   Test 3 excludes latest Test 1 + latest Test 2 sets.
+   Test 2:
+     excludes latest Test 1 question set
+
+   Test 3:
+     excludes latest Test 1 + Test 2 sets
+
    ...
-   Test 10 excludes latest sets from Tests 1-9.
 
-   Repeated attempts do NOT permanently consume the entire
-   1,100-question bank.
+   Test 10:
+     excludes latest Test 1-9 sets
+
+   IMPORTANT:
+   We use the latest completed attempt for each previous
+   mock test rather than every historical attempt.
+
+   This prevents repeated attempts from permanently
+   consuming the entire 1,100-question bank.
    ========================================================= */
 
 async function getPreviousTestQuestionIds(
@@ -278,17 +384,31 @@ async function getPreviousTestQuestionIds(
     return new Set<string>();
   }
 
-  const previousTestNumbers = Array.from(
-    { length: testNumber - 1 },
-    (_, index) => index + 1
-  );
+  const previousTestNumbers =
+    Array.from(
+      {
+        length: testNumber - 1,
+      },
+      (_, index) => index + 1
+    );
 
-  const { data: mockTests, error: mockTestsError } =
-    await supabaseAdmin
-      .from("nism_mock_tests")
-      .select("id, test_number")
-      .eq("module_code", MODULE_CODE)
-      .in("test_number", previousTestNumbers);
+  /* -------------------------------------------------------
+     Get previous mock test IDs
+     ------------------------------------------------------- */
+
+  const {
+    data: mockTests,
+    error: mockTestsError,
+  } = await supabaseAdmin()
+    .from("nism_mock_tests")
+    .select(
+      "id, test_number"
+    )
+    .eq("module_code", MODULE_CODE)
+    .in(
+      "test_number",
+      previousTestNumbers
+    );
 
   if (mockTestsError) {
     throw new Error(
@@ -296,25 +416,45 @@ async function getPreviousTestQuestionIds(
     );
   }
 
-  if (!mockTests || mockTests.length === 0) {
+  if (
+    !mockTests ||
+    mockTests.length === 0
+  ) {
     return new Set<string>();
   }
 
-  const mockTestIds = mockTests.map((row) => row.id);
+  const mockTestIds =
+    mockTests.map(
+      (row) => row.id
+    );
 
-  const { data: attempts, error: attemptsError } =
-    await supabaseAdmin
-      .from("nism_attempts")
-      .select(
-        `
-        id,
-        mock_test_id,
-        submitted_at,
-        created_at
-        `
-      )
-      .in("mock_test_id", mockTestIds)
-      .order("created_at", { ascending: false });
+  /* -------------------------------------------------------
+     Get attempts belonging to previous tests
+     ------------------------------------------------------- */
+
+  const {
+    data: attempts,
+    error: attemptsError,
+  } = await supabaseAdmin()
+    .from("nism_attempts")
+    .select(
+      `
+      id,
+      mock_test_id,
+      submitted_at,
+      created_at
+      `
+    )
+    .in(
+      "mock_test_id",
+      mockTestIds
+    )
+    .order(
+      "created_at",
+      {
+        ascending: false,
+      }
+    );
 
   if (attemptsError) {
     throw new Error(
@@ -322,21 +462,33 @@ async function getPreviousTestQuestionIds(
     );
   }
 
-  if (!attempts || attempts.length === 0) {
+  if (
+    !attempts ||
+    attempts.length === 0
+  ) {
     return new Set<string>();
   }
 
-  /*
-    Keep only the latest completed attempt for each mock test.
-  */
-  const latestAttemptByMockTest = new Map<string, string>();
+  const typedAttempts =
+    attempts as AttemptRecord[];
 
-  for (const attempt of attempts) {
+  /* -------------------------------------------------------
+     Keep latest completed attempt for each mock test
+     ------------------------------------------------------- */
+
+  const latestAttemptByMockTest =
+    new Map<string, string>();
+
+  for (const attempt of typedAttempts) {
     if (!attempt.submitted_at) {
       continue;
     }
 
-    if (!latestAttemptByMockTest.has(attempt.mock_test_id)) {
+    if (
+      !latestAttemptByMockTest.has(
+        attempt.mock_test_id
+      )
+    ) {
       latestAttemptByMockTest.set(
         attempt.mock_test_id,
         attempt.id
@@ -344,25 +496,34 @@ async function getPreviousTestQuestionIds(
     }
   }
 
-  const latestAttemptIds = Array.from(
-    latestAttemptByMockTest.values()
-  );
+  const latestAttemptIds =
+    Array.from(
+      latestAttemptByMockTest.values()
+    );
 
-  if (latestAttemptIds.length === 0) {
+  if (
+    latestAttemptIds.length === 0
+  ) {
     return new Set<string>();
   }
 
-  const usedQuestionIds = new Set<string>();
+  /* -------------------------------------------------------
+     Get questions belonging to those attempts
+     ------------------------------------------------------- */
 
-  /*
-    Usually this is only 100 x 9 = 900 rows maximum,
-    so one query is sufficient.
-  */
-  const { data: attemptQuestions, error: attemptQuestionsError } =
-    await supabaseAdmin
-      .from("nism_attempt_questions")
-      .select("attempt_id, question_id")
-      .in("attempt_id", latestAttemptIds);
+  const {
+    data: attemptQuestions,
+    error:
+      attemptQuestionsError,
+  } = await supabaseAdmin()
+    .from("nism_attempt_questions")
+    .select(
+      "attempt_id, question_id"
+    )
+    .in(
+      "attempt_id",
+      latestAttemptIds
+    );
 
   if (attemptQuestionsError) {
     throw new Error(
@@ -370,9 +531,16 @@ async function getPreviousTestQuestionIds(
     );
   }
 
-  for (const row of attemptQuestions || []) {
+  const usedQuestionIds =
+    new Set<string>();
+
+  for (
+    const row of attemptQuestions || []
+  ) {
     if (row.question_id) {
-      usedQuestionIds.add(row.question_id);
+      usedQuestionIds.add(
+        row.question_id
+      );
     }
   }
 
@@ -380,16 +548,17 @@ async function getPreviousTestQuestionIds(
 }
 
 /* =========================================================
-   Select exactly 100 questions.
+   SELECT QUESTIONS
 
    First attempt:
-     - exclude previous test questions
+     previous questions excluded.
 
-   If exact quotas cannot be achieved because of the current
-   bank, retry with previous questions allowed as fallback.
+   Fallback:
+     previous questions allowed if exact quotas cannot
+     otherwise be achieved.
 
-   This means the API should not suddenly fail merely because
-   the bank becomes tight after several tests.
+   This prevents Tests 2-10 from breaking because one
+   particular unit/difficulty pool becomes tight.
    ========================================================= */
 
 function selectQuestions(
@@ -397,19 +566,30 @@ function selectQuestions(
   previousQuestionIds: Set<string>,
   allowPreviousQuestions: boolean
 ): SelectedQuestion[] {
-  const selectedIds = new Set<string>();
+  const selectedIds =
+    new Set<string>();
 
-  const selected: SelectedQuestion[] = [];
+  const selected: SelectedQuestion[] =
+    [];
 
-  const remainingUnits: Record<number, number> = {
+  const remainingUnits: Record<
+    number,
+    number
+  > = {
     ...UNIT_QUOTAS,
   };
 
-  const remainingDifficulty: Record<string, number> = {
+  const remainingDifficulty: Record<
+    string,
+    number
+  > = {
     ...DIFFICULTY_TARGETS,
   };
 
-  const answerCounts: Record<string, number> = {
+  const answerCounts: Record<
+    string,
+    number
+  > = {
     A: 0,
     B: 0,
     C: 0,
@@ -417,32 +597,54 @@ function selectQuestions(
   };
 
   let scenarioApplicationCount = 0;
+
   let calculationCount = 0;
 
-  function isEligible(question: QuestionRecord): boolean {
-    if (selectedIds.has(question.id)) {
+  /* -------------------------------------------------------
+     Determine whether question is eligible
+     ------------------------------------------------------- */
+
+  function isEligible(
+    question: QuestionRecord
+  ): boolean {
+    if (
+      selectedIds.has(question.id)
+    ) {
       return false;
     }
 
     if (
       !allowPreviousQuestions &&
-      previousQuestionIds.has(question.id)
+      previousQuestionIds.has(
+        question.id
+      )
     ) {
       return false;
     }
 
     if (
-      !remainingUnits[question.unit_number] ||
-      remainingUnits[question.unit_number] <= 0
+      !remainingUnits[
+        question.unit_number
+      ] ||
+      remainingUnits[
+        question.unit_number
+      ] <= 0
     ) {
       return false;
     }
 
-    const difficulty = normalizeDifficulty(question.difficulty);
+    const difficulty =
+      normalizeDifficulty(
+        question.difficulty
+      );
 
     if (
-      !remainingDifficulty[difficulty] ||
-      remainingDifficulty[difficulty] <= 0
+      !remainingDifficulty[
+        difficulty
+      ] ||
+      remainingDifficulty[
+        difficulty
+      ] <= 0
     ) {
       return false;
     }
@@ -450,27 +652,45 @@ function selectQuestions(
     return true;
   }
 
+  /* -------------------------------------------------------
+     Get candidates for unit + difficulty
+     ------------------------------------------------------- */
+
   function getPairCandidates(
     unitNumber: number,
     difficulty: string
   ): QuestionRecord[] {
-    return allQuestions.filter((question) => {
-      if (!isEligible(question)) return false;
+    return allQuestions.filter(
+      (question) => {
+        if (
+          !isEligible(question)
+        ) {
+          return false;
+        }
 
-      if (question.unit_number !== unitNumber) {
-        return false;
+        if (
+          question.unit_number !==
+          unitNumber
+        ) {
+          return false;
+        }
+
+        return (
+          normalizeDifficulty(
+            question.difficulty
+          ) === difficulty
+        );
       }
-
-      return normalizeDifficulty(question.difficulty) === difficulty;
-    });
+    );
   }
 
-  /*
-    Select the most constrained unit/difficulty pair first.
-    This greatly reduces the chance of reaching the end with
-    an impossible quota.
-  */
-  while (selected.length < 100) {
+  /* -------------------------------------------------------
+     Select most constrained pair first
+     ------------------------------------------------------- */
+
+  while (
+    selected.length < 100
+  ) {
     const availablePairs: Array<{
       unit: number;
       difficulty: string;
@@ -478,38 +698,56 @@ function selectQuestions(
       scarcity: number;
     }> = [];
 
-    for (const unitString of Object.keys(remainingUnits)) {
-      const unit = Number(unitString);
+    for (
+      const unitString of Object.keys(
+        remainingUnits
+      )
+    ) {
+      const unit =
+        Number(unitString);
 
-      if (remainingUnits[unit] <= 0) continue;
+      if (
+        remainingUnits[unit] <= 0
+      ) {
+        continue;
+      }
 
-      for (const difficulty of Object.keys(
-        remainingDifficulty
-      )) {
-        if (remainingDifficulty[difficulty] <= 0) {
+      for (
+        const difficulty of Object.keys(
+          remainingDifficulty
+        )
+      ) {
+        if (
+          remainingDifficulty[
+            difficulty
+          ] <= 0
+        ) {
           continue;
         }
 
-        const candidates = getPairCandidates(
-          unit,
-          difficulty
-        );
+        const candidates =
+          getPairCandidates(
+            unit,
+            difficulty
+          );
 
-        if (candidates.length === 0) {
+        if (
+          candidates.length === 0
+        ) {
           continue;
         }
 
-        /*
-          Fewer candidates = more constrained.
-          Give priority to that pair.
-        */
         const need =
           Math.min(
             remainingUnits[unit],
-            remainingDifficulty[difficulty]
+            remainingDifficulty[
+              difficulty
+            ]
           ) || 1;
 
-        const scarcity = candidates.length / need;
+        const scarcity =
+          candidates.length /
+          need;
 
         availablePairs.push({
           unit,
@@ -520,61 +758,99 @@ function selectQuestions(
       }
     }
 
-    if (availablePairs.length === 0) {
+    if (
+      availablePairs.length === 0
+    ) {
       break;
     }
 
+    /*
+      Most constrained pair first.
+    */
     availablePairs.sort(
-      (a, b) => a.scarcity - b.scarcity
+      (a, b) =>
+        a.scarcity -
+        b.scarcity
     );
 
-    const chosenPair = availablePairs[0];
+    const chosenPair =
+      availablePairs[0];
 
-    const rankedCandidates = [...chosenPair.candidates]
-      .map((question) => ({
-        question,
-        score: candidateScore(
+    /* -----------------------------------------------------
+       Rank questions inside selected pair
+       ----------------------------------------------------- */
+
+    const rankedCandidates =
+      chosenPair.candidates
+        .map((question) => ({
           question,
-          answerCounts,
-          scenarioApplicationCount,
-          calculationCount
-        ),
-      }))
-      .sort((a, b) => b.score - a.score);
+          score:
+            candidateScore(
+              question,
+              answerCounts,
+              scenarioApplicationCount,
+              calculationCount
+            ),
+        }))
+        .sort(
+          (a, b) =>
+            b.score -
+            a.score
+        );
 
     /*
-      Pick from the top candidates with a small random window.
-      This preserves quality preference while preventing
-      identical question ordering on every run.
+      Choose randomly from the best few candidates.
+      This preserves quality preference but avoids
+      identical tests every time.
     */
-    const randomWindow = Math.min(
-      5,
-      rankedCandidates.length
-    );
+    const randomWindow =
+      Math.min(
+        5,
+        rankedCandidates.length
+      );
 
     const chosen =
       rankedCandidates[
-        Math.floor(Math.random() * randomWindow)
+        Math.floor(
+          Math.random() *
+            randomWindow
+        )
       ].question;
 
+    /* -----------------------------------------------------
+       Add question
+       ----------------------------------------------------- */
+
     selected.push(chosen);
-    selectedIds.add(chosen.id);
 
-    remainingUnits[chosen.unit_number]--;
-
-    const chosenDifficulty = normalizeDifficulty(
-      chosen.difficulty
+    selectedIds.add(
+      chosen.id
     );
 
-    remainingDifficulty[chosenDifficulty]--;
+    remainingUnits[
+      chosen.unit_number
+    ]--;
 
-    const answer = normalizeAnswer(chosen.correct_option);
+    const chosenDifficulty =
+      normalizeDifficulty(
+        chosen.difficulty
+      );
+
+    remainingDifficulty[
+      chosenDifficulty
+    ]--;
+
+    const answer =
+      normalizeAnswer(
+        chosen.correct_option
+      );
 
     answerCounts[answer]++;
 
-    const type = normalizeQuestionType(
-      chosen.question_type
-    );
+    const type =
+      normalizeQuestionType(
+        chosen.question_type
+      );
 
     if (
       type === "Scenario" ||
@@ -592,32 +868,68 @@ function selectQuestions(
     }
   }
 
-  /*
-    Exact validation.
-  */
-  if (selected.length !== 100) {
+  /* -------------------------------------------------------
+     Exact count validation
+     ------------------------------------------------------- */
+
+  if (
+    selected.length !== 100
+  ) {
     return [];
   }
 
-  for (const unit of Object.keys(UNIT_QUOTAS)) {
-    const unitNumber = Number(unit);
+  /* -------------------------------------------------------
+     Validate unit distribution
+     ------------------------------------------------------- */
 
-    const actual = selected.filter(
-      (q) => q.unit_number === unitNumber
-    ).length;
+  for (
+    const unit of Object.keys(
+      UNIT_QUOTAS
+    )
+  ) {
+    const unitNumber =
+      Number(unit);
 
-    if (actual !== UNIT_QUOTAS[unitNumber]) {
+    const actual =
+      selected.filter(
+        (question) =>
+          question.unit_number ===
+          unitNumber
+      ).length;
+
+    if (
+      actual !==
+      UNIT_QUOTAS[
+        unitNumber
+      ]
+    ) {
       return [];
     }
   }
 
-  for (const difficulty of Object.keys(DIFFICULTY_TARGETS)) {
-    const actual = selected.filter(
-      (q) =>
-        normalizeDifficulty(q.difficulty) === difficulty
-    ).length;
+  /* -------------------------------------------------------
+     Validate difficulty distribution
+     ------------------------------------------------------- */
 
-    if (actual !== DIFFICULTY_TARGETS[difficulty]) {
+  for (
+    const difficulty of Object.keys(
+      DIFFICULTY_TARGETS
+    )
+  ) {
+    const actual =
+      selected.filter(
+        (question) =>
+          normalizeDifficulty(
+            question.difficulty
+          ) === difficulty
+      ).length;
+
+    if (
+      actual !==
+      DIFFICULTY_TARGETS[
+        difficulty
+      ]
+    ) {
       return [];
     }
   }
@@ -626,17 +938,18 @@ function selectQuestions(
 }
 
 /* =========================================================
-   Improve answer-position balance.
-
-   We do not change the correct answer itself.
-   We only replace a selected question with another question
-   having the same unit + difficulty.
+   REBALANCE ANSWER POSITIONS
 
    Target:
-     approximately 20-30 of each A/B/C/D.
+     approximately 20-30 questions for each A/B/C/D.
 
-   This is deliberately a soft balance rather than a hard
-   requirement so content selection remains more important.
+   Replacement is allowed only when:
+     - same unit
+     - same difficulty
+     - question not already selected
+     - previous-test exclusion respected
+
+   We never modify correct_option.
    ========================================================= */
 
 function rebalanceAnswerPositions(
@@ -645,73 +958,123 @@ function rebalanceAnswerPositions(
   previousQuestionIds: Set<string>,
   allowPreviousQuestions: boolean
 ): SelectedQuestion[] {
-  const selectedIds = new Set(
-    selected.map((question) => question.id)
-  );
+  const selectedIds =
+    new Set(
+      selected.map(
+        (question) =>
+          question.id
+      )
+    );
 
-  const counts: Record<string, number> = {
+  const counts: Record<
+    string,
+    number
+  > = {
     A: 0,
     B: 0,
     C: 0,
     D: 0,
   };
 
-  for (const question of selected) {
-    counts[normalizeAnswer(question.correct_option)]++;
+  for (
+    const question of selected
+  ) {
+    const answer =
+      normalizeAnswer(
+        question.correct_option
+      );
+
+    counts[answer]++;
   }
 
   function findReplacement(
     selectedQuestion: SelectedQuestion,
     desiredAnswer: string
   ): QuestionRecord | null {
-    const candidates = allQuestions.filter((question) => {
-      if (selectedIds.has(question.id)) return false;
+    const candidates =
+      allQuestions.filter(
+        (question) => {
+          if (
+            selectedIds.has(
+              question.id
+            )
+          ) {
+            return false;
+          }
 
-      if (
-        !allowPreviousQuestions &&
-        previousQuestionIds.has(question.id)
-      ) {
-        return false;
-      }
+          if (
+            !allowPreviousQuestions &&
+            previousQuestionIds.has(
+              question.id
+            )
+          ) {
+            return false;
+          }
 
-      if (
-        question.unit_number !==
-        selectedQuestion.unit_number
-      ) {
-        return false;
-      }
+          if (
+            question.unit_number !==
+            selectedQuestion.unit_number
+          ) {
+            return false;
+          }
 
-      if (
-        normalizeDifficulty(question.difficulty) !==
-        normalizeDifficulty(selectedQuestion.difficulty)
-      ) {
-        return false;
-      }
+          if (
+            normalizeDifficulty(
+              question.difficulty
+            ) !==
+            normalizeDifficulty(
+              selectedQuestion.difficulty
+            )
+          ) {
+            return false;
+          }
 
-      return (
-        normalizeAnswer(question.correct_option) ===
-        desiredAnswer
+          return (
+            normalizeAnswer(
+              question.correct_option
+            ) === desiredAnswer
+          );
+        }
       );
-    });
 
-    if (candidates.length === 0) {
+    if (
+      candidates.length === 0
+    ) {
       return null;
     }
 
-    return shuffle(candidates)[0];
+    return shuffle(
+      candidates
+    )[0];
   }
 
   /*
-    Repair extreme imbalance only.
+    Maximum 30 repair iterations.
   */
-  for (let iteration = 0; iteration < 30; iteration++) {
-    const entries = Object.entries(counts);
+  for (
+    let iteration = 0;
+    iteration < 30;
+    iteration++
+  ) {
+    const entries =
+      Object.entries(counts);
 
-    entries.sort((a, b) => b[1] - a[1]);
+    entries.sort(
+      (a, b) =>
+        b[1] - a[1]
+    );
 
-    const highest = entries[0];
-    const lowest = entries[entries.length - 1];
+    const highest =
+      entries[0];
 
+    const lowest =
+      entries[
+        entries.length - 1
+      ];
+
+    /*
+      Already nicely balanced.
+    */
     if (
       highest[1] <= 30 &&
       lowest[1] >= 20
@@ -719,33 +1082,50 @@ function rebalanceAnswerPositions(
       break;
     }
 
-    const overAnswer = highest[0];
-    const underAnswer = lowest[0];
+    const overAnswer =
+      highest[0];
 
-    const overIndex = selected.findIndex(
-      (question) =>
-        normalizeAnswer(question.correct_option) ===
-        overAnswer
-    );
+    const underAnswer =
+      lowest[0];
 
-    if (overIndex === -1) break;
+    const overIndex =
+      selected.findIndex(
+        (question) =>
+          normalizeAnswer(
+            question.correct_option
+          ) === overAnswer
+      );
 
-    const replacement = findReplacement(
-      selected[overIndex],
-      underAnswer
-    );
+    if (
+      overIndex === -1
+    ) {
+      break;
+    }
+
+    const replacement =
+      findReplacement(
+        selected[overIndex],
+        underAnswer
+      );
 
     if (!replacement) {
       break;
     }
 
-    selectedIds.delete(selected[overIndex].id);
-    selectedIds.add(replacement.id);
+    selectedIds.delete(
+      selected[overIndex].id
+    );
+
+    selectedIds.add(
+      replacement.id
+    );
 
     counts[overAnswer]--;
+
     counts[underAnswer]++;
 
-    selected[overIndex] = replacement;
+    selected[overIndex] =
+      replacement;
   }
 
   return selected;
@@ -755,32 +1135,54 @@ function rebalanceAnswerPositions(
    POST
    ========================================================= */
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const body = await request.json();
+    /* -----------------------------------------------------
+       Read request
+       ----------------------------------------------------- */
 
-    const testNumber = Number(body?.testNumber);
+    const body =
+      await request.json();
+
+    const testNumber =
+      Number(
+        body?.testNumber
+      );
+
+    /* -----------------------------------------------------
+       Validate test number
+       ----------------------------------------------------- */
 
     if (
-      !Number.isInteger(testNumber) ||
+      !Number.isInteger(
+        testNumber
+      ) ||
       testNumber < 1 ||
       testNumber > 10
     ) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid test number. Test number must be 1-10.",
+          error:
+            "Invalid test number. Test number must be 1-10.",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
     /* -----------------------------------------------------
-       1. Load mock test configuration
+       1. Get mock test configuration
        ----------------------------------------------------- */
 
-    const { data: mockTest, error: mockTestError } =
-      await supabaseAdmin
+    const {
+      data: mockTest,
+      error: mockTestError,
+    } =
+      await supabaseAdmin()
         .from("nism_mock_tests")
         .select(
           `
@@ -794,18 +1196,30 @@ export async function POST(request: Request) {
           is_active
           `
         )
-        .eq("module_code", MODULE_CODE)
-        .eq("test_number", testNumber)
-        .eq("is_active", true)
+        .eq(
+          "module_code",
+          MODULE_CODE
+        )
+        .eq(
+          "test_number",
+          testNumber
+        )
+        .eq(
+          "is_active",
+          true
+        )
         .maybeSingle();
 
     if (mockTestError) {
       return NextResponse.json(
         {
           success: false,
-          error: `Failed to load mock test: ${mockTestError.message}`,
+          error:
+            `Failed to load mock test: ${mockTestError.message}`,
         },
-        { status: 500 }
+        {
+          status: 500,
+        }
       );
     }
 
@@ -813,9 +1227,12 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: `Mock Test ${testNumber} is not configured.`,
+          error:
+            `Mock Test ${testNumber} is not configured.`,
         },
-        { status: 404 }
+        {
+          status: 404,
+        }
       );
     }
 
@@ -826,13 +1243,22 @@ export async function POST(request: Request) {
     const allQuestions =
       await fetchAllActiveQuestions();
 
-    if (allQuestions.length < 100) {
+    console.log(
+      `NISM: Loaded ${allQuestions.length} active questions.`
+    );
+
+    if (
+      allQuestions.length < 100
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: `Only ${allQuestions.length} active questions are available. At least 100 are required.`,
+          error:
+            `Only ${allQuestions.length} active questions are available. At least 100 are required.`,
         },
-        { status: 500 }
+        {
+          status: 500,
+        }
       );
     }
 
@@ -841,93 +1267,155 @@ export async function POST(request: Request) {
        ----------------------------------------------------- */
 
     const previousQuestionIds =
-      await getPreviousTestQuestionIds(testNumber);
+      await getPreviousTestQuestionIds(
+        testNumber
+      );
+
+    console.log(
+      `NISM Test ${testNumber}: ${previousQuestionIds.size} previous-test questions excluded.`
+    );
 
     /* -----------------------------------------------------
        4. First selection attempt
-          Previous tests excluded
+
+       Previous test questions excluded.
        ----------------------------------------------------- */
 
-    let selectedQuestions = selectQuestions(
-      allQuestions,
-      previousQuestionIds,
-      false
-    );
-
-    let usedFallback = false;
-
-    /* -----------------------------------------------------
-       5. If bank constraints become tight, retry allowing
-          previous questions.
-
-          This protects the API from failing after several
-          tests have been generated.
-       ----------------------------------------------------- */
-
-    if (selectedQuestions.length !== 100) {
-      selectedQuestions = selectQuestions(
+    let selectedQuestions =
+      selectQuestions(
         allQuestions,
         previousQuestionIds,
-        true
+        false
       );
+
+    let usedFallback =
+      false;
+
+    /* -----------------------------------------------------
+       5. Fallback
+
+       If exact unit + difficulty quotas cannot be
+       achieved without previous questions, allow
+       previous questions.
+
+       This keeps the test operational even if the
+       question bank becomes tight.
+       ----------------------------------------------------- */
+
+    if (
+      selectedQuestions.length !== 100
+    ) {
+      console.warn(
+        `NISM Test ${testNumber}: strict previous-test exclusion could not generate 100 questions. Using fallback.`
+      );
+
+      selectedQuestions =
+        selectQuestions(
+          allQuestions,
+          previousQuestionIds,
+          true
+        );
 
       usedFallback = true;
     }
 
-    if (selectedQuestions.length !== 100) {
+    /* -----------------------------------------------------
+       Final selection validation
+       ----------------------------------------------------- */
+
+    if (
+      selectedQuestions.length !== 100
+    ) {
       return NextResponse.json(
         {
           success: false,
           error:
             "Unable to generate a valid 100-question mock test with the current question bank. Please review active questions by unit and difficulty.",
         },
-        { status: 500 }
+        {
+          status: 500,
+        }
       );
     }
 
     /* -----------------------------------------------------
-       6. Balance answer positions
+       6. Answer-position balancing
        ----------------------------------------------------- */
 
-    selectedQuestions = rebalanceAnswerPositions(
-      selectedQuestions,
-      allQuestions,
-      previousQuestionIds,
-      usedFallback
-    );
+    selectedQuestions =
+      rebalanceAnswerPositions(
+        selectedQuestions,
+        allQuestions,
+        previousQuestionIds,
+        usedFallback
+      );
 
     /* -----------------------------------------------------
-       7. Final shuffle
+       7. Final random order
+
+       The selection logic decides WHAT questions to use.
+       This decides their display order.
        ----------------------------------------------------- */
 
-    selectedQuestions = shuffle(selectedQuestions);
+    selectedQuestions =
+      shuffle(
+        selectedQuestions
+      );
 
     /* -----------------------------------------------------
        8. Create attempt
        ----------------------------------------------------- */
 
-    const { data: attempt, error: attemptError } =
-      await supabaseAdmin
+    const {
+      data: attempt,
+      error: attemptError,
+    } =
+      await supabaseAdmin()
         .from("nism_attempts")
         .insert({
-          module_code: MODULE_CODE,
-          mock_test_id: mockTest.id,
-          started_at: new Date().toISOString(),
-          total_questions: selectedQuestions.length,
-          attempted_questions: 0,
-          correct_answers: 0,
-          wrong_answers: 0,
-          unanswered_questions: selectedQuestions.length,
+          module_code:
+            MODULE_CODE,
+
+          mock_test_id:
+            mockTest.id,
+
+          started_at:
+            new Date().toISOString(),
+
+          total_questions:
+            selectedQuestions.length,
+
+          attempted_questions:
+            0,
+
+          correct_answers:
+            0,
+
+          wrong_answers:
+            0,
+
+          unanswered_questions:
+            selectedQuestions.length,
+
           score: 0,
+
           percentage: 0,
+
           passed: false,
-          time_taken_seconds: 0,
-          status: "in_progress",
+
+          time_taken_seconds:
+            0,
+
+          status:
+            "in_progress",
         })
         .select("id")
         .single();
 
-    if (attemptError || !attempt) {
+    if (
+      attemptError ||
+      !attempt
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -935,37 +1423,56 @@ export async function POST(request: Request) {
             attemptError?.message ||
             "Failed to create NISM attempt.",
         },
-        { status: 500 }
+        {
+          status: 500,
+        }
       );
     }
 
     /* -----------------------------------------------------
-       9. Store attempt question mapping
-
-       Correct answers remain in nism_questions only.
-       Browser receives safe question data below.
+       9. Save question mapping
        ----------------------------------------------------- */
 
     const attemptQuestionRows =
-      selectedQuestions.map((question, index) => ({
-        attempt_id: attempt.id,
-        question_id: question.id,
-        question_number: index + 1,
-      }));
+      selectedQuestions.map(
+        (question, index) => ({
+          attempt_id:
+            attempt.id,
 
-    const { error: attemptQuestionError } =
-      await supabaseAdmin
-        .from("nism_attempt_questions")
-        .insert(attemptQuestionRows);
+          question_id:
+            question.id,
 
-    if (attemptQuestionError) {
+          question_number:
+            index + 1,
+        })
+      );
+
+    const {
+      error:
+        attemptQuestionError,
+    } =
+      await supabaseAdmin()
+        .from(
+          "nism_attempt_questions"
+        )
+        .insert(
+          attemptQuestionRows
+        );
+
+    if (
+      attemptQuestionError
+    ) {
       /*
-        Remove orphan attempt if mapping failed.
+        Remove orphan attempt if question mapping fails.
       */
-      await supabaseAdmin
+
+      await supabaseAdmin()
         .from("nism_attempts")
         .delete()
-        .eq("id", attempt.id);
+        .eq(
+          "id",
+          attempt.id
+        );
 
       return NextResponse.json(
         {
@@ -973,45 +1480,84 @@ export async function POST(request: Request) {
           error:
             `Failed to store attempt questions: ${attemptQuestionError.message}`,
         },
-        { status: 500 }
+        {
+          status: 500,
+        }
       );
     }
 
     /* -----------------------------------------------------
-       10. Never send correct_option to browser
+       10. Never expose correct_option to browser
+
+       This is important for exam security.
        ----------------------------------------------------- */
 
-    const safeQuestions = selectedQuestions.map(
-      (question, index) => ({
-        id: question.id,
-        questionNumber: index + 1,
-        unitNumber: question.unit_number,
-        unitTitle: question.unit_title,
-        topic: question.topic,
-        questionText: question.question_text,
-        optionA: question.option_a,
-        optionB: question.option_b,
-        optionC: question.option_c,
-        optionD: question.option_d,
-        difficulty: normalizeDifficulty(
-          question.difficulty
-        ),
-      })
-    );
+    const safeQuestions =
+      selectedQuestions.map(
+        (question, index) => ({
+          id: question.id,
+
+          questionNumber:
+            index + 1,
+
+          unitNumber:
+            question.unit_number,
+
+          unitTitle:
+            question.unit_title,
+
+          topic:
+            question.topic,
+
+          questionText:
+            question.question_text,
+
+          optionA:
+            question.option_a,
+
+          optionB:
+            question.option_b,
+
+          optionC:
+            question.option_c,
+
+          optionD:
+            question.option_d,
+
+          difficulty:
+            normalizeDifficulty(
+              question.difficulty
+            ),
+        })
+      );
 
     /* -----------------------------------------------------
-       11. Return same response structure expected by the
-           existing frontend.
+       11. Return response
+
+       IMPORTANT:
+       This structure is kept compatible with the existing
+       frontend.
        ----------------------------------------------------- */
 
     return NextResponse.json({
       success: true,
-      attemptId: attempt.id,
-      testNumber,
-      questionCount: safeQuestions.length,
+
+      attemptId:
+        attempt.id,
+
+      testNumber:
+
+        testNumber,
+
+      questionCount:
+        safeQuestions.length,
+
       durationMinutes:
-        mockTest.duration_minutes ?? 120,
-      questions: safeQuestions,
+        mockTest.duration_minutes ??
+        120,
+
+      questions:
+        safeQuestions,
     });
   } catch (error) {
     console.error(
@@ -1027,7 +1573,9 @@ export async function POST(request: Request) {
             ? error.message
             : "Unexpected server error.",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
