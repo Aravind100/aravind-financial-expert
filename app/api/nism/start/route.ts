@@ -25,19 +25,26 @@ const DIFFICULTY_TARGETS: Record<string, number> = {
 };
 
 /*
- * Preferred question-type mix.
+ * Realistic target based on the current question bank.
  *
  * These are SOFT targets.
- * The engine will strongly prefer them,
- * but will not fail if the question bank
- * does not contain enough questions of a type.
+ *
+ * Current bank has approximately:
+ * Conceptual: 1039
+ * Application: 24
+ * Scenario: 25
+ * Calculation: 12
+ * Regulatory: 0
+ *
+ * Scenario/calculation flags provide additional
+ * usable questions.
  */
 const QUESTION_TYPE_TARGETS: Record<string, number> = {
   Conceptual: 50,
-  Application: 15,
-  Scenario: 15,
-  Calculation: 10,
-  Regulatory: 10,
+  Application: 20,
+  Scenario: 18,
+  Calculation: 12,
+  Regulatory: 0,
 };
 
 const ANSWER_TARGETS: Record<string, number> = {
@@ -116,14 +123,6 @@ function normalizeAnswer(
   return "A";
 }
 
-/*
- * Determine the effective question type.
- *
- * Explicit question_type is preferred.
- * Scenario/calculation flags are used as
- * additional protection when metadata was
- * not fully classified.
- */
 function normalizeQuestionType(
   value: string | null | undefined
 ): string {
@@ -131,45 +130,70 @@ function normalizeQuestionType(
     .trim()
     .toLowerCase();
 
-  if (v === "scenario") return "Scenario";
-  if (v === "application") return "Application";
-  if (v === "calculation") return "Calculation";
-  if (v === "regulatory") return "Regulatory";
+  if (v === "application") {
+    return "Application";
+  }
+
+  if (v === "scenario") {
+    return "Scenario";
+  }
+
+  if (v === "calculation") {
+    return "Calculation";
+  }
+
+  if (v === "regulatory") {
+    return "Regulatory";
+  }
 
   return "Conceptual";
 }
 
+/*
+ * Determine the effective type of a question.
+ *
+ * Priority:
+ *
+ * 1. Calculation flag
+ * 2. Scenario flag
+ * 3. Explicit Application
+ * 4. Explicit Regulatory
+ * 5. Conceptual
+ *
+ * This allows the existing database flags to
+ * improve classification without editing 1,100
+ * questions manually.
+ */
 function getEffectiveQuestionType(
   question: QuestionRecord
 ): string {
+  if (
+    question.is_calculation === true
+  ) {
+    return "Calculation";
+  }
+
+  if (
+    question.is_scenario === true
+  ) {
+    return "Scenario";
+  }
+
   const explicitType =
     normalizeQuestionType(
       question.question_type
     );
 
-  /*
-   * If explicit metadata says something
-   * specific, trust it.
-   */
   if (
-    explicitType === "Application" ||
-    explicitType === "Scenario" ||
-    explicitType === "Calculation" ||
+    explicitType === "Application"
+  ) {
+    return "Application";
+  }
+
+  if (
     explicitType === "Regulatory"
   ) {
-    return explicitType;
-  }
-
-  /*
-   * Use flags to identify questions that
-   * were marked as scenario/calculation.
-   */
-  if (question.is_calculation === true) {
-    return "Calculation";
-  }
-
-  if (question.is_scenario === true) {
-    return "Scenario";
+    return "Regulatory";
   }
 
   return "Conceptual";
@@ -178,29 +202,35 @@ function getEffectiveQuestionType(
 function getQualityScore(
   question: QuestionRecord
 ): number {
-  const status = String(
-    question.quality_status || ""
-  )
-    .trim()
-    .toLowerCase();
+  const status =
+    String(
+      question.quality_status || ""
+    )
+      .trim()
+      .toLowerCase();
 
   if (status === "approved") {
-    return 35;
+    return 25;
   }
 
   if (status === "review") {
-    return 10;
+    return 5;
   }
 
   return 0;
 }
 
 /*
- * Score according to how far the current
- * test is from the preferred question-type mix.
+ * Type balancing.
  *
- * The farther below target a type is,
- * the stronger the preference becomes.
+ * IMPORTANT:
+ *
+ * We compare CURRENT / TARGET rather than
+ * simply TARGET - CURRENT.
+ *
+ * This prevents the 50-question Conceptual
+ * target from overpowering all the smaller
+ * categories.
  */
 function getQuestionTypeScore(
   question: QuestionRecord,
@@ -214,66 +244,62 @@ function getQuestionTypeScore(
   const target =
     QUESTION_TYPE_TARGETS[type] || 0;
 
+  /*
+   * Regulatory currently has no available
+   * questions, so don't attempt to force it.
+   */
+  if (target <= 0) {
+    return -100;
+  }
+
   const current =
     typeCounts[type] || 0;
 
-  const remainingNeed =
-    Math.max(
-      0,
-      target - current
-    );
-
-  let score = 0;
+  const progressRatio =
+    current / target;
 
   /*
-   * Strong preference for types
-   * that are currently under target.
+   * Maximum priority at the beginning.
+   * Priority reduces as the type approaches
+   * its target.
    */
-  score += remainingNeed * 6;
+  let score =
+    (1 - progressRatio) * 100;
 
   /*
-   * Extra priority for Application,
-   * Scenario and Calculation because
-   * these are currently underrepresented
-   * in the existing question bank selections.
+   * Stronger preference for the less common
+   * practical question styles.
    */
   if (
-    type === "Application" &&
+    type === "Calculation" &&
     current < target
   ) {
-    score += 30;
+    score += 25;
   }
 
   if (
     type === "Scenario" &&
     current < target
   ) {
-    score += 35;
+    score += 20;
   }
 
   if (
-    type === "Calculation" &&
+    type === "Application" &&
     current < target
   ) {
-    score += 40;
-  }
-
-  if (
-    type === "Regulatory" &&
-    current < target
-  ) {
-    score += 30;
+    score += 15;
   }
 
   /*
-   * Once a type reaches its target,
-   * reduce its priority heavily.
+   * Once the target is reached, strongly
+   * discourage additional questions of that
+   * type unless necessary.
    */
   if (
-    target > 0 &&
     current >= target
   ) {
-    score -= 45;
+    score -= 100;
   }
 
   return score;
@@ -296,7 +322,7 @@ function getAnswerBalanceScore(
 
   return (
     target - current
-  ) * 5;
+  ) * 4;
 }
 
 function getCandidateScore(
@@ -507,16 +533,16 @@ async function getPreviousTestQuestionIds(
     return new Set<string>();
   }
 
-  /*
-   * Keep the newest submitted attempt
-   * for each previous mock test.
-   */
   const latestAttemptIds =
     new Map<
       string,
       string
     >();
 
+  /*
+   * Only completed/submitted attempts
+   * are used for no-repeat logic.
+   */
   for (
     const attempt of
       attempts
@@ -708,8 +734,8 @@ function selectQuestions(
       }> = [];
 
     /*
-     * Find available
-     * unit/difficulty combinations.
+     * Preserve the exact unit and
+     * difficulty quotas.
      */
     for (
       const unitKey of
@@ -809,9 +835,7 @@ function selectQuestions(
     }
 
     /*
-     * Always handle the most
-     * constrained unit/difficulty
-     * combination first.
+     * Protect scarce combinations first.
      */
     availablePairs.sort(
       (a, b) =>
@@ -823,7 +847,8 @@ function selectQuestions(
       availablePairs[0];
 
     /*
-     * Score every candidate.
+     * Rank candidates inside the
+     * selected unit/difficulty bucket.
      */
     const ranked =
       chosenPair.candidates
@@ -847,15 +872,12 @@ function selectQuestions(
         );
 
     /*
-     * Select randomly from the
-     * strongest candidates.
-     *
-     * This prevents every generated
-     * mock test from being identical.
+     * Randomize among the best candidates
+     * so tests are not identical.
      */
     const topCount =
       Math.min(
-        7,
+        8,
         ranked.length
       );
 
@@ -911,8 +933,7 @@ function selectQuestions(
   }
 
   /*
-   * Must always produce
-   * exactly 100 questions.
+   * Must contain exactly 100.
    */
   if (
     selected.length !==
@@ -922,7 +943,7 @@ function selectQuestions(
   }
 
   /*
-   * Verify exact unit quotas.
+   * Validate unit distribution.
    */
   for (
     const unitKey of
@@ -955,7 +976,7 @@ function selectQuestions(
   }
 
   /*
-   * Verify exact difficulty quotas.
+   * Validate difficulty distribution.
    */
   for (
     const difficulty of
@@ -1069,6 +1090,23 @@ function rebalanceAnswerPositions(
             return false;
           }
 
+          /*
+           * Keep the same effective question
+           * type when replacing, so answer
+           * balancing doesn't destroy the
+           * question-type balance.
+           */
+          if (
+            getEffectiveQuestionType(
+              question
+            ) !==
+            getEffectiveQuestionType(
+              original
+            )
+          ) {
+            return false;
+          }
+
           return (
             normalizeAnswer(
               question.correct_option
@@ -1090,10 +1128,6 @@ function rebalanceAnswerPositions(
     )[0];
   }
 
-  /*
-   * Keep answer positions
-   * reasonably balanced.
-   */
   for (
     let i = 0;
     i < 30;
@@ -1323,8 +1357,8 @@ export async function POST(
     }
 
     /*
-     * Get questions used in the
-     * latest submitted previous tests.
+     * Find questions used by the latest
+     * submitted previous tests.
      */
     const previousQuestionIds =
       await getPreviousTestQuestionIds(
@@ -1336,8 +1370,8 @@ export async function POST(
     );
 
     /*
-     * First attempt:
-     * strict no-reuse mode.
+     * Strict selection:
+     * no reuse of previous completed tests.
      */
     let selectedQuestions =
       selectQuestions(
@@ -1350,17 +1384,16 @@ export async function POST(
       false;
 
     /*
-     * If the bank cannot satisfy
-     * all exact unit/difficulty
-     * constraints without reuse,
-     * activate fallback.
+     * Fallback only if exact 100 questions
+     * cannot be created under all current
+     * unit/difficulty constraints.
      */
     if (
       selectedQuestions.length !==
       100
     ) {
       console.warn(
-        `NISM Test ${testNumber}: strict selection could not create 100 questions. Activating fallback.`
+        `NISM Test ${testNumber}: strict selection failed. Activating fallback.`
       );
 
       selectedQuestions =
@@ -1391,7 +1424,8 @@ export async function POST(
     }
 
     /*
-     * Balance answer positions.
+     * Balance A/B/C/D without changing
+     * unit, difficulty or effective type.
      */
     selectedQuestions =
       rebalanceAnswerPositions(
@@ -1402,7 +1436,7 @@ export async function POST(
       );
 
     /*
-     * Final random order.
+     * Random final order.
      */
     selectedQuestions =
       shuffle(
@@ -1544,19 +1578,11 @@ export async function POST(
     }
 
     /*
+     * Safe frontend response.
+     *
      * IMPORTANT:
-     *
-     * Frontend expects:
-     *
-     * options: {
-     *   A: "...",
-     *   B: "...",
-     *   C: "...",
-     *   D: "..."
-     * }
-     *
-     * Correct answer is NEVER
-     * sent to the browser.
+     * correct_option is NEVER sent
+     * to the browser.
      */
     const safeQuestions =
       selectedQuestions.map(
@@ -1635,6 +1661,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
+
         error:
           error instanceof Error
             ? error.message
