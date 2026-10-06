@@ -43,7 +43,10 @@ async function getArticle(slug: string): Promise<Article | null> {
 function getAbsoluteImageUrl(imageUrl: string | null) {
   if (!imageUrl) return undefined
 
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+  if (
+    imageUrl.startsWith('http://') ||
+    imageUrl.startsWith('https://')
+  ) {
     return imageUrl
   }
 
@@ -73,6 +76,7 @@ export async function generateMetadata({
   const description =
     article.excerpt ||
     article.content
+      .replace(/<[^>]*>/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 155)
@@ -199,6 +203,7 @@ export default async function ArticlePage({
    * characters inside article fields from breaking
    * the JSON-LD script.
    */
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -208,6 +213,7 @@ export default async function ArticlePage({
     description:
       typedArticle.excerpt ||
       typedArticle.content
+        .replace(/<[^>]*>/g, ' ')
         .replace(/\s+/g, ' ')
         .trim()
         .slice(0, 155),
@@ -295,6 +301,7 @@ export default async function ArticlePage({
           )}
 
           <div className="articleMeta">
+
             {typedArticle.published_at
               ? new Date(
                   typedArticle.published_at
@@ -310,6 +317,7 @@ export default async function ArticlePage({
                   month: 'long',
                   year: 'numeric',
                 })}
+
           </div>
 
         </div>
@@ -322,29 +330,18 @@ export default async function ArticlePage({
           />
         )}
 
-        <div className="articleBody">
-          {typedArticle.content
-            .split('\n')
-            .map((paragraph, index) => {
-
-              const text = paragraph.trim()
-
-              if (!text) {
-                return (
-                  <div
-                    key={index}
-                    className="articleSpace"
-                  />
-                )
-              }
-
-              return (
-                <p key={index}>
-                  {text}
-                </p>
-              )
-            })}
-        </div>
+        {/* 
+          IMPORTANT:
+          Article content is stored as HTML in Supabase.
+          dangerouslySetInnerHTML allows links, headings,
+          lists, bold text, etc. to render correctly.
+        */}
+        <div
+          className="articleBody"
+          dangerouslySetInnerHTML={{
+            __html: typedArticle.content,
+          }}
+        />
 
         {typedArticle.tags &&
           typedArticle.tags.length > 0 && (
@@ -371,12 +368,14 @@ export default async function ArticlePage({
         </div>
 
         <div className="articleBottom">
+
           <Link
             href="/articles"
             className="backButton"
           >
             ← View All Articles
           </Link>
+
         </div>
 
       </article>
@@ -464,11 +463,106 @@ export default async function ArticlePage({
 
         .articleBody p {
           margin: 0 0 18px;
-          white-space: pre-wrap;
         }
 
-        .articleSpace {
-          height: 8px;
+        /* Clickable links inside articles */
+        .articleBody a {
+          color: #1557a6;
+          text-decoration: underline;
+          font-weight: 600;
+        }
+
+        .articleBody a:hover {
+          color: #0f3f7a;
+        }
+
+        /* Article headings */
+        .articleBody h2 {
+          margin: 32px 0 14px;
+          color: #0f172a;
+          font-size: 28px;
+          line-height: 1.3;
+        }
+
+        .articleBody h3 {
+          margin: 26px 0 12px;
+          color: #0f172a;
+          font-size: 23px;
+          line-height: 1.35;
+        }
+
+        .articleBody h4 {
+          margin: 22px 0 10px;
+          color: #0f172a;
+          font-size: 20px;
+        }
+
+        /* Bold text */
+        .articleBody strong {
+          color: #0f172a;
+          font-weight: 700;
+        }
+
+        /* Bullet lists */
+        .articleBody ul {
+          margin: 15px 0 22px 25px;
+          padding-left: 20px;
+        }
+
+        /* Numbered lists */
+        .articleBody ol {
+          margin: 15px 0 22px 25px;
+          padding-left: 20px;
+        }
+
+        .articleBody li {
+          margin-bottom: 8px;
+        }
+
+        /* Blockquotes */
+        .articleBody blockquote {
+          margin: 25px 0;
+          padding: 15px 20px;
+          border-left: 4px solid #1557a6;
+          background: #f1f5f9;
+          color: #475569;
+          border-radius: 6px;
+        }
+
+        /* Horizontal line */
+        .articleBody hr {
+          margin: 30px 0;
+          border: 0;
+          border-top: 1px solid #e5e7eb;
+        }
+
+        /* Images inside article content */
+        .articleBody img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 12px;
+          margin: 20px 0;
+        }
+
+        /* Tables inside article content */
+        .articleBody table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 25px 0;
+          font-size: 16px;
+        }
+
+        .articleBody th,
+        .articleBody td {
+          border: 1px solid #e5e7eb;
+          padding: 10px 12px;
+          text-align: left;
+        }
+
+        .articleBody th {
+          background: #f1f5f9;
+          color: #0f172a;
+          font-weight: 700;
         }
 
         .articleTags {
@@ -515,6 +609,10 @@ export default async function ArticlePage({
           font-weight: 700;
         }
 
+        .backButton:hover {
+          background: #0f3f7a;
+        }
+
         @media (max-width: 600px) {
 
           .articlePage {
@@ -538,6 +636,20 @@ export default async function ArticlePage({
           .articleBody {
             font-size: 16px;
             line-height: 1.8;
+          }
+
+          .articleBody h2 {
+            font-size: 24px;
+          }
+
+          .articleBody h3 {
+            font-size: 21px;
+          }
+
+          .articleBody table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
           }
 
         }
