@@ -20,120 +20,39 @@ type Article = {
   created_at: string
 }
 
-/*
- * Converts article HTML fragments into clean article text
- * while preserving clickable <a href=""> links.
- *
- * This is intentionally NOT rendering the complete article
- * with dangerouslySetInnerHTML because existing articles
- * contain a mixture of normal text and HTML fragments.
+/**
+ * Supports both plain-text articles and formatted HTML saved by the admin editor.
+ * Keep article HTML limited to content authored by trusted administrators.
  */
-function renderArticleContent(content: string) {
-  /*
-   * Extract all anchor tags first.
-   *
-   * This also handles anchors where the opening tag,
-   * link text and closing tag are separated by line breaks.
-   */
-  const links: {
-    text: string
-    href: string
-  }[] = []
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
 
-  const LINK_PLACEHOLDER_PREFIX = '___ARTICLE_LINK_'
-  const LINK_PLACEHOLDER_SUFFIX = '___'
+function prepareArticleHtml(content: string) {
+  const hasFormatting = /<\/?(?:p|h[1-6]|ul|ol|li|strong|b|em|i|a|blockquote|table|thead|tbody|tr|th|td|br|hr|div)\b/i.test(content)
 
-  let processedContent = content
-
-  processedContent = processedContent.replace(
-    /<a\s+[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi,
-    (_match, href, linkText) => {
-      const cleanText = String(linkText)
-        .replace(/<[^>]*>/g, '')
-        .replace(/\s+/g, ' ')
+  let html = hasFormatting
+    ? content
+    : content
         .trim()
+        .split(/\n\s*\n+/)
+        .filter(Boolean)
+        .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, '<br />')}</p>`)
+        .join('\n')
 
-      const index = links.length
+  // Remove executable/embedded content and unsafe inline event handlers.
+  html = html
+    .replace(/<(script|style|iframe|object|embed|form)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<(script|style|iframe|object|embed|form)\b[^>]*\/?\s*>/gi, '')
+    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/\s+(href|src)\s*=\s*(["'])\s*javascript:[\s\S]*?\2/gi, ' $1="#"')
 
-      links.push({
-        href: String(href).trim(),
-        text: cleanText,
-      })
-
-      return `${LINK_PLACEHOLDER_PREFIX}${index}${LINK_PLACEHOLDER_SUFFIX}`
-    }
-  )
-
-  /*
-   * Remove remaining HTML tags.
-   *
-   * This prevents <p>, </p>, <strong>, etc. from appearing
-   * visibly in the article.
-   */
-  processedContent = processedContent.replace(
-    /<[^>]*>/g,
-    ''
-  )
-
-  /*
-   * Decode the most common HTML entities.
-   */
-  processedContent = processedContent
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-
-  /*
-   * Preserve the original article's paragraph structure.
-   */
-  const paragraphs = processedContent
-    .split(/\n+/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean)
-
-  return paragraphs.map((paragraph, paragraphIndex) => {
-    const parts = paragraph.split(
-      /(___ARTICLE_LINK_\d+___)/
-    )
-
-    return (
-      <p key={paragraphIndex}>
-        {parts.map((part, partIndex) => {
-          const match = part.match(
-            /^___ARTICLE_LINK_(\d+)___$/
-          )
-
-          if (!match) {
-            return part
-          }
-
-          const linkIndex = Number(match[1])
-          const link = links[linkIndex]
-
-          if (!link) {
-            return null
-          }
-
-          /*
-           * External links open in a new tab.
-           */
-          return (
-            <a
-              key={`${paragraphIndex}-${partIndex}`}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {link.text || link.href}
-            </a>
-          )
-        })}
-      </p>
-    )
-  })
+  return html
 }
 
 async function getArticle(
@@ -430,8 +349,7 @@ export default async function ArticlePage({
           )}
 
           <div className="articleMeta">
-
-            {typedArticle.published_at
+            <span>📅 {typedArticle.published_at
               ? new Date(
                   typedArticle.published_at
                 ).toLocaleDateString(
@@ -451,8 +369,10 @@ export default async function ArticlePage({
                     month: 'long',
                     year: 'numeric',
                   }
-                )}
-
+                )}</span>
+            <span className="articleReadTime">
+              ⏱ {Math.max(1, Math.ceil(typedArticle.content.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length / 220))} min read
+            </span>
           </div>
 
         </div>
@@ -466,11 +386,12 @@ export default async function ArticlePage({
         )}
 
         {/* Article Content */}
-        <div className="articleBody">
-          {renderArticleContent(
-            typedArticle.content
-          )}
-        </div>
+        <div
+          className="articleBody"
+          dangerouslySetInnerHTML={{
+            __html: prepareArticleHtml(typedArticle.content),
+          }}
+        />
 
         {typedArticle.tags &&
           typedArticle.tags.length > 0 && (
@@ -513,191 +434,7 @@ export default async function ArticlePage({
 
       </article>
 
-      <style>{`
 
-        .articlePage {
-          min-height: 100vh;
-          background: #f7f9fc;
-          padding: 50px 0 80px;
-        }
-
-        .articleContainer {
-          width: min(900px, 92%);
-          margin: 0 auto;
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
-          border-radius: 20px;
-          padding: 40px;
-          box-shadow:
-            0 10px 35px rgba(
-              15,
-              23,
-              42,
-              0.06
-            );
-        }
-
-        .backLink {
-          display: inline-block;
-          margin-bottom: 30px;
-          color: #1557a6;
-          font-weight: 700;
-          text-decoration: none;
-        }
-
-        .backLink:hover {
-          text-decoration: underline;
-        }
-
-        .articleHeader {
-          border-bottom:
-            1px solid #e5e7eb;
-          padding-bottom: 30px;
-        }
-
-        .articleCategory {
-          display: inline-block;
-          margin-bottom: 14px;
-          padding: 7px 13px;
-          border-radius: 999px;
-          background: #e8f1ff;
-          color: #1557a6;
-          font-size: 13px;
-          font-weight: 800;
-        }
-
-        .articleHeader h1 {
-          margin: 0;
-          color: #0f172a;
-          font-size:
-            clamp(32px, 5vw, 52px);
-          line-height: 1.12;
-        }
-
-        .articleExcerpt {
-          margin: 20px 0 0;
-          color: #64748b;
-          font-size: 19px;
-          line-height: 1.7;
-        }
-
-        .articleMeta {
-          margin-top: 20px;
-          color: #94a3b8;
-          font-size: 14px;
-        }
-
-        .articleImage {
-          width: 100%;
-          max-height: 480px;
-          object-fit: cover;
-          border-radius: 14px;
-          margin: 35px 0;
-        }
-
-        .articleBody {
-          color: #334155;
-          font-size: 18px;
-          line-height: 1.9;
-        }
-
-        .articleBody p {
-          margin: 0 0 18px;
-          white-space: pre-wrap;
-        }
-
-        /*
-         * Article links
-         */
-        .articleBody a {
-          color: #1557a6;
-          text-decoration: underline;
-          font-weight: 600;
-          cursor: pointer;
-        }
-
-        .articleBody a:hover {
-          color: #0f3f7a;
-        }
-
-        .articleTags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 35px;
-          padding-top: 25px;
-          border-top:
-            1px solid #e5e7eb;
-        }
-
-        .articleTags span {
-          padding: 7px 11px;
-          border-radius: 999px;
-          background: #f1f5f9;
-          color: #475569;
-          font-size: 13px;
-          font-weight: 600;
-        }
-
-        .articleDisclaimer {
-          margin-top: 35px;
-          padding: 18px;
-          border-radius: 10px;
-          background: #fff7ed;
-          color: #7c2d12;
-          font-size: 13px;
-          line-height: 1.6;
-        }
-
-        .articleBottom {
-          margin-top: 35px;
-          padding-top: 25px;
-          border-top:
-            1px solid #e5e7eb;
-        }
-
-        .backButton {
-          display: inline-block;
-          padding: 11px 17px;
-          border-radius: 9px;
-          background: #1557a6;
-          color: #ffffff;
-          text-decoration: none;
-          font-weight: 700;
-        }
-
-        .backButton:hover {
-          background: #0f3f7a;
-        }
-
-        @media (max-width: 600px) {
-
-          .articlePage {
-            padding: 25px 0 50px;
-          }
-
-          .articleContainer {
-            width: 90%;
-            padding: 24px;
-            border-radius: 15px;
-          }
-
-          .articleHeader h1 {
-            font-size: 32px;
-          }
-
-          .articleExcerpt {
-            font-size: 17px;
-          }
-
-          .articleBody {
-            font-size: 16px;
-            line-height: 1.8;
-          }
-
-        }
-
-      `}</style>
 
     </main>
   )
