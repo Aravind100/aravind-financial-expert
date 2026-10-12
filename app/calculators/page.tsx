@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const investmentCalculators = [
-  {
+  { 
     icon: "📈",
     title: "SIP Calculator",
     description:
