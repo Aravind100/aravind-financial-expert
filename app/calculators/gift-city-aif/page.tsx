@@ -11,6 +11,7 @@ function numberFormat(value: number, currency: "USD" | "INR") {
   }).format(Number.isFinite(value) ? value : 0);
 }
 
+
 function percent(value: number) {
   return `${value.toFixed(2)}%`;
 }
