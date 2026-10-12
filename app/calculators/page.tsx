@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const investmentCalculators = [
-  { 
+  {
     icon: "📈",
     title: "SIP Calculator",
     description:
@@ -15,14 +15,6 @@ const investmentCalculators = [
     description:
       "Estimate the potential value of a one-time investment over a selected investment period.",
     href: "/calculators/lumpsum",
-    status: "Available",
-  },
-  {
-    icon: "🌎",
-    title: "Foreign Investor — India Calculator",
-    description:
-      "Estimate an Indian investment's value in US dollars after assumed fund fees and rupee depreciation.",
-    href: "/calculators/gift-city-aif",
     status: "Available",
   },
   {
@@ -182,9 +174,9 @@ function CalculatorCard({
 }
 
 export const metadata = {
-  title: "Financial Calculators | SIP, CAGR, Foreign Investor & More",
+  title: "Financial Calculators | SIP, CAGR, XIRR, EMI & More",
   description:
-    "Explore SIP, lumpsum, financial planning and foreign investor India investment calculators with illustrative USD returns adjusted for currency depreciation.",
+    "Explore financial calculators for SIP, investments, financial planning, loans and insurance. Use simple calculators to understand your financial numbers.",
 };
 
 export default function CalculatorsPage() {
@@ -250,7 +242,7 @@ export default function CalculatorsPage() {
               <h2>Calculate your investment illustrations</h2>
 
               <p className="muted">
-                Explore SIP, lumpsum, foreign investor USD returns, Step-Up SIP, CAGR and XIRR calculations.
+                Explore SIP, lumpsum, Step-Up SIP, CAGR and XIRR calculations.
               </p>
             </div>
           </div>
