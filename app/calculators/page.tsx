@@ -18,6 +18,14 @@ const investmentCalculators = [
     status: "Available",
   },
   {
+    icon: "🌎",
+    title: "Foreign Investor — India Calculator",
+    description:
+      "Estimate an Indian investment's value in US dollars after assumed fund fees and rupee depreciation.",
+    href: "/calculators/gift-city-aif",
+    status: "Available",
+  },
+  {
     icon: "🚀",
     title: "Step-Up SIP Calculator",
     description:
@@ -174,9 +182,9 @@ function CalculatorCard({
 }
 
 export const metadata = {
-  title: "Financial Calculators | SIP, CAGR, XIRR, EMI & More",
+  title: "Financial Calculators | SIP, CAGR, Foreign Investor & More",
   description:
-    "Explore financial calculators for SIP, investments, financial planning, loans and insurance. Use simple calculators to understand your financial numbers.",
+    "Explore SIP, lumpsum, financial planning and foreign investor India investment calculators with illustrative USD returns adjusted for currency depreciation.",
 };
 
 export default function CalculatorsPage() {
@@ -242,7 +250,7 @@ export default function CalculatorsPage() {
               <h2>Calculate your investment illustrations</h2>
 
               <p className="muted">
-                Explore SIP, lumpsum, Step-Up SIP, CAGR and XIRR calculations.
+                Explore SIP, lumpsum, foreign investor USD returns, Step-Up SIP, CAGR and XIRR calculations.
               </p>
             </div>
           </div>
