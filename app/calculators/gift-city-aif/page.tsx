@@ -16,6 +16,61 @@ function percent(value: number) {
   return `${value.toFixed(2)}%`;
 }
 
+function SliderField({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+  formatValue,
+  hint,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (value: number) => void;
+  formatValue: (value: number) => string;
+  hint?: string;
+}) {
+  return (
+    <label style={{ display: "grid", gap: 9 }}>
+      <span style={{ fontWeight: 600 }}>{label}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(event) => onChange(Number(event.target.value))}
+          aria-label={label}
+          style={{
+            width: "100%",
+            minWidth: 0,
+            accentColor: "#0f766e",
+            cursor: "pointer",
+          }}
+        />
+        <output
+          style={{
+            minWidth: 100,
+            textAlign: "right",
+            fontWeight: 700,
+            fontVariantNumeric: "tabular-nums",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {formatValue(value)}
+        </output>
+      </div>
+      {hint ? <small className="muted">{hint}</small> : null}
+    </label>
+  );
+}
+
 export default function GiftCityAifCalculatorPage() {
   const [investmentUsd, setInvestmentUsd] = useState(100_000);
   const [entryRate, setEntryRate] = useState(88);
@@ -63,13 +118,6 @@ export default function GiftCityAifCalculatorPage() {
     otherCostsUsd,
   ]);
 
-  const updateNumber =
-    (setter: (value: number) => void, min: number, max: number) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const parsed = Number(event.target.value);
-      if (Number.isFinite(parsed)) setter(Math.min(max, Math.max(min, parsed)));
-    };
-
   return (
     <main className="section" style={{ maxWidth: 1080, margin: "0 auto", paddingTop: 36, paddingBottom: 64 }}>
       <div className="calculatorEyebrow">INTERNATIONAL INVESTOR TOOLS</div>
@@ -84,59 +132,93 @@ export default function GiftCityAifCalculatorPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 24, marginTop: 28 }}>
         <section className="card" style={{ padding: 24 }}>
           <h2>Investment assumptions</h2>
-          <div style={{ display: "grid", gap: 18, marginTop: 18 }}>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Initial investment (USD)</span>
-              <input type="number" min={1} max={1000000000} step={1000} value={investmentUsd}
-                onChange={updateNumber(setInvestmentUsd, 1, 1_000_000_000)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-            </label>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Entry exchange rate (INR per USD)</span>
-              <input type="number" min={1} max={500} step={0.1} value={entryRate}
-                onChange={updateNumber(setEntryRate, 1, 500)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-            </label>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Expected annual portfolio return (%)</span>
-              <input type="number" min={-100} max={100} step={0.5} value={annualReturn}
-                onChange={updateNumber(setAnnualReturn, -100, 100)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-            </label>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Annual fund fee (%)</span>
-              <input type="number" min={0} max={50} step={0.25} value={annualFee}
-                onChange={updateNumber(setAnnualFee, 0, 50)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-            </label>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Annual INR depreciation vs USD (%)</span>
-              <input type="number" min={-50} max={50} step={0.5} value={rupeeDepreciation}
-                onChange={updateNumber(setRupeeDepreciation, -50, 50)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-              <small className="muted">Use a negative figure to model rupee appreciation.</small>
-            </label>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Investment duration (years)</span>
-              <input type="number" min={1} max={50} step={1} value={duration}
-                onChange={updateNumber(setDuration, 1, 50)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-            </label>
-            <label style={{ display: "grid", gap: 7 }}>
-              <span>Other one-time costs (USD, optional)</span>
-              <input type="number" min={0} max={1000000000} step={100} value={otherCostsUsd}
-                onChange={updateNumber(setOtherCostsUsd, 0, 1_000_000_000)}
-                style={{ width: "100%", padding: 11, border: "1px solid #cbd5e1", borderRadius: 8 }} />
-            </label>
-            <button type="button" className="btn alt" onClick={() => {
-              setInvestmentUsd(100_000);
-              setEntryRate(88);
-              setAnnualReturn(12);
-              setAnnualFee(2);
-              setRupeeDepreciation(4);
-              setDuration(5);
-              setOtherCostsUsd(0);
-            }}>Reset example</button>
+          <div style={{ display: "grid", gap: 22, marginTop: 18 }}>
+            <SliderField
+              label="Initial investment (USD)"
+              value={investmentUsd}
+              min={10000}
+              max={1000000}
+              step={5000}
+              onChange={setInvestmentUsd}
+              formatValue={(value) => numberFormat(value, "USD")}
+            />
+
+            <SliderField
+              label="Entry exchange rate (INR per USD)"
+              value={entryRate}
+              min={70}
+              max={120}
+              step={0.25}
+              onChange={setEntryRate}
+              formatValue={(value) => `₹${value.toFixed(2)}`}
+            />
+
+            <SliderField
+              label="Expected annual portfolio return (%)"
+              value={annualReturn}
+              min={-20}
+              max={30}
+              step={0.5}
+              onChange={setAnnualReturn}
+              formatValue={percent}
+            />
+
+            <SliderField
+              label="Annual fund fee (%)"
+              value={annualFee}
+              min={0}
+              max={5}
+              step={0.25}
+              onChange={setAnnualFee}
+              formatValue={percent}
+            />
+
+            <SliderField
+              label="Annual INR depreciation vs USD (%)"
+              value={rupeeDepreciation}
+              min={-10}
+              max={15}
+              step={0.5}
+              onChange={setRupeeDepreciation}
+              formatValue={percent}
+              hint="Negative values model rupee appreciation; positive values model depreciation."
+            />
+
+            <SliderField
+              label="Investment duration"
+              value={duration}
+              min={1}
+              max={20}
+              step={1}
+              onChange={setDuration}
+              formatValue={(value) => `${value} ${value === 1 ? "year" : "years"}`}
+            />
+
+            <SliderField
+              label="Other one-time costs (USD, optional)"
+              value={otherCostsUsd}
+              min={0}
+              max={50000}
+              step={100}
+              onChange={setOtherCostsUsd}
+              formatValue={(value) => numberFormat(value, "USD")}
+            />
+
+            <button
+              type="button"
+              className="btn alt"
+              onClick={() => {
+                setInvestmentUsd(100_000);
+                setEntryRate(88);
+                setAnnualReturn(12);
+                setAnnualFee(2);
+                setRupeeDepreciation(4);
+                setDuration(5);
+                setOtherCostsUsd(0);
+              }}
+            >
+              Reset example
+            </button>
           </div>
         </section>
 
