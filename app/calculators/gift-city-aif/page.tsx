@@ -51,14 +51,22 @@ function SliderField({
             width: "100%",
             minWidth: 0,
             accentColor: "#0f766e",
-            cursor: "pointer",
+            cursor: "ew-resize",
+            height: 7,
+            borderRadius: 999,
           }}
         />
         <output
           style={{
             minWidth: 100,
             textAlign: "right",
-            fontWeight: 700,
+            fontWeight: 800,
+            fontSize: 13,
+            color: "#0f766e",
+            background: "#ecfeff",
+            border: "1px solid #a5f3fc",
+            borderRadius: 10,
+            padding: "8px 9px",
             fontVariantNumeric: "tabular-nums",
             whiteSpace: "nowrap",
           }}
@@ -119,20 +127,46 @@ export default function GiftCityAifCalculatorPage() {
   ]);
 
   return (
-    <main className="section" style={{ maxWidth: 1080, margin: "0 auto", paddingTop: 36, paddingBottom: 64 }}>
-      <div className="calculatorEyebrow">INTERNATIONAL INVESTOR TOOLS</div>
-      <h1>Foreign Investor — India Investment Calculator</h1>
-      <p className="muted" style={{ maxWidth: 800 }}>
-        Estimate how an investment in an Indian portfolio may translate back
-        into US dollars after assumed portfolio returns, annual fund fees and
-        rupee depreciation. Designed for educational scenario analysis,
-        including discussions about eligible GIFT City and AIF routes.
-      </p>
+    <main style={{ maxWidth: 1180, margin: "0 auto", padding: "32px 20px 72px", color: "#0f172a" }}>
+      <section style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: 24,
+        padding: "clamp(26px, 5vw, 52px)",
+        color: "#ffffff",
+        background: "linear-gradient(125deg, #0b132b 0%, #123b5d 52%, #087e8b 100%)",
+        boxShadow: "0 24px 60px rgba(15, 23, 42, 0.18)",
+      }}>
+        <div style={{ position: "absolute", width: 280, height: 280, borderRadius: "50%", background: "rgba(255,255,255,0.07)", right: -70, top: -100 }} />
+        <div style={{ position: "absolute", width: 180, height: 180, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.16)", right: 70, bottom: -110 }} />
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 780 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 12px", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 999, background: "rgba(255,255,255,0.09)", fontSize: 12, fontWeight: 800, letterSpacing: "0.12em" }}>
+            🌎 INTERNATIONAL INVESTOR TOOLS
+          </div>
+          <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.08, letterSpacing: "-0.04em", margin: "22px 0 16px", color: "#ffffff" }}>
+            Invest in India.<br />Understand your USD returns.
+          </h1>
+          <p style={{ maxWidth: 720, color: "rgba(255,255,255,0.82)", fontSize: "clamp(1rem, 2vw, 1.15rem)", lineHeight: 1.75, margin: 0 }}>
+            Explore how portfolio performance, fund fees and rupee movement may affect the dollar value of an investment through an eligible Indian investment route.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
+            {["USD-based illustration", "Currency-adjusted estimate", "Instant calculations"].map((item) => (
+              <span key={item} style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.12)", fontSize: 13, fontWeight: 600 }}>{item}</span>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 24, marginTop: 28 }}>
-        <section className="card" style={{ padding: 24 }}>
-          <h2>Investment assumptions</h2>
-          <div style={{ display: "grid", gap: 22, marginTop: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 24, marginTop: 28, alignItems: "start" }}>
+        <section style={{ padding: "clamp(20px, 3vw, 30px)", border: "1px solid #e2e8f0", borderRadius: 22, background: "#ffffff", boxShadow: "0 12px 36px rgba(15,23,42,0.06)" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 46, height: 46, display: "grid", placeItems: "center", flexShrink: 0, borderRadius: 14, background: "#e0f2fe", fontSize: 22 }}>🎛️</div>
+            <div>
+              <h2 style={{ margin: "0 0 5px", fontSize: 23 }}>Investment assumptions</h2>
+              <p style={{ margin: 0, color: "#64748b", fontSize: 14, lineHeight: 1.6 }}>Move the sliders to explore different scenarios.</p>
+            </div>
+          </div>
+          <div style={{ display: "grid", gap: 23 }}>
             <SliderField
               label="Initial investment (USD)"
               value={investmentUsd}
@@ -222,15 +256,22 @@ export default function GiftCityAifCalculatorPage() {
           </div>
         </section>
 
-        <section className="card" style={{ padding: 24 }}>
-          <div className="calculatorEyebrow">ILLUSTRATIVE RESULTS</div>
-          <h2 style={{ marginTop: 8 }}>Estimated final value in USD</h2>
-          <p style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 750, margin: "12px 0 24px", overflowWrap: "anywhere" }}>
-            {numberFormat(result.finalUsd, "USD")}
-          </p>
+        <section style={{ padding: "clamp(20px, 3vw, 30px)", border: "1px solid #cbd5e1", borderRadius: 22, background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 58%)", boxShadow: "0 12px 36px rgba(15,23,42,0.06)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#0f766e", fontSize: 12, fontWeight: 800, letterSpacing: "0.12em" }}>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#14b8a6" }} />
+            ILLUSTRATIVE RESULTS
+          </div>
+          <div style={{ marginTop: 16, padding: 22, borderRadius: 18, color: "#ffffff", background: "linear-gradient(135deg, #0f766e, #115e59)" }}>
+            <p style={{ color: "rgba(255,255,255,0.78)", fontSize: 13, fontWeight: 700, margin: 0 }}>ESTIMATED FINAL VALUE IN USD</p>
+            <p style={{ fontSize: "clamp(2.1rem, 5vw, 3.2rem)", fontWeight: 850, letterSpacing: "-0.04em", margin: "10px 0 0", overflowWrap: "anywhere", lineHeight: 1.1 }}>
+              {numberFormat(result.finalUsd, "USD")}
+            </p>
+            <p style={{ margin: "12px 0 0", fontSize: 14, color: "rgba(255,255,255,0.82)" }}>
+              {result.profitUsd >= 0 ? "Potential gain" : "Potential loss"}: {result.profitUsd >= 0 ? "+" : "−"}{numberFormat(Math.abs(result.profitUsd), "USD")}
+            </p>
+          </div>
           <div style={{ display: "grid", gap: 0 }}>
             {[
-              ["Estimated USD profit / loss", `${result.profitUsd >= 0 ? "+" : "−"}${numberFormat(Math.abs(result.profitUsd), "USD")}`],
               ["Annualized USD return", percent(result.annualizedUsdReturn)],
               ["Entry exchange rate", `₹${entryRate.toFixed(2)} / USD`],
               ["Estimated exit exchange rate", `₹${result.exitRate.toFixed(2)} / USD`],
@@ -239,14 +280,14 @@ export default function GiftCityAifCalculatorPage() {
               ["Illustrative net annual INR growth", percent(result.netAnnualGrowth)],
               ["Other costs deducted", numberFormat(otherCostsUsd, "USD")],
             ].map(([label, value]) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 16, padding: "13px 0", borderBottom: "1px solid #e2e8f0" }}>
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 16, padding: "14px 0", borderBottom: "1px solid #e2e8f0" }}>
                 <span className="muted">{label}</span>
                 <strong style={{ textAlign: "right", overflowWrap: "anywhere" }}>{value}</strong>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 22, padding: 16, background: "#f1f5f9", borderRadius: 10 }}>
-            <strong>How currency depreciation affects you</strong>
+          <div style={{ marginTop: 22, padding: 18, background: "#ecfeff", border: "1px solid #a5f3fc", borderRadius: 15 }}>
+            <strong style={{ color: "#155e75" }}>💱 How currency depreciation affects you</strong>
             <p className="muted" style={{ marginBottom: 0, marginTop: 8 }}>
               If the rupee weakens against the dollar, the same INR portfolio
               value converts into fewer US dollars. A higher INR investment
@@ -267,7 +308,7 @@ export default function GiftCityAifCalculatorPage() {
         </ul>
       </section>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 24 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 30 }}>
         <Link className="btn" href="/contact">Discuss your requirement →</Link>
         <Link className="btn alt" href="/calculators">← All calculators</Link>
       </div>
