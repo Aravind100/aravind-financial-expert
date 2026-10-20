@@ -1,10 +1,24 @@
 {
   "name": "aravind-financial-website",
   "private": true,
-  "scripts": {"dev":"next dev","build":"next build","start":"next start","lint":"next lint"},
-  "dependencies": {
-    "next":"latest","react":"latest","react-dom":"latest",
-    "@supabase/supabase-js":"latest","@supabase/ssr":"latest"
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "devDependencies": {"typescript":"latest","@types/node":"latest","@types/react":"latest","@types/react-dom":"latest"}
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@supabase/supabase-js": "latest",
+    "@supabase/ssr": "latest",
+    "xlsx": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest"
+  }
 }
