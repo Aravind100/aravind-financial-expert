@@ -693,6 +693,20 @@ export default function PortfolioReviewPage() {
             Prepare portfolio review enquiry
           </button>
         </form>
+
+        
+<button
+  type="button"
+  onClick={() => {
+    void downloadPDFReport().catch(() => {
+      setMessage("Unable to generate the PDF. Please try again.");
+    });
+  }}
+  className="mt-4 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white"
+>
+  Download PDF Report
+</button>
+
       </section>
 
       <p className="mt-6 text-xs leading-5 text-gray-500">
