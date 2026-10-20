@@ -1,5 +1,6 @@
 
 "use client";
+import styles from "./page.module.css";
 
 import { useMemo, useState } from "react";
 
@@ -119,7 +120,7 @@ export default function PortfolioReviewPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
+    <main className={styles.page}>
       <header className="mb-8">
         <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-emerald-700">
           Investor tools
