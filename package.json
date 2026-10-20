@@ -13,7 +13,8 @@
     "react-dom": "latest",
     "@supabase/supabase-js": "latest",
     "@supabase/ssr": "latest",
-    "xlsx": "latest"
+    "xlsx": "latest",
+    "jspdf": "latest"
   },
   "devDependencies": {
     "typescript": "latest",
