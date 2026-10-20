@@ -33,6 +33,12 @@ const money = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const percentage = (value: number) =>
+  `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+
+const profitLossPercent = (currentValue: number, invested: number) =>
+  invested > 0 ? ((currentValue - invested) / invested) * 100 : null;
+
 function normalizeHeader(value: string) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
 }
@@ -147,6 +153,25 @@ export default function PortfolioReviewPage() {
     const sip = visible.reduce((sum, h) => sum + h.sipAmount, 0);
     return { invested, current, profit: current - invested, sip };
   }, [visible]);
+
+  const allocation = useMemo(() => {
+    const stocks = visible
+      .filter((h) => h.type === "stock")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    const mutualFunds = visible
+      .filter((h) => h.type === "mutual-fund")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    return {
+      stocks,
+      mutualFunds,
+      total: stocks + mutualFunds,
+      stockPercent: stocks + mutualFunds > 0 ? (stocks / (stocks + mutualFunds)) * 100 : 0,
+      mutualFundPercent: stocks + mutualFunds > 0 ? (mutualFunds / (stocks + mutualFunds)) * 100 : 0,
+    };
+  }, [visible]);
+
+  const totalProfitPercent =
+    totals.invested > 0 ? (totals.profit / totals.invested) * 100 : null;
 
   function updateHolding(id: string, field: keyof Holding, value: string) {
     setHoldings((old) =>
@@ -292,13 +317,10 @@ export default function PortfolioReviewPage() {
   async function downloadPDFReport() {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
-
-    // jsPDF's default Helvetica font may not display the ₹ symbol correctly.
-    // Use INR text in the PDF while keeping the website's currency formatting unchanged.
     const pdfMoney = (value: number) =>
-      `INR ${new Intl.NumberFormat("en-IN", {
-        maximumFractionDigits: 0,
-      }).format(value)}`;
+      `INR ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(value)}`;
+    const pdfPercent = (value: number | null) =>
+      value === null ? "N/A (no invested amount)" : percentage(value);
 
     const reportDate = new Date().toLocaleDateString("en-IN");
     const reportHoldings = visible.filter((h) => h.name.trim());
@@ -328,6 +350,7 @@ export default function PortfolioReviewPage() {
     doc.setFont("helvetica", "normal");
     writeLine("Stock / SIP Portfolio Review", 13);
     writeLine(`Report date: ${reportDate}`, 10);
+    writeLine("Contact: +91 91733 34069 | aravindchaudhary90@gmail.com", 9);
     y += 4;
 
     doc.setFont("helvetica", "bold");
@@ -336,8 +359,30 @@ export default function PortfolioReviewPage() {
     writeLine(`Total invested: ${pdfMoney(totals.invested)}`);
     writeLine(`Current value: ${pdfMoney(totals.current)}`);
     writeLine(`Difference: ${pdfMoney(totals.profit)}`);
+    writeLine(`Overall gain / loss: ${pdfPercent(totalProfitPercent)}`);
     writeLine(`Monthly SIP: ${pdfMoney(totals.sip)}`);
-    y += 5;
+    y += 4;
+
+    doc.setFont("helvetica", "bold");
+    writeLine("PORTFOLIO ALLOCATION (BY CURRENT VALUE)", 11);
+    doc.setFont("helvetica", "normal");
+    writeLine(`Stocks: ${pdfMoney(allocation.stocks)} (${allocation.stockPercent.toFixed(2)}%)`);
+    writeLine(`Mutual funds: ${pdfMoney(allocation.mutualFunds)} (${allocation.mutualFundPercent.toFixed(2)}%)`);
+    const barX = left;
+    const barY = y + 1;
+    const barW = pageWidth - left * 2;
+    const barH = 5;
+    if (allocation.total > 0) {
+      const stockW = barW * allocation.stockPercent / 100;
+      doc.setFillColor(4, 120, 87);
+      doc.rect(barX, barY, stockW, barH, "F");
+      doc.setFillColor(134, 239, 172);
+      doc.rect(barX + stockW, barY, barW - stockW, barH, "F");
+    } else {
+      doc.setDrawColor(160, 160, 160);
+      doc.rect(barX, barY, barW, barH);
+    }
+    y = barY + barH + 7;
 
     doc.setFont("helvetica", "bold");
     writeLine("HOLDINGS", 12);
@@ -358,6 +403,9 @@ export default function PortfolioReviewPage() {
       writeLine(`Invested: ${pdfMoney(h.invested)}`);
       writeLine(`Current value: ${pdfMoney(h.currentValue)}`);
       writeLine(`Difference: ${pdfMoney(h.currentValue - h.invested)}`);
+      writeLine(`Gain / loss: ${pdfPercent(profitLossPercent(h.currentValue, h.invested))}`);
+      const holdingAllocation = totals.current > 0 ? (h.currentValue / totals.current) * 100 : 0;
+      writeLine(`Portfolio allocation: ${holdingAllocation.toFixed(2)}%`);
       writeLine(`Monthly SIP: ${pdfMoney(h.sipAmount)}`);
       y += 3;
     });
@@ -371,8 +419,9 @@ export default function PortfolioReviewPage() {
       "It does not fetch live market prices or provide a buy, hold or sell recommendation."
     );
     writeLine(
-      "The difference shown is current value minus invested amount. " +
-      "It is not an annualised return and may not represent actual SIP performance."
+      "Gain/loss percentage is the difference divided by the entered invested amount. " +
+      "It is not an annualised return and may not represent actual SIP performance. " +
+      "Allocation percentages use entered current values and may change as values change."
     );
     writeLine(
       "Please verify all figures and consult an appropriately qualified financial professional if needed."
@@ -603,6 +652,27 @@ export default function PortfolioReviewPage() {
                 </label>
               </div>
 
+              <div className="mt-4 grid gap-3 rounded-lg border bg-white p-3 sm:grid-cols-3">
+                <div>
+                  <p className="text-xs text-gray-500">Gain / loss</p>
+                  <p className={`mt-1 font-semibold ${h.currentValue - h.invested >= 0 ? "text-emerald-700" : "text-red-700"}`}>
+                    {money(h.currentValue - h.invested)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Gain / loss %</p>
+                  <p className={`mt-1 font-semibold ${(h.currentValue - h.invested) >= 0 ? "text-emerald-700" : "text-red-700"}`}>
+                    {profitLossPercent(h.currentValue, h.invested) === null ? "N/A" : percentage(profitLossPercent(h.currentValue, h.invested) as number)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Portfolio allocation</p>
+                  <p className="mt-1 font-semibold">
+                    {totals.current > 0 ? `${((h.currentValue / totals.current) * 100).toFixed(2)}%` : "0.00%"}
+                  </p>
+                </div>
+              </div>
+
               <button
                 type="button"
                 onClick={() =>
@@ -637,6 +707,7 @@ export default function PortfolioReviewPage() {
             ["Invested amount", money(totals.invested)],
             ["Current value", money(totals.current)],
             ["Difference", money(totals.profit)],
+            ["Overall gain / loss", totalProfitPercent === null ? "N/A" : percentage(totalProfitPercent)],
             ["Monthly SIP", money(totals.sip)],
           ].map(([label, value]) => (
             <div key={label} className="rounded-xl bg-gray-50 p-4">
@@ -647,8 +718,62 @@ export default function PortfolioReviewPage() {
         </div>
         <p className="mt-4 text-sm text-gray-600">
           Difference = entered current value minus entered invested amount.
+          The percentage is calculated as difference divided by total invested.
           It is not an annualised return and may not equal actual SIP returns.
         </p>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          <div className="rounded-xl border p-4">
+            <h3 className="font-semibold">Allocation by investment type</h3>
+            <p className="mt-1 text-sm text-gray-600">Based on current value of the visible holdings.</p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                  <span>Stocks</span>
+                  <span className="font-medium">{money(allocation.stocks)} · {allocation.stockPercent.toFixed(1)}%</span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-gray-100">
+                  <div className="h-full rounded-full bg-emerald-700" style={{ width: `${allocation.stockPercent}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                  <span>Mutual funds</span>
+                  <span className="font-medium">{money(allocation.mutualFunds)} · {allocation.mutualFundPercent.toFixed(1)}%</span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-gray-100">
+                  <div className="h-full rounded-full bg-green-300" style={{ width: `${allocation.mutualFundPercent}%` }} />
+                </div>
+              </div>
+              {allocation.total === 0 && <p className="text-sm text-gray-500">Enter current values to see your allocation.</p>}
+            </div>
+          </div>
+
+          <div className="rounded-xl border p-4">
+            <h3 className="font-semibold">Allocation by holding</h3>
+            <p className="mt-1 text-sm text-gray-600">Share of the total current value.</p>
+            <div className="mt-4 space-y-3">
+              {visible.filter((h) => h.name.trim()).length === 0 ? (
+                <p className="text-sm text-gray-500">Add or import named holdings to see allocation.</p>
+              ) : (
+                visible.filter((h) => h.name.trim()).map((h) => {
+                  const share = totals.current > 0 ? (h.currentValue / totals.current) * 100 : 0;
+                  return (
+                    <div key={`allocation-${h.id}`}>
+                      <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                        <span className="min-w-0 truncate">{h.name}</span>
+                        <span className="shrink-0 font-medium">{share.toFixed(1)}%</span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+                        <div className="h-full rounded-full bg-emerald-600" style={{ width: `${share}%` }} />
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="rounded-2xl border p-4 sm:p-6">
