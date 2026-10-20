@@ -1,0 +1,190 @@
+
+.page {
+  --navy: #102a43;
+  --green: #087f5b;
+  --green-light: #e8f7ef;
+  --border: #dce5ed;
+  --muted: #617386;
+  min-height: 80vh;
+  padding: 36px 20px 60px;
+  background: #f4f7fb;
+  color: #182b3a;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.page,
+.page * {
+  box-sizing: border-box;
+}
+
+.page > header {
+  max-width: 1120px;
+  margin: 0 auto 28px;
+  padding: 34px;
+  border-radius: 20px;
+  color: white;
+  background: linear-gradient(120deg, #102a43, #176b58);
+  box-shadow: 0 12px 32px #102a4318;
+}
+
+.page > header p {
+  color: #dceee8;
+  line-height: 1.7;
+}
+
+.page h1 {
+  margin: 10px 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+}
+
+.page h2 {
+  margin: 0 0 14px;
+  color: var(--navy);
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.page section {
+  max-width: 1120px;
+  margin: 0 auto 22px;
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 5px 20px #183b5610;
+}
+
+.page section p {
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.page button {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: white;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.page button:hover {
+  background: var(--green-light);
+  transform: translateY(-1px);
+}
+
+.page button:focus-visible,
+.page input:focus-visible,
+.page select:focus-visible {
+  outline: 3px solid #82c9ad;
+  outline-offset: 2px;
+}
+
+.page input:not([type="file"]),
+.page select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 7px;
+  padding: 10px 12px;
+  border: 1px solid #cbd7e2;
+  border-radius: 9px;
+  background: #fff;
+  color: #182b3a;
+  font: inherit;
+}
+
+.page input[type="file"] {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px dashed #a9bac9;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.page label {
+  display: block;
+  color: #354b5e;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.page button[type="submit"] {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.page button[type="submit"]:hover {
+  background: #066b4d;
+}
+
+.page section > div > div {
+  min-width: 0;
+}
+
+.page section > div[class*="bg-gray-50"] {
+  border: 1px solid #e4ebf1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.page section > div[class*="bg-gray-50"] p {
+  overflow-wrap: anywhere;
+}
+
+.page section > div[class*="bg-gray-50"] p:last-child {
+  color: var(--navy);
+}
+
+.page section > div[class*="space-y-5"] > div {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.page section > div[class*="space-y-5"] button {
+  margin-top: 12px;
+  color: #b42318;
+}
+
+.page > p {
+  max-width: 1120px;
+  margin: 0 auto;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 12px 40px;
+  }
+
+  .page > header {
+    padding: 24px 20px;
+    border-radius: 15px;
+  }
+
+  .page section {
+    padding: 19px 15px;
+    border-radius: 14px;
+  }
+
+  .page h2 {
+    font-size: 19px;
+  }
+
+  .page button {
+    max-width: 100%;
+  }
+}
