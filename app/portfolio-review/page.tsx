@@ -293,6 +293,13 @@ export default function PortfolioReviewPage() {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
+    // jsPDF's default Helvetica font may not display the ₹ symbol correctly.
+    // Use INR text in the PDF while keeping the website's currency formatting unchanged.
+    const pdfMoney = (value: number) =>
+      `INR ${new Intl.NumberFormat("en-IN", {
+        maximumFractionDigits: 0,
+      }).format(value)}`;
+
     const reportDate = new Date().toLocaleDateString("en-IN");
     const reportHoldings = visible.filter((h) => h.name.trim());
 
@@ -326,10 +333,10 @@ export default function PortfolioReviewPage() {
     doc.setFont("helvetica", "bold");
     writeLine("PORTFOLIO SUMMARY", 12);
     doc.setFont("helvetica", "normal");
-    writeLine(`Total invested: ${money(totals.invested)}`);
-    writeLine(`Current value: ${money(totals.current)}`);
-    writeLine(`Difference: ${money(totals.profit)}`);
-    writeLine(`Monthly SIP: ${money(totals.sip)}`);
+    writeLine(`Total invested: ${pdfMoney(totals.invested)}`);
+    writeLine(`Current value: ${pdfMoney(totals.current)}`);
+    writeLine(`Difference: ${pdfMoney(totals.profit)}`);
+    writeLine(`Monthly SIP: ${pdfMoney(totals.sip)}`);
     y += 5;
 
     doc.setFont("helvetica", "bold");
@@ -348,10 +355,10 @@ export default function PortfolioReviewPage() {
       writeLine(
         `Type: ${h.type === "stock" ? "Stock" : "Mutual fund"} | Quantity/units: ${h.quantity}`
       );
-      writeLine(`Invested: ${money(h.invested)}`);
-      writeLine(`Current value: ${money(h.currentValue)}`);
-      writeLine(`Difference: ${money(h.currentValue - h.invested)}`);
-      writeLine(`Monthly SIP: ${money(h.sipAmount)}`);
+      writeLine(`Invested: ${pdfMoney(h.invested)}`);
+      writeLine(`Current value: ${pdfMoney(h.currentValue)}`);
+      writeLine(`Difference: ${pdfMoney(h.currentValue - h.invested)}`);
+      writeLine(`Monthly SIP: ${pdfMoney(h.sipAmount)}`);
       y += 3;
     });
 
