@@ -289,6 +289,91 @@ export default function PortfolioReviewPage() {
       `mailto:aravindchaudhary90@gmail.com?subject=${subject}&body=${body}`;
   }
 
+  async function downloadPDFReport() {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF();
+
+    const reportDate = new Date().toLocaleDateString("en-IN");
+    const reportHoldings = visible.filter((h) => h.name.trim());
+
+    let y = 20;
+    const left = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    function addPageIfNeeded(requiredHeight = 10) {
+      if (y + requiredHeight > pageHeight - 18) {
+        doc.addPage();
+        y = 20;
+      }
+    }
+
+    function writeLine(text: string, size = 10) {
+      addPageIfNeeded(size / 2 + 4);
+      doc.setFontSize(size);
+      const lines = doc.splitTextToSize(text, pageWidth - left * 2);
+      doc.text(lines, left, y);
+      y += lines.length * (size / 2 + 2);
+    }
+
+    doc.setFont("helvetica", "bold");
+    writeLine("ARAVIND FINANCIAL EXPERT", 16);
+    doc.setFont("helvetica", "normal");
+    writeLine("Stock / SIP Portfolio Review", 13);
+    writeLine(`Report date: ${reportDate}`, 10);
+    y += 4;
+
+    doc.setFont("helvetica", "bold");
+    writeLine("PORTFOLIO SUMMARY", 12);
+    doc.setFont("helvetica", "normal");
+    writeLine(`Total invested: ${money(totals.invested)}`);
+    writeLine(`Current value: ${money(totals.current)}`);
+    writeLine(`Difference: ${money(totals.profit)}`);
+    writeLine(`Monthly SIP: ${money(totals.sip)}`);
+    y += 5;
+
+    doc.setFont("helvetica", "bold");
+    writeLine("HOLDINGS", 12);
+    doc.setFont("helvetica", "normal");
+
+    if (!reportHoldings.length) {
+      writeLine("No named holdings were entered.");
+    }
+
+    reportHoldings.forEach((h, index) => {
+      addPageIfNeeded(38);
+      doc.setFont("helvetica", "bold");
+      writeLine(`${index + 1}. ${h.name}`, 10);
+      doc.setFont("helvetica", "normal");
+      writeLine(
+        `Type: ${h.type === "stock" ? "Stock" : "Mutual fund"} | Quantity/units: ${h.quantity}`
+      );
+      writeLine(`Invested: ${money(h.invested)}`);
+      writeLine(`Current value: ${money(h.currentValue)}`);
+      writeLine(`Difference: ${money(h.currentValue - h.invested)}`);
+      writeLine(`Monthly SIP: ${money(h.sipAmount)}`);
+      y += 3;
+    });
+
+    y += 3;
+    doc.setFont("helvetica", "bold");
+    writeLine("IMPORTANT INFORMATION", 11);
+    doc.setFont("helvetica", "normal");
+    writeLine(
+      "This report is based only on values entered or imported by the user. " +
+      "It does not fetch live market prices or provide a buy, hold or sell recommendation."
+    );
+    writeLine(
+      "The difference shown is current value minus invested amount. " +
+      "It is not an annualised return and may not represent actual SIP performance."
+    );
+    writeLine(
+      "Please verify all figures and consult an appropriately qualified financial professional if needed."
+    );
+
+    doc.save("Aravind-Financial-Portfolio-Report.pdf");
+  }
+
   return (
     <main className={styles.page}>
       <header className="mb-8">
