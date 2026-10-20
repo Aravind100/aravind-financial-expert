@@ -316,116 +316,225 @@ export default function PortfolioReviewPage() {
 
   async function downloadPDFReport() {
     const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF();
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+
     const pdfMoney = (value: number) =>
       `INR ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(value)}`;
     const pdfPercent = (value: number | null) =>
-      value === null ? "N/A (no invested amount)" : percentage(value);
-
+      value === null ? "N/A" : percentage(value);
     const reportDate = new Date().toLocaleDateString("en-IN");
     const reportHoldings = visible.filter((h) => h.name.trim());
 
-    let y = 20;
-    const left = 15;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentWidth = pageWidth - margin * 2;
+    const navy: [number, number, number] = [21, 50, 75];
+    const teal: [number, number, number] = [7, 133, 138];
+    const pale: [number, number, number] = [242, 246, 249];
+    const line: [number, number, number] = [216, 226, 233];
+    const ink: [number, number, number] = [38, 55, 70];
+    const muted: [number, number, number] = [98, 118, 134];
+    const green: [number, number, number] = [22, 132, 91];
+    const red: [number, number, number] = [185, 55, 55];
+    let y = 15;
 
-    function addPageIfNeeded(requiredHeight = 10) {
-      if (y + requiredHeight > pageHeight - 18) {
+    function roundedCard(x: number, top: number, w: number, h: number, fill: [number, number, number]) {
+      doc.setFillColor(...fill);
+      doc.setDrawColor(...line);
+      doc.roundedRect(x, top, w, h, 2.5, 2.5, "FD");
+    }
+
+    function sectionTitle(title: string) {
+      ensureSpace(12);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...navy);
+      doc.text(title.toUpperCase(), margin, y);
+      y += 3;
+      doc.setDrawColor(...teal);
+      doc.setLineWidth(0.8);
+      doc.line(margin, y, margin + 18, y);
+      y += 6;
+    }
+
+    function ensureSpace(height: number) {
+      if (y + height > pageHeight - 18) {
         doc.addPage();
-        y = 20;
+        y = 17;
       }
     }
 
-    function writeLine(text: string, size = 10) {
-      addPageIfNeeded(size / 2 + 4);
+    function bodyText(text: string, size = 8.5, color: [number, number, number] = ink, lineHeight = 4.2) {
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(size);
-      const lines = doc.splitTextToSize(text, pageWidth - left * 2);
-      doc.text(lines, left, y);
-      y += lines.length * (size / 2 + 2);
+      doc.setTextColor(...color);
+      const lines = doc.splitTextToSize(text, contentWidth);
+      ensureSpace(lines.length * lineHeight + 2);
+      doc.text(lines, margin, y);
+      y += lines.length * lineHeight + 2;
     }
 
+    // Branded banner
+    doc.setFillColor(...navy);
+    doc.rect(0, 0, pageWidth, 43, "F");
+    doc.setFillColor(...teal);
+    doc.rect(0, 0, pageWidth, 3, "F");
     doc.setFont("helvetica", "bold");
-    writeLine("ARAVIND FINANCIAL EXPERT", 16);
+    doc.setFontSize(19);
+    doc.setTextColor(255, 255, 255);
+    doc.text("ARAVIND FINANCIAL EXPERT", margin, 16);
     doc.setFont("helvetica", "normal");
-    writeLine("Stock / SIP Portfolio Review", 13);
-    writeLine(`Report date: ${reportDate}`, 10);
-    writeLine("Contact: +91 91733 34069 | aravindchaudhary90@gmail.com", 9);
-    y += 4;
+    doc.setFontSize(10);
+    doc.setTextColor(220, 239, 240);
+    doc.text("Stock / SIP Portfolio Review", margin, 23);
+    doc.setFontSize(8);
+    doc.text(`Report date: ${reportDate}`, margin, 31);
+    doc.text("Contact: +91 91733 34069", margin, 36);
+    doc.text("aravindchaudhary90@gmail.com", pageWidth - margin, 36, { align: "right" });
+    y = 51;
 
+    sectionTitle("Portfolio summary");
+    const gap = 3;
+    const metricW = (contentWidth - gap * 3) / 4;
+    const metricH = 22;
+    const metrics: Array<[string, string, [number, number, number]]> = [
+      ["TOTAL INVESTED", pdfMoney(totals.invested), navy],
+      ["CURRENT VALUE", pdfMoney(totals.current), navy],
+      ["NET DIFFERENCE", `${totals.profit > 0 ? "+" : totals.profit < 0 ? "−" : ""}${pdfMoney(Math.abs(totals.profit))}`, totals.profit >= 0 ? green : red],
+      ["MONTHLY SIP", pdfMoney(totals.sip), navy],
+    ];
+    metrics.forEach(([label, value, valueColor], index) => {
+      const x = margin + index * (metricW + gap);
+      roundedCard(x, y, metricW, metricH, pale);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.3);
+      doc.setTextColor(...muted);
+      doc.text(label, x + 3, y + 6);
+      doc.setFontSize(9);
+      doc.setTextColor(...valueColor);
+      const wrapped = doc.splitTextToSize(value, metricW - 6);
+      doc.text(wrapped, x + 3, y + 14);
+    });
+    y += metricH + 3;
+
+    const gainColor = totalProfitPercent === null ? muted : totalProfitPercent >= 0 ? green : red;
+    roundedCard(margin, y, contentWidth, 15, [231, 245, 241]);
     doc.setFont("helvetica", "bold");
-    writeLine("PORTFOLIO SUMMARY", 12);
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text("OVERALL GAIN / LOSS", margin + 4, y + 6);
+    doc.setFontSize(12);
+    doc.setTextColor(...gainColor);
+    doc.text(pdfPercent(totalProfitPercent), margin + 4, y + 11.5);
     doc.setFont("helvetica", "normal");
-    writeLine(`Total invested: ${pdfMoney(totals.invested)}`);
-    writeLine(`Current value: ${pdfMoney(totals.current)}`);
-    writeLine(`Difference: ${pdfMoney(totals.profit)}`);
-    writeLine(`Overall gain / loss: ${pdfPercent(totalProfitPercent)}`);
-    writeLine(`Monthly SIP: ${pdfMoney(totals.sip)}`);
-    y += 4;
+    doc.setFontSize(7.5);
+    doc.setTextColor(...ink);
+    doc.text("Difference divided by total invested amount", margin + 55, y + 9);
+    y += 22;
 
-    doc.setFont("helvetica", "bold");
-    writeLine("PORTFOLIO ALLOCATION (BY CURRENT VALUE)", 11);
-    doc.setFont("helvetica", "normal");
-    writeLine(`Stocks: ${pdfMoney(allocation.stocks)} (${allocation.stockPercent.toFixed(2)}%)`);
-    writeLine(`Mutual funds: ${pdfMoney(allocation.mutualFunds)} (${allocation.mutualFundPercent.toFixed(2)}%)`);
-    const barX = left;
-    const barY = y + 1;
-    const barW = pageWidth - left * 2;
-    const barH = 5;
-    if (allocation.total > 0) {
-      const stockW = barW * allocation.stockPercent / 100;
-      doc.setFillColor(4, 120, 87);
-      doc.rect(barX, barY, stockW, barH, "F");
-      doc.setFillColor(134, 239, 172);
-      doc.rect(barX + stockW, barY, barW - stockW, barH, "F");
-    } else {
-      doc.setDrawColor(160, 160, 160);
-      doc.rect(barX, barY, barW, barH);
-    }
-    y = barY + barH + 7;
+    sectionTitle("Portfolio allocation by current value");
+    const allocRows = [
+      { label: "Stocks", amount: allocation.stocks, pct: allocation.stockPercent, color: teal },
+      { label: "Mutual funds", amount: allocation.mutualFunds, pct: allocation.mutualFundPercent, color: navy },
+    ];
+    allocRows.forEach((item) => {
+      ensureSpace(12);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(...ink);
+      doc.text(item.label, margin, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...muted);
+      doc.text(pdfMoney(item.amount), margin + 43, y);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...navy);
+      doc.text(`${item.pct.toFixed(2)}%`, pageWidth - margin, y, { align: "right" });
+      const barX = margin;
+      const barY = y + 2.5;
+      const barW = contentWidth;
+      doc.setFillColor(230, 236, 240);
+      doc.roundedRect(barX, barY, barW, 3, 1.2, 1.2, "F");
+      if (allocation.total > 0 && item.pct > 0) {
+        doc.setFillColor(...item.color);
+        doc.roundedRect(barX, barY, Math.max(1, barW * item.pct / 100), 3, 1.2, 1.2, "F");
+      }
+      y += 10;
+    });
+    y += 2;
 
-    doc.setFont("helvetica", "bold");
-    writeLine("HOLDINGS", 12);
-    doc.setFont("helvetica", "normal");
-
+    sectionTitle("Holdings breakdown");
     if (!reportHoldings.length) {
-      writeLine("No named holdings were entered.");
+      bodyText("No named holdings were entered.");
     }
 
     reportHoldings.forEach((h, index) => {
-      addPageIfNeeded(38);
-      doc.setFont("helvetica", "bold");
-      writeLine(`${index + 1}. ${h.name}`, 10);
-      doc.setFont("helvetica", "normal");
-      writeLine(
-        `Type: ${h.type === "stock" ? "Stock" : "Mutual fund"} | Quantity/units: ${h.quantity}`
-      );
-      writeLine(`Invested: ${pdfMoney(h.invested)}`);
-      writeLine(`Current value: ${pdfMoney(h.currentValue)}`);
-      writeLine(`Difference: ${pdfMoney(h.currentValue - h.invested)}`);
-      writeLine(`Gain / loss: ${pdfPercent(profitLossPercent(h.currentValue, h.invested))}`);
+      const holdingProfit = h.currentValue - h.invested;
+      const holdingPct = profitLossPercent(h.currentValue, h.invested);
       const holdingAllocation = totals.current > 0 ? (h.currentValue / totals.current) * 100 : 0;
-      writeLine(`Portfolio allocation: ${holdingAllocation.toFixed(2)}%`);
-      writeLine(`Monthly SIP: ${pdfMoney(h.sipAmount)}`);
-      y += 3;
+      const cardHeight = 38;
+      ensureSpace(cardHeight + 3);
+      roundedCard(margin, y, contentWidth, cardHeight, index % 2 === 0 ? pale : [255, 255, 255]);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.2);
+      doc.setTextColor(...navy);
+      const nameLines = doc.splitTextToSize(`${index + 1}. ${h.name}`, contentWidth - 47);
+      doc.text(nameLines.slice(0, 2), margin + 4, y + 6);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text(`${h.type === "stock" ? "Stock" : "Mutual fund"}  |  Quantity / units: ${h.quantity}`, margin + 4, y + 13);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setTextColor(holdingProfit >= 0 ? green[0] : red[0], holdingProfit >= 0 ? green[1] : red[1], holdingProfit >= 0 ? green[2] : red[2]);
+      doc.text(`${holdingProfit > 0 ? "+" : holdingProfit < 0 ? "−" : ""}${pdfMoney(Math.abs(holdingProfit))}`, pageWidth - margin - 4, y + 7, { align: "right" });
+      doc.setFontSize(7.3);
+      doc.text(pdfPercent(holdingPct), pageWidth - margin - 4, y + 12.5, { align: "right" });
+
+      const colY = y + 21;
+      const colW = contentWidth / 4;
+      const details = [
+        ["INVESTED", pdfMoney(h.invested)],
+        ["CURRENT VALUE", pdfMoney(h.currentValue)],
+        ["PORTFOLIO SHARE", `${holdingAllocation.toFixed(2)}%`],
+        ["MONTHLY SIP", pdfMoney(h.sipAmount)],
+      ];
+      details.forEach(([label, value], colIndex) => {
+        const x = margin + 4 + colIndex * colW;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(5.8);
+        doc.setTextColor(...muted);
+        doc.text(label, x, colY);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.setTextColor(...ink);
+        doc.text(value, x, colY + 5);
+      });
+      y += cardHeight + 3;
     });
 
-    y += 3;
-    doc.setFont("helvetica", "bold");
-    writeLine("IMPORTANT INFORMATION", 11);
-    doc.setFont("helvetica", "normal");
-    writeLine(
-      "This report is based only on values entered or imported by the user. " +
-      "It does not fetch live market prices or provide a buy, hold or sell recommendation."
-    );
-    writeLine(
-      "Gain/loss percentage is the difference divided by the entered invested amount. " +
-      "It is not an annualised return and may not represent actual SIP performance. " +
-      "Allocation percentages use entered current values and may change as values change."
-    );
-    writeLine(
-      "Please verify all figures and consult an appropriately qualified financial professional if needed."
-    );
+    y += 1;
+    sectionTitle("Important information");
+    bodyText("This report is based only on values entered or imported by the user. It does not fetch live market prices or provide a buy, hold or sell recommendation.", 7.5, ink, 3.8);
+    bodyText("Gain/loss percentage is the difference divided by the entered invested amount. It is not an annualised return and may not represent actual SIP performance. Allocation percentages use entered current values and may change as values change.", 7.5, ink, 3.8);
+    bodyText("Please verify all figures and consult an appropriately qualified financial professional if needed.", 7.5, ink, 3.8);
+
+    // Consistent footer and page numbering on every page.
+    const pageCount = doc.getNumberOfPages();
+    for (let page = 1; page <= pageCount; page++) {
+      doc.setPage(page);
+      doc.setDrawColor(...line);
+      doc.setLineWidth(0.4);
+      doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text("ARAVIND FINANCIAL EXPERT  |  Portfolio review", margin, pageHeight - 7);
+      doc.text(`Page ${page} of ${pageCount}`, pageWidth - margin, pageHeight - 7, { align: "right" });
+    }
 
     doc.save("Aravind-Financial-Portfolio-Report.pdf");
   }
