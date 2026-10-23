@@ -456,10 +456,28 @@ export default function PortfolioReviewPage() {
       y += 6;
     }
 
+    function drawCompactPageHeader() {
+      doc.setFillColor(...navy);
+      doc.rect(0, 0, pageWidth, 16, "F");
+      doc.setFillColor(...teal);
+      doc.rect(0, 0, pageWidth, 1.5, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      doc.text("ARAVIND FINANCIAL EXPERT", margin, 7);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(220, 239, 240);
+      doc.text(`Portfolio review | ${reportDate}`, pageWidth - margin, 7, { align: "right" });
+      doc.setDrawColor(...line);
+      doc.line(margin, 19, pageWidth - margin, 19);
+    }
+
     function ensureSpace(height: number) {
       if (y + height > pageHeight - 18) {
         doc.addPage();
-        y = 17;
+        drawCompactPageHeader();
+        y = 25;
       }
     }
 
@@ -490,6 +508,12 @@ export default function PortfolioReviewPage() {
     doc.text(`Report date: ${reportDate}`, margin, 31);
     doc.text("Contact: +91 91733 34069", margin, 36);
     doc.text("aravindchaudhary90@gmail.com", pageWidth - margin, 36, { align: "right" });
+    if (investorName.trim()) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7.5);
+      doc.setTextColor(255, 255, 255);
+      doc.text(`Prepared for: ${investorName.trim().slice(0, 55)}`, pageWidth - margin, 15, { align: "right" });
+    }
     y = 51;
 
     sectionTitle("Portfolio summary");
@@ -563,7 +587,32 @@ export default function PortfolioReviewPage() {
       doc.setFont("helvetica", "bold");
       doc.text(`${item.pct.toFixed(1)}%`, pageWidth - margin, rowY, { align: "right" });
     });
-    y += 51;
+    y += 43;
+
+    // Compact stacked allocation bar makes the asset mix easier to scan at a glance.
+    ensureSpace(13);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...navy);
+    doc.text("PORTFOLIO MIX", margin, y + 2);
+    const barX = margin + 30;
+    const barY = y - 1;
+    const barW = contentWidth - 30;
+    const barH = 5;
+    doc.setFillColor(232, 237, 241);
+    doc.roundedRect(barX, barY, barW, barH, 2, 2, "F");
+    let barOffset = 0;
+    assetSlices.forEach((item) => {
+      const fraction = allocation.total > 0 ? Math.max(0, item.amount / allocation.total) : 0;
+      const segmentW = barW * fraction;
+      if (segmentW > 0.1) {
+        const rgb: [number, number, number] = item.label === "Equity" ? [7, 133, 90] : item.label === "Debt" ? [37, 99, 235] : item.label === "Hybrid" ? [245, 158, 11] : item.label === "Other" ? [139, 92, 246] : [156, 163, 175];
+        doc.setFillColor(...rgb);
+        doc.rect(barX + barOffset, barY, segmentW, barH, "F");
+        barOffset += segmentW;
+      }
+    });
+    y += 10;
 
     sectionTitle("Asset allocation observations");
     const observations: string[] = [];
@@ -584,6 +633,48 @@ export default function PortfolioReviewPage() {
       }
     }
     observations.forEach((item) => bodyText(`• ${item}`, 7.8, ink, 4));
+
+    // Top holdings and concentration: calculated from the current portfolio values entered by the investor.
+    const rankedHoldings = [...reportHoldings]
+      .filter((h) => h.currentValue > 0)
+      .sort((a, b) => b.currentValue - a.currentValue)
+      .slice(0, 5);
+    if (rankedHoldings.length) {
+      sectionTitle("Largest holdings by current value");
+      const tableX = margin;
+      const tableW = contentWidth;
+      const nameW = tableW * 0.48;
+      const amountW = tableW * 0.28;
+      const pctW = tableW - nameW - amountW;
+      doc.setFillColor(...navy);
+      doc.roundedRect(tableX, y - 3, tableW, 7, 1.5, 1.5, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.8);
+      doc.setTextColor(255, 255, 255);
+      doc.text("HOLDING", tableX + 3, y + 1.5);
+      doc.text("CURRENT VALUE", tableX + nameW + amountW - 3, y + 1.5, { align: "right" });
+      doc.text("PORTFOLIO SHARE", tableX + tableW - 3, y + 1.5, { align: "right" });
+      y += 7;
+      rankedHoldings.forEach((h, idx) => {
+        ensureSpace(7);
+        const share = totals.current > 0 ? (h.currentValue / totals.current) * 100 : 0;
+        if (idx % 2 === 0) {
+          doc.setFillColor(...pale);
+          doc.rect(tableX, y - 3.5, tableW, 7, "F");
+        }
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(...ink);
+        const shortName = doc.splitTextToSize(h.name, nameW - 6)[0];
+        doc.text(shortName, tableX + 3, y + 1.2);
+        doc.text(pdfMoney(h.currentValue), tableX + nameW + amountW - 3, y + 1.2, { align: "right" });
+        doc.text(`${share.toFixed(2)}%`, tableX + tableW - 3, y + 1.2, { align: "right" });
+        y += 7;
+      });
+      const topFiveValue = rankedHoldings.reduce((sum, h) => sum + h.currentValue, 0);
+      const topFiveShare = totals.current > 0 ? (topFiveValue / totals.current) * 100 : 0;
+      bodyText(`The ${rankedHoldings.length} largest holding(s) shown above represent ${topFiveShare.toFixed(1)}% of the portfolio's current value. A higher concentration in a small number of holdings can increase holding-specific risk.`, 7.2, muted, 3.7);
+    }
 
     sectionTitle("Holdings breakdown");
     if (!reportHoldings.length) {
