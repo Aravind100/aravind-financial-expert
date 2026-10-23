@@ -107,9 +107,7 @@ function parseRows(rows: Record<string, unknown>[]): Holding[] {
               ? "other"
               : rawAssetClass.includes("equity") || rawAssetClass.includes("stock")
                 ? "equity"
-                : type === "stock"
-                  ? "equity"
-                  : "unclassified";
+                : "unclassified";
 
       return {
         id: `import-${Date.now()}-${index}-${Math.random()}`,
