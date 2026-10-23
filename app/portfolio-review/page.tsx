@@ -5,10 +5,12 @@ import styles from "./page.module.css";
 import { useMemo, useState } from "react";
 
 type PortfolioType = "stock" | "mutual-fund";
+type AssetClass = "equity" | "debt" | "hybrid" | "other" | "unclassified";
 
 type Holding = {
   id: string;
   type: PortfolioType;
+  assetClass: AssetClass;
   name: string;
   quantity: number;
   invested: number;
@@ -19,6 +21,7 @@ type Holding = {
 const emptyHolding = (type: PortfolioType = "stock"): Holding => ({
   id: `${Date.now()}-${Math.random()}`,
   type,
+  assetClass: type === "stock" ? "equity" : "unclassified",
   name: "",
   quantity: 0,
   invested: 0,
@@ -90,9 +93,28 @@ function parseRows(rows: Record<string, unknown>[]): Holding[] {
           ? "mutual-fund"
           : "stock";
 
+      const rawAssetClass = String(
+        getCell(row, ["asset class", "equity debt", "asset category", "investment class"])
+      ).toLowerCase();
+      const assetClass: AssetClass =
+        type === "stock"
+          ? "equity"
+          : rawAssetClass.includes("debt") || rawAssetClass.includes("fixed income")
+          ? "debt"
+          : rawAssetClass.includes("hybrid") || rawAssetClass.includes("balanced")
+            ? "hybrid"
+            : rawAssetClass.includes("other") || rawAssetClass.includes("gold")
+              ? "other"
+              : rawAssetClass.includes("equity") || rawAssetClass.includes("stock")
+                ? "equity"
+                : type === "stock"
+                  ? "equity"
+                  : "unclassified";
+
       return {
         id: `import-${Date.now()}-${index}-${Math.random()}`,
         type,
+        assetClass,
         name,
         quantity: parseNumber(
           getCell(row, ["quantity", "units", "shares", "qty"])
@@ -161,12 +183,39 @@ export default function PortfolioReviewPage() {
     const mutualFunds = visible
       .filter((h) => h.type === "mutual-fund")
       .reduce((sum, h) => sum + h.currentValue, 0);
+    const equity = visible
+      .filter((h) => h.assetClass === "equity")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    const debt = visible
+      .filter((h) => h.assetClass === "debt")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    const hybrid = visible
+      .filter((h) => h.assetClass === "hybrid")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    const other = visible
+      .filter((h) => h.assetClass === "other")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    const unclassified = visible
+      .filter((h) => h.assetClass === "unclassified")
+      .reduce((sum, h) => sum + h.currentValue, 0);
+    const total = equity + debt + hybrid + other + unclassified;
+    const pct = (value: number) => total > 0 ? (value / total) * 100 : 0;
     return {
       stocks,
       mutualFunds,
-      total: stocks + mutualFunds,
+      total,
       stockPercent: stocks + mutualFunds > 0 ? (stocks / (stocks + mutualFunds)) * 100 : 0,
       mutualFundPercent: stocks + mutualFunds > 0 ? (mutualFunds / (stocks + mutualFunds)) * 100 : 0,
+      equity,
+      debt,
+      hybrid,
+      other,
+      unclassified,
+      equityPercent: pct(equity),
+      debtPercent: pct(debt),
+      hybridPercent: pct(hybrid),
+      otherPercent: pct(other),
+      unclassifiedPercent: pct(unclassified),
     };
   }, [visible]);
 
@@ -178,8 +227,14 @@ export default function PortfolioReviewPage() {
       old.map((h) => {
         if (h.id !== id) return h;
         if (field === "type") {
-          return { ...h, type: value as PortfolioType };
+          const nextType = value as PortfolioType;
+          return {
+            ...h,
+            type: nextType,
+            assetClass: nextType === "stock" ? "equity" : h.assetClass,
+          };
         }
+        if (field === "assetClass") return { ...h, assetClass: value as AssetClass };
         if (field === "name") return { ...h, name: value };
         return { ...h, [field]: Math.max(0, Number(value) || 0) };
       })
@@ -325,6 +380,51 @@ export default function PortfolioReviewPage() {
     const reportDate = new Date().toLocaleDateString("en-IN");
     const reportHoldings = visible.filter((h) => h.name.trim());
 
+    function createPieChartDataUrl(
+      slices: Array<{ label: string; value: number; color: string }>
+    ) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 420;
+      canvas.height = 420;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Could not create the portfolio pie chart.");
+      const total = slices.reduce((sum, item) => sum + item.value, 0);
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      let startAngle = -Math.PI / 2;
+      if (total > 0) {
+        slices.filter((item) => item.value > 0).forEach((item) => {
+          const angle = (item.value / total) * Math.PI * 2;
+          context.beginPath();
+          context.moveTo(210, 210);
+          context.arc(210, 210, 170, startAngle, startAngle + angle);
+          context.closePath();
+          context.fillStyle = item.color;
+          context.fill();
+          context.strokeStyle = "#ffffff";
+          context.lineWidth = 3;
+          context.stroke();
+          startAngle += angle;
+        });
+      } else {
+        context.beginPath();
+        context.arc(210, 210, 170, 0, Math.PI * 2);
+        context.fillStyle = "#e5e7eb";
+        context.fill();
+      }
+      context.beginPath();
+      context.arc(210, 210, 92, 0, Math.PI * 2);
+      context.fillStyle = "#ffffff";
+      context.fill();
+      context.fillStyle = "#15324b";
+      context.textAlign = "center";
+      context.font = "bold 24px Arial";
+      context.fillText("Allocation", 210, 202);
+      context.font = "bold 20px Arial";
+      context.fillText(pdfMoney(allocation.total), 210, 232);
+      return canvas.toDataURL("image/png");
+    }
+
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
@@ -433,35 +533,59 @@ export default function PortfolioReviewPage() {
     doc.text("Difference divided by total invested amount", margin + 55, y + 9);
     y += 22;
 
-    sectionTitle("Portfolio allocation by current value");
-    const allocRows = [
-      { label: "Stocks", amount: allocation.stocks, pct: allocation.stockPercent, color: teal },
-      { label: "Mutual funds", amount: allocation.mutualFunds, pct: allocation.mutualFundPercent, color: navy },
+    sectionTitle("Equity / debt asset allocation");
+    const assetSlices = [
+      { label: "Equity", amount: allocation.equity, pct: allocation.equityPercent, color: "#07855a" },
+      { label: "Debt", amount: allocation.debt, pct: allocation.debtPercent, color: "#2563eb" },
+      { label: "Hybrid", amount: allocation.hybrid, pct: allocation.hybridPercent, color: "#f59e0b" },
+      { label: "Other", amount: allocation.other, pct: allocation.otherPercent, color: "#8b5cf6" },
+      { label: "Unclassified", amount: allocation.unclassified, pct: allocation.unclassifiedPercent, color: "#9ca3af" },
     ];
-    allocRows.forEach((item) => {
-      ensureSpace(12);
+    const pieDataUrl = createPieChartDataUrl(
+      assetSlices.map((item) => ({ label: item.label, value: item.amount, color: item.color }))
+    );
+    ensureSpace(58);
+    doc.addImage(pieDataUrl, "PNG", margin, y, 48, 48);
+    const legendX = margin + 55;
+    assetSlices.forEach((item, index) => {
+      const rowY = y + 6 + index * 8;
+      doc.setFillColor(...(
+        item.label === "Equity" ? [7, 133, 90] :
+        item.label === "Debt" ? [37, 99, 235] :
+        item.label === "Hybrid" ? [245, 158, 11] :
+        item.label === "Other" ? [139, 92, 246] : [156, 163, 175]
+      ) as [number, number, number]);
+      doc.circle(legendX + 2, rowY - 1, 1.8, "F");
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
+      doc.setFontSize(8);
       doc.setTextColor(...ink);
-      doc.text(item.label, margin, y);
+      doc.text(item.label, legendX + 7, rowY);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(...muted);
-      doc.text(pdfMoney(item.amount), margin + 43, y);
+      doc.text(pdfMoney(item.amount), legendX + 33, rowY);
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(...navy);
-      doc.text(`${item.pct.toFixed(2)}%`, pageWidth - margin, y, { align: "right" });
-      const barX = margin;
-      const barY = y + 2.5;
-      const barW = contentWidth;
-      doc.setFillColor(230, 236, 240);
-      doc.roundedRect(barX, barY, barW, 3, 1.2, 1.2, "F");
-      if (allocation.total > 0 && item.pct > 0) {
-        doc.setFillColor(...item.color);
-        doc.roundedRect(barX, barY, Math.max(1, barW * item.pct / 100), 3, 1.2, 1.2, "F");
-      }
-      y += 10;
+      doc.text(`${item.pct.toFixed(1)}%`, pageWidth - margin, rowY, { align: "right" });
     });
-    y += 2;
+    y += 51;
+
+    sectionTitle("Asset allocation observations");
+    const observations: string[] = [];
+    if (allocation.total <= 0) {
+      observations.push("Enter current values to calculate asset allocation.");
+    } else {
+      if (allocation.equityPercent >= 99.99) {
+        observations.push("The entered portfolio is effectively 100% equity. Consider whether diversification across asset classes is appropriate for your goals, time horizon and risk tolerance.");
+      } else if (allocation.debtPercent >= 99.99) {
+        observations.push("The entered portfolio is effectively 100% debt. Consider whether exposure to other asset classes is appropriate for your goals, time horizon and risk tolerance.");
+      } else if (allocation.unclassifiedPercent > 0) {
+        observations.push(`${allocation.unclassifiedPercent.toFixed(1)}% of the portfolio is unclassified. Select an asset class for these holdings to improve the accuracy of this report.`);
+      } else {
+        observations.push(`The entered portfolio includes ${allocation.equityPercent.toFixed(1)}% equity and ${allocation.debtPercent.toFixed(1)}% debt. Whether this mix is appropriate depends on your goals, time horizon and risk tolerance.`);
+      }
+      if (allocation.hybridPercent > 0 || allocation.otherPercent > 0) {
+        observations.push("Hybrid and other assets are shown separately and are not included in the equity or debt percentages.");
+      }
+    }
+    observations.forEach((item) => bodyText(`• ${item}`, 7.8, ink, 4));
 
     sectionTitle("Holdings breakdown");
     if (!reportHoldings.length) {
@@ -485,7 +609,7 @@ export default function PortfolioReviewPage() {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
       doc.setTextColor(...muted);
-      doc.text(`${h.type === "stock" ? "Stock" : "Mutual fund"}  |  Quantity / units: ${h.quantity}`, margin + 4, y + 13);
+      doc.text(`${h.type === "stock" ? "Stock" : "Mutual fund"}  |  Asset class: ${h.assetClass}  |  Quantity / units: ${h.quantity}`, margin + 4, y + 13);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8.5);
@@ -629,6 +753,7 @@ export default function PortfolioReviewPage() {
                 <thead>
                   <tr className="border-b">
                     <th className="p-2">Type</th>
+                    <th className="p-2">Asset class</th>
                     <th className="p-2">Name</th>
                     <th className="p-2">Quantity</th>
                     <th className="p-2">Invested</th>
@@ -642,6 +767,7 @@ export default function PortfolioReviewPage() {
                       <td className="p-2">
                         {h.type === "stock" ? "Stock" : "Mutual fund"}
                       </td>
+                      <td className="p-2">{h.assetClass}</td>
                       <td className="p-2">{h.name}</td>
                       <td className="p-2">{h.quantity}</td>
                       <td className="p-2">{money(h.invested)}</td>
@@ -693,6 +819,22 @@ export default function PortfolioReviewPage() {
                   >
                     <option value="stock">Stock</option>
                     <option value="mutual-fund">Mutual fund / SIP</option>
+                  </select>
+                </label>
+
+                <label className="text-sm">
+                  Asset class
+                  <select
+                    value={h.assetClass}
+                    disabled={h.type === "stock"}
+                    onChange={(e) => updateHolding(h.id, "assetClass", e.target.value)}
+                    className="mt-1 w-full rounded-lg border bg-white p-2 disabled:bg-gray-100"
+                  >
+                    <option value="equity">Equity</option>
+                    <option value="debt">Debt / fixed income</option>
+                    <option value="hybrid">Hybrid / balanced</option>
+                    <option value="other">Other (e.g. gold)</option>
+                    <option value="unclassified">Not sure / unclassified</option>
                   </select>
                 </label>
 
@@ -832,6 +974,50 @@ export default function PortfolioReviewPage() {
         </p>
 
         <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          <div className="rounded-xl border p-4">
+            <h3 className="font-semibold">Equity vs. debt allocation</h3>
+            <p className="mt-1 text-sm text-gray-600">Based on the asset class selected for each holding and its current value.</p>
+            <div className="mt-4 flex flex-col items-center gap-5 sm:flex-row">
+              <div
+                aria-label={`Equity ${allocation.equityPercent.toFixed(1)} percent, debt ${allocation.debtPercent.toFixed(1)} percent, hybrid ${allocation.hybridPercent.toFixed(1)} percent, other ${allocation.otherPercent.toFixed(1)} percent, unclassified ${allocation.unclassifiedPercent.toFixed(1)} percent`}
+                className="h-44 w-44 shrink-0 rounded-full"
+                style={{
+                  background: allocation.total > 0
+                    ? `conic-gradient(#07855a 0% ${allocation.equityPercent}%, #2563eb ${allocation.equityPercent}% ${allocation.equityPercent + allocation.debtPercent}%, #f59e0b ${allocation.equityPercent + allocation.debtPercent}% ${allocation.equityPercent + allocation.debtPercent + allocation.hybridPercent}%, #8b5cf6 ${allocation.equityPercent + allocation.debtPercent + allocation.hybridPercent}% ${allocation.equityPercent + allocation.debtPercent + allocation.hybridPercent + allocation.otherPercent}%, #9ca3af ${allocation.equityPercent + allocation.debtPercent + allocation.hybridPercent + allocation.otherPercent}% 100%)`
+                    : "#e5e7eb",
+                }}
+              />
+              <div className="w-full space-y-2 text-sm">
+                {[
+                  ["Equity", allocation.equity, allocation.equityPercent, "#07855a"],
+                  ["Debt", allocation.debt, allocation.debtPercent, "#2563eb"],
+                  ["Hybrid", allocation.hybrid, allocation.hybridPercent, "#f59e0b"],
+                  ["Other", allocation.other, allocation.otherPercent, "#8b5cf6"],
+                  ["Unclassified", allocation.unclassified, allocation.unclassifiedPercent, "#9ca3af"],
+                ].map(([label, amount, pct, color]) => (
+                  <div key={String(label)} className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: String(color) }} />
+                      {String(label)}
+                    </span>
+                    <span className="text-right font-medium">{money(Number(amount))} · {Number(pct).toFixed(1)}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-4 rounded-lg border p-3 text-sm">
+              {allocation.total <= 0
+                ? "Enter current values to calculate your asset allocation."
+                : allocation.equityPercent >= 99.99
+                  ? "Your entered portfolio is 100% equity. Consider whether adding other asset classes would improve diversification for your goals and risk tolerance."
+                  : allocation.debtPercent >= 99.99
+                    ? "Your entered portfolio is 100% debt. Consider whether broader asset-class diversification fits your goals and risk tolerance."
+                    : allocation.unclassifiedPercent > 0
+                      ? `${allocation.unclassifiedPercent.toFixed(1)}% of the portfolio is unclassified. Please select an asset class for those holdings to improve the report.`
+                      : `Your entered portfolio has ${allocation.equityPercent.toFixed(1)}% equity and ${allocation.debtPercent.toFixed(1)}% debt. Suitability depends on your goals, time horizon and risk tolerance.`}
+            </div>
+          </div>
+
           <div className="rounded-xl border p-4">
             <h3 className="font-semibold">Allocation by investment type</h3>
             <p className="mt-1 text-sm text-gray-600">Based on current value of the visible holdings.</p>
