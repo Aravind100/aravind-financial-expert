@@ -378,6 +378,32 @@ export default function PortfolioReviewPage() {
     const reportDate = new Date().toLocaleDateString("en-IN");
     const reportHoldings = visible.filter((h) => h.name.trim());
 
+    const aiResponse = await fetch("/api/portfolio-review/report", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    holdings: reportHoldings.map((h) => ({
+      type: h.type,
+      assetClass: h.assetClass,
+      name: h.name,
+      quantity: h.quantity,
+      invested: h.invested,
+      currentValue: h.currentValue,
+      sipAmount: h.sipAmount,
+    })),
+  }),
+});
+
+const aiResult = await aiResponse.json();
+
+if (!aiResponse.ok) {
+  throw new Error(aiResult.error || "Unable to generate AI observations.");
+}
+
+const aiAnalysis: string = aiResult.analysis;
+
     function createPieChartDataUrl(
       slices: Array<{ label: string; value: number; color: string }>
     ) {
@@ -729,6 +755,20 @@ export default function PortfolioReviewPage() {
       y += cardHeight + 3;
     });
 
+    sectionTitle("AI-generated portfolio observations");
+
+aiAnalysis
+  .split(/\n+/)
+  .map((line) => line.trim())
+  .filter(Boolean)
+  .forEach((line) => bodyText(line, 7.5, ink, 3.8));
+
+bodyText(
+  "AI-generated observations are informational and may contain errors. Verify all figures and seek appropriate professional advice before making investment decisions.",
+  7.2,
+  muted,
+  3.8
+);
     y += 1;
     sectionTitle("Important information");
     bodyText("This report is based only on values entered or imported by the user. It does not fetch live market prices or provide a buy, hold or sell recommendation.", 7.5, ink, 3.8);
@@ -1220,7 +1260,7 @@ export default function PortfolioReviewPage() {
   }}
   className="mt-4 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white"
 >
-  Download PDF Report
+Download AI Portfolio Report
 </button>
 
       </section>
