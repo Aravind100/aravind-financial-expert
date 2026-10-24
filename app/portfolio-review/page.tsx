@@ -828,7 +828,7 @@ export default function PortfolioReviewPage() {
       const topFiveShare = totals.current > 0 ? (topFiveValue / totals.current) * 100 : 0;
       bodyText(`The ${rankedHoldings.length} largest holding(s) shown above represent ${topFiveShare.toFixed(1)}% of the portfolio's current value. A higher concentration in a small number of holdings can increase holding-specific risk.`, 7.2, muted, 3.7);
     }
-
+    ensureSpace(45);
     sectionTitle("Holdings breakdown");
     if (!reportHoldings.length) {
       bodyText("No named holdings were entered.");
