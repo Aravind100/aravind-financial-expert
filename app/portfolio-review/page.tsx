@@ -1253,11 +1253,15 @@ bodyText(
         
 <button
   type="button"
-  onClick={() => {
-    void downloadPDFReport().catch(() => {
-      setMessage("Unable to generate the PDF. Please try again.");
-    });
-  }}
+ onClick={() => {
+  void downloadPDFReport().catch((error) => {
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Unable to generate the PDF. Please try again."
+    );
+  });
+}}
   className="mt-4 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white"
 >
 Download AI Portfolio Report
