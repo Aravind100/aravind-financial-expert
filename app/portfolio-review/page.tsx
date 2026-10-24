@@ -46,6 +46,36 @@ function normalizeHeader(value: string) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
 }
 
+// Best-effort classification based on common mutual-fund scheme names.
+// This is a convenience only; users should verify the category against the scheme documents.
+function inferMutualFundAssetClass(name: string): AssetClass {
+  const normalized = name.toLowerCase();
+
+  if (/\b(gold|silver|commodity|commodities)\b/.test(normalized)) {
+    return "other";
+  }
+
+  if (
+    /\b(debt|liquid|overnight|money market|corporate bond|gilt|floater|short duration|medium duration|long duration|credit risk|banking and psu|banking & psu|ultra short|low duration|fixed maturity|target maturity)\b/.test(normalized)
+  ) {
+    return "debt";
+  }
+
+  if (
+    /\b(hybrid|balanced advantage|balanced fund|multi asset|multi-asset|aggressive hybrid|conservative hybrid|equity savings|arbitrage)\b/.test(normalized)
+  ) {
+    return "hybrid";
+  }
+
+  if (
+    /\b(equity|flexi cap|flexicap|large cap|largecap|mid cap|midcap|small cap|smallcap|multi cap|multicap|index fund|nifty|sensex|elss|focused|value fund|contra|dividend yield|sectoral|thematic|bluechip|blue chip|large and mid cap|large & mid cap)\b/.test(normalized)
+  ) {
+    return "equity";
+  }
+
+  return "unclassified";
+}
+
 function getCell(row: Record<string, unknown>, aliases: string[]) {
   const keys = Object.keys(row);
   const normalizedAliases = aliases.map(normalizeHeader);
@@ -96,18 +126,22 @@ function parseRows(rows: Record<string, unknown>[]): Holding[] {
       const rawAssetClass = String(
         getCell(row, ["asset class", "equity debt", "asset category", "investment class"])
       ).toLowerCase();
-      const assetClass: AssetClass =
-        type === "stock"
-          ? "equity"
-          : rawAssetClass.includes("debt") || rawAssetClass.includes("fixed income")
+      const importedAssetClass: AssetClass =
+        rawAssetClass.includes("debt") || rawAssetClass.includes("fixed income")
           ? "debt"
           : rawAssetClass.includes("hybrid") || rawAssetClass.includes("balanced")
             ? "hybrid"
-            : rawAssetClass.includes("other") || rawAssetClass.includes("gold")
+            : rawAssetClass.includes("other") || rawAssetClass.includes("gold") || rawAssetClass.includes("silver")
               ? "other"
               : rawAssetClass.includes("equity") || rawAssetClass.includes("stock")
                 ? "equity"
                 : "unclassified";
+      const assetClass: AssetClass =
+        type === "stock"
+          ? "equity"
+          : importedAssetClass !== "unclassified"
+            ? importedAssetClass
+            : inferMutualFundAssetClass(name);
 
       return {
         id: `import-${Date.now()}-${index}-${Math.random()}`,
@@ -229,11 +263,25 @@ export default function PortfolioReviewPage() {
           return {
             ...h,
             type: nextType,
-            assetClass: nextType === "stock" ? "equity" : h.assetClass,
+            assetClass:
+              nextType === "stock"
+                ? "equity"
+                : h.assetClass === "unclassified"
+                  ? inferMutualFundAssetClass(h.name)
+                  : h.assetClass,
           };
         }
         if (field === "assetClass") return { ...h, assetClass: value as AssetClass };
-        if (field === "name") return { ...h, name: value };
+        if (field === "name") {
+          return {
+            ...h,
+            name: value,
+            assetClass:
+              h.type === "mutual-fund" && h.assetClass === "unclassified"
+                ? inferMutualFundAssetClass(value)
+                : h.assetClass,
+          };
+        }
         return { ...h, [field]: Math.max(0, Number(value) || 0) };
       })
     );
@@ -781,8 +829,7 @@ export default function PortfolioReviewPage() {
       bodyText(`The ${rankedHoldings.length} largest holding(s) shown above represent ${topFiveShare.toFixed(1)}% of the portfolio's current value. A higher concentration in a small number of holdings can increase holding-specific risk.`, 7.2, muted, 3.7);
     }
 
-    ensureSpace(45);
-sectionTitle("Holdings breakdown");
+    sectionTitle("Holdings breakdown");
     if (!reportHoldings.length) {
       bodyText("No named holdings were entered.");
     }
