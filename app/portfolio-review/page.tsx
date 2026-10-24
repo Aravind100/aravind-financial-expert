@@ -378,31 +378,110 @@ export default function PortfolioReviewPage() {
     const reportDate = new Date().toLocaleDateString("en-IN");
     const reportHoldings = visible.filter((h) => h.name.trim());
 
-    const aiResponse = await fetch("/api/portfolio-review/report", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    holdings: reportHoldings.map((h) => ({
-      type: h.type,
-      assetClass: h.assetClass,
-      name: h.name,
-      quantity: h.quantity,
-      invested: h.invested,
-      currentValue: h.currentValue,
-      sipAmount: h.sipAmount,
-    })),
-  }),
-});
+    // Generate smart portfolio observations locally — no external API required.
+    const smartObservations: string[] = [];
 
-const aiResult = await aiResponse.json();
+    if (reportHoldings.length === 0) {
+      smartObservations.push(
+        "No named holdings were entered. Add holdings to generate a meaningful portfolio review."
+      );
+    } else {
+      const gainLoss = totals.current - totals.invested;
+      const returnPct =
+        totals.invested > 0 ? (gainLoss / totals.invested) * 100 : null;
 
-if (!aiResponse.ok) {
-  throw new Error(aiResult.error || "Unable to generate AI observations.");
-}
+      smartObservations.push(
+        `Portfolio overview: ${reportHoldings.length} holding(s), total invested ${pdfMoney(totals.invested)}, and current value ${pdfMoney(totals.current)}.`
+      );
 
-const aiAnalysis: string = aiResult.analysis;
+      if (returnPct !== null) {
+        smartObservations.push(
+          `Portfolio performance: The entered values indicate a ${gainLoss >= 0 ? "gain" : "loss"} of ${pdfMoney(Math.abs(gainLoss))} (${Math.abs(returnPct).toFixed(2)}%). This is a simple gain/loss calculation, not an annualised return.`
+        );
+      } else {
+        smartObservations.push(
+          "Portfolio performance cannot be calculated because the entered invested amount is zero."
+        );
+      }
+
+      if (totals.current > 0) {
+        smartObservations.push(
+          `Asset allocation: Equity ${allocation.equityPercent.toFixed(1)}%, debt ${allocation.debtPercent.toFixed(1)}%, hybrid ${allocation.hybridPercent.toFixed(1)}%, other ${allocation.otherPercent.toFixed(1)}%, and unclassified ${allocation.unclassifiedPercent.toFixed(1)}%.`
+        );
+
+        if (allocation.equityPercent >= 80) {
+          smartObservations.push(
+            "Equity exposure is 80% or more. Review whether this level of market exposure is appropriate for the investor's risk tolerance and investment horizon."
+          );
+        }
+
+        if (allocation.unclassifiedPercent > 0) {
+          smartObservations.push(
+            "Some holdings are unclassified. Verify their asset classes before relying on the allocation analysis."
+          );
+        }
+
+        const largest = [...reportHoldings]
+          .filter((h) => h.currentValue > 0)
+          .sort((a, b) => b.currentValue - a.currentValue)[0];
+
+        if (largest) {
+          const share = (largest.currentValue / totals.current) * 100;
+          smartObservations.push(
+            `Largest holding: ${largest.name} represents ${share.toFixed(1)}% of the portfolio's current value.`
+          );
+
+          if (share >= 25) {
+            smartObservations.push(
+              "Concentration alert: One holding represents at least 25% of portfolio value. Review the risks associated with relying heavily on a single investment."
+            );
+          }
+        }
+      }
+
+      const measurableHoldings = reportHoldings.filter((h) => h.invested > 0);
+      const profitable = measurableHoldings.filter(
+        (h) => h.currentValue > h.invested
+      );
+      const lossMaking = measurableHoldings.filter(
+        (h) => h.currentValue < h.invested
+      );
+
+      smartObservations.push(
+        `Holdings performance: ${profitable.length} holding(s) show gains and ${lossMaking.length} show losses among ${measurableHoldings.length} holdings with positive invested amounts.`
+      );
+
+      const biggestLoss = [...lossMaking].sort(
+        (a, b) =>
+          (a.currentValue - a.invested) - (b.currentValue - b.invested)
+      )[0];
+
+      if (biggestLoss) {
+        smartObservations.push(
+          `Largest absolute loss: ${biggestLoss.name} shows a difference of ${pdfMoney(biggestLoss.invested - biggestLoss.currentValue)}. Review the investment's fundamentals and original investment rationale.`
+        );
+      }
+
+      if (totals.sip > 0) {
+        smartObservations.push(
+          `Monthly SIP commitments total ${pdfMoney(totals.sip)}. Review their affordability and alignment with long-term goals.`
+        );
+      }
+
+      const missingValues = reportHoldings.filter(
+        (h) => h.invested > 0 && h.currentValue === 0
+      );
+
+      if (missingValues.length > 0) {
+        smartObservations.push(
+          `Data quality alert: ${missingValues.length} holding(s) have an invested amount but zero current value. Verify whether current valuations are missing or the investments have no remaining value.`
+        );
+      }
+
+      smartObservations.push(
+        "Review priority: Verify portfolio data, assess concentration and diversification, and evaluate investments against financial goals. No buy or sell recommendation is implied."
+      );
+    }
 
     function createPieChartDataUrl(
       slices: Array<{ label: string; value: number; color: string }>
@@ -755,20 +834,18 @@ const aiAnalysis: string = aiResult.analysis;
       y += cardHeight + 3;
     });
 
-    sectionTitle("AI-generated portfolio observations");
+    sectionTitle("Smart portfolio observations");
 
-aiAnalysis
-  .split(/\n+/)
-  .map((line) => line.trim())
-  .filter(Boolean)
-  .forEach((line) => bodyText(line, 7.5, ink, 3.8));
+    smartObservations.forEach((observation, index) => {
+      bodyText(`${index + 1}. ${observation}`, 7.8, ink, 4);
+    });
 
-bodyText(
-  "AI-generated observations are informational and may contain errors. Verify all figures and seek appropriate professional advice before making investment decisions.",
-  7.2,
-  muted,
-  3.8
-);
+    bodyText(
+      "These observations are automatically generated using predefined calculation rules and user-entered values. They are not AI-generated investment advice. Verify all figures before making investment decisions.",
+      7.2,
+      muted,
+      3.8
+    );
     y += 1;
     sectionTitle("Important information");
     bodyText("This report is based only on values entered or imported by the user. It does not fetch live market prices or provide a buy, hold or sell recommendation.", 7.5, ink, 3.8);
@@ -1264,7 +1341,7 @@ bodyText(
 }}
   className="mt-4 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white"
 >
-Download AI Portfolio Report
+Download Smart Portfolio Report
 </button>
 
       </section>
