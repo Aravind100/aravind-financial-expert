@@ -1253,12 +1253,18 @@ bodyText(
         
 <button
   type="button"
-  onClick={() => {
-    alert("Button click is working!");
-  }}
+ onClick={() => {
+  void downloadPDFReport().catch((error) => {
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Unable to generate the PDF. Please try again."
+    );
+  });
+}}
   className="mt-4 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white"
 >
-  Test Download Button
+Download AI Portfolio Report
 </button>
 
       </section>
